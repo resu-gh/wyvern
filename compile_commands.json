@@ -1,0 +1,30 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-Isrc",
+      "-Isrc/include",
+      "-c",
+      "-o",
+      "build/src/mparser.cpp.o",
+      "src/mparser.cpp"
+    ],
+    "directory": "/home/resu/workspace/github/resu-gh/wyvern",
+    "file": "/home/resu/workspace/github/resu-gh/wyvern/src/mparser.cpp",
+    "output": "/home/resu/workspace/github/resu-gh/wyvern/build/src/mparser.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-Isrc",
+      "-Isrc/include",
+      "-c",
+      "-o",
+      "build/src/wyvern.cpp.o",
+      "src/wyvern.cpp"
+    ],
+    "directory": "/home/resu/workspace/github/resu-gh/wyvern",
+    "file": "/home/resu/workspace/github/resu-gh/wyvern/src/wyvern.cpp",
+    "output": "/home/resu/workspace/github/resu-gh/wyvern/build/src/wyvern.cpp.o"
+  }
+]
