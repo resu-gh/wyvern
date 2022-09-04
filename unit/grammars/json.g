@@ -1,4 +1,11 @@
-json {
+// json grammar input file
+
+/* wow
+       *  this is a description
+ * of the json grammar
+ */
+
+ json {
    %whitespace "[ \t\r\n]*";
    document: '{' element '}' [document];
    element: name ':' '{' contents '}' [element];

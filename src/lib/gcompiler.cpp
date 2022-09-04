@@ -1,15 +1,25 @@
-#include "lib/gcompiler.hpp"
+#include "lib/include/gcompiler.hpp"
 
-gcompiler::gcompiler() {}
+#include <iostream>
 
-int gcompiler::compile(const std::string::const_iterator &b, const std::string::const_iterator &e) {
-    printf("gcompiler [b, e)  = [%p, %p)\n", &*b, &*e);
+gcompiler::gcompiler()
+    : m_grammar(std::make_shared<ggrammar>()) {}
 
-    ggrammar grammar;
-    printf("gcompiler grammar = %p\n", &grammar);
+int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
+    printf("gcom [b, e)  = [%p, %p)\n", &*begin, &*end);
+    printf("gcom grammar = %p %ld\n", &*m_grammar, m_grammar.use_count());
 
     gparser parser;
-    int err = parser.parse(b, e, &grammar);
+    int errors = parser.parse(begin, end, m_grammar);
 
-    return err;
+    if (errors == 0) {
+        ggenerator generator;
+        errors = generator.generate(m_grammar);
+
+        if (errors == 0) {
+            printf("gcom ok\n");
+        }
+    }
+
+    return errors;
 }

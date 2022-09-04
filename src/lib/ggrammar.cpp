@@ -1,3 +1,3 @@
-#include "lib/ggrammar.hpp"
+#include "lib/include/ggrammar.hpp"
 
 ggrammar::ggrammar() {}
