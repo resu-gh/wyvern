@@ -1,27 +1,18 @@
 #include "include/mlogger.hpp"
 #include "include/mparser.hpp"
 #include "include/mstream.hpp"
-#include <iterator>
-#include <string>
-#include <cstring>
+#include "lib/gcompiler.hpp"
 
 int main(int argc, char *argv[]) {
     mparser mp(argc, argv);
     mstream ms(mp.ifile(), mp.ofile());
 
-    mlogger ml;
-    ml.out << ml.cred << ms.source << ml.creset << "\n";
-    std::string::const_iterator b = ms.source.begin();
-    std::string::const_iterator e = ms.source.end();
-    const char *ab = &*b;
-    const char *ae = &*e;
-    ml.out << "[" << &ab << ", " << &ae << ")\n";
-    ml.out << "[" << *ab << ", " << *ae << ")";
+    gcompiler gc;
+    printf("main      [b, e)  = [%p, %p)\n",&*ms.source.begin(), &*ms.source.end());
+    int e = gc.compile(ms.source.begin(), ms.source.end());
 
-    ml.out << (*ae == '\0' ? "true" : "false") << "\n";
-    ml.out << std::distance(ab, ae) << "\n";
-    ml.out << ms.source.size() << "\n";
-    ml.out << strlen(ms.source.c_str()) << "\n";
+    if (e != 0)
+        return EXIT_FAILURE;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
