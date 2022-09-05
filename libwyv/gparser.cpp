@@ -1,6 +1,6 @@
-#include "lib/include/gparser.hpp"
-#include "lib/include/ecode.hpp"
-#include "lib/include/ggrammar.hpp"
+#include "./include/gparser.hpp"
+#include "./include/ecode.hpp"
+#include "./include/ggrammar.hpp"
 
 #include <cassert>
 #include <cctype>
@@ -8,9 +8,9 @@
 #include <string>
 
 gparser::gparser()
-    : m_grammar(nullptr),
-      m_position(nullptr),
+    : m_position(nullptr),
       m_end(nullptr),
+      m_grammar(nullptr),
       m_line(1),
       m_errors(0),
       m_lexeme() {
@@ -28,7 +28,7 @@ int gparser::parse(std::string::iterator &start,
     m_end = finish;
     printf("gpar [p, f)  = [%p, %p)\n", &*m_position, &*m_end);
     m_grammar = grammar;
-    printf("gcom grammar = %p %ld\n", &*m_grammar, m_grammar.use_count());
+    printf("gpar grammar = %p %ld\n", &*m_grammar, m_grammar.use_count());
     m_line = 1;
     m_errors = 0;
     if (!match_grammar()) {

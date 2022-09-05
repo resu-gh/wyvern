@@ -1,6 +1,6 @@
-#include "include/mlogger.hpp"
+#include "./include/glogger.hpp"
 
-mlogger::mlogger()
+glogger::glogger()
     : out(std::cout),
       err(std::cerr),
       creset("\033[0m"),

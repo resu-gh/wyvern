@@ -9,6 +9,8 @@ enum class ecode {
 inline std::ostream &operator<<(std::ostream &o, const ecode &t) {
     switch (t) {
     case ecode::E_SYNTAX:
-        return o << "E_SYNTAX";
+        o << "E_SYNTAX";
+        break;
     }
+    return o;
 }

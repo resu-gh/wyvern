@@ -1,7 +1,6 @@
-#include "include/mlogger.hpp"
-#include "include/mparser.hpp"
-#include "include/mstream.hpp"
-#include "lib/include/gcompiler.hpp"
+#include "../libwyv/include/gcompiler.hpp"
+#include "../libwyvcc/include/mparser.hpp"
+#include "../libwyvcc/include/mstream.hpp"
 
 int main(int argc, char *argv[]) {
     mparser mp(argc, argv);

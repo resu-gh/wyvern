@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mlogger.hpp"
+#include "./mlogger.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -19,7 +19,7 @@ class mstream {
   public:
     mstream(const std::string &ifile, const std::string &ofile);
 
-private:
+  private:
     void try_read(const std::string &);
     void try_write(const std::string &);
 };

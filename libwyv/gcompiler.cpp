@@ -1,4 +1,4 @@
-#include "lib/include/gcompiler.hpp"
+#include "./include/gcompiler.hpp"
 
 #include <iostream>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lib/include/ggrammar.hpp"
+#include "./ggrammar.hpp"
 
 #include <iostream>
 #include <memory>

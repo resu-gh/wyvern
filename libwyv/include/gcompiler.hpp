@@ -1,8 +1,8 @@
 #pragma once
 
-#include "lib/include/ggenerator.hpp"
-#include "lib/include/ggrammar.hpp"
-#include "lib/include/gparser.hpp"
+#include "./ggenerator.hpp"
+#include "./ggrammar.hpp"
+#include "./gparser.hpp"
 
 #include <memory>
 #include <string>

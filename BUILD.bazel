@@ -1,0 +1,15 @@
+cc_binary(
+    name = "wyvcc",
+    srcs = ["src/wyvcc.cpp"],
+    copts = [
+        "-Wall",
+        "-g",
+        "-Wextra",
+        "-Wpedantic",
+        "-std=c++17",
+    ],
+    deps = [
+        "//libwyv",
+        "//libwyvcc",
+    ],
+)

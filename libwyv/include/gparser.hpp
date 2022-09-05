@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/mlogger.hpp"
+#include "./glogger.hpp"
 
 #include <memory>
 #include <string>
@@ -15,7 +15,7 @@ class gparser {
     int m_line;   // uint32_t
     int m_errors; // uint32_t
     std::string m_lexeme;
-    mlogger m_log;
+    glogger m_log;
 
   public:
     gparser();

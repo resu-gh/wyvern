@@ -1,12 +1,12 @@
-#include "include/mparser.hpp"
+#include "./include/mparser.hpp"
 
 mparser::mparser(int argc, char **argv)
     : m_args(argv + 1, argv + argc),
       m_argst(),
+      m_log(),
       m_help(false),
       m_ifile(),
-      m_ofile(),
-      m_log() {
+      m_ofile() {
     parse();
     check();
     build();

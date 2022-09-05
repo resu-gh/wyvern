@@ -1,4 +1,4 @@
-#include "include/mstream.hpp"
+#include "./include/mstream.hpp"
 
 mstream::mstream(const std::string &ifile, const std::string &ofile)
     : m_log(),

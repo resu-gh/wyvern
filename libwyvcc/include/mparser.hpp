@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mlogger.hpp"
-#include "mtype.hpp"
+#include "./mlogger.hpp"
+#include "./mtype.hpp"
 
 #include <algorithm>
 #include <iostream>

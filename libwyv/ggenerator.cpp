@@ -1,4 +1,4 @@
-#include "lib/include/ggenerator.hpp"
+#include "./include/ggenerator.hpp"
 
 ggenerator::ggenerator() {}
 
