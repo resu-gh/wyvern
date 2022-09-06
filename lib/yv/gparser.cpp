@@ -76,13 +76,13 @@ bool gparser::match_associativity_statement() {
 
 bool gparser::match_associativity() {
     if (match("%left")) {
-        // m_grammar->left(m_line);
+        m_grammar->left(m_line);
         return true;
     } else if (match("%right")) {
-        // m_grammar->right(m_line);
+        m_grammar->right(m_line);
         return true;
     } else if (match("%none")) {
-        // m_grammar->none(m_line);
+        m_grammar->none(m_line);
         return true;
     }
     return false;
@@ -205,7 +205,7 @@ bool gparser::match_expression() {
 
 bool gparser::match_precedence() {
     if (match("%precedence")) {
-        // m_grammar->precedence();
+        m_grammar->precedence();
         match_symbol();
         return true;
     }

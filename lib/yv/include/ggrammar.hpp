@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glogger.hpp"
 #include "gproduction.hpp"
 #include "gsymbolassoc.hpp"
 
@@ -19,10 +20,14 @@ class ggrammar {
     bool m_active_precedence_directive;
     /// most recently set associativity
     gsymbolassoc m_associativity;
+    /// current precedence
+    int m_precedence;
     /// currently active production
     std::shared_ptr<gproduction> m_active_production;
     /// currently active symbol
     std::shared_ptr<gsymbol> m_active_symbol;
+
+    glogger m_log;
 
   public:
     ggrammar();
@@ -33,5 +38,9 @@ class ggrammar {
   public:
     // why ggrammar& returns ?
     ggrammar &grammar(const std::string &identifier);
+    ggrammar &left(int line);
+    ggrammar &right(int line);
+    ggrammar &none(int line);
     ggrammar &whitespace();
+    ggrammar &precedence();
 };
