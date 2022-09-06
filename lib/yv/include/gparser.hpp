@@ -9,12 +9,19 @@ class ggrammar;
 
 class gparser {
   private:
+    /// current input position
     std::string::iterator m_position;
+    /// 1 poast the last char of input to parse
     std::string::iterator m_end;
+    /// grammar to build from parsing input
     std::shared_ptr<ggrammar> m_grammar;
-    int m_line;   // uint32_t
-    int m_errors; // uint32_t
+    /// current line number (uint32_t)
+    int m_line;
+    /// number of errors occurred during parsing and generation (uint32_t)
+    int m_errors;
+    /// currently parsed lexeme
     std::string m_lexeme;
+
     glogger m_log;
 
   public:

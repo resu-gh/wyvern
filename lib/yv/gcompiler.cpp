@@ -1,5 +1,9 @@
 #include "include/gcompiler.hpp"
+#include "include/ggenerator.hpp"
+#include "include/ggrammar.hpp"
+#include "include/gparser.hpp"
 
+#include <cstdio>
 #include <iostream>
 
 gcompiler::gcompiler()
@@ -11,6 +15,8 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
 
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);
+
+    printf("gcom ggram ident: %s\n", m_grammar->identifier().c_str());
 
     if (errors == 0) {
         ggenerator generator;

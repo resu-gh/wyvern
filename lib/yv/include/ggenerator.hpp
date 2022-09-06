@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ggrammar.hpp"
-
-#include <iostream>
 #include <memory>
 
+class ggrammar;
+
+/// parser state machine generator
 class ggenerator {
   public:
     ggenerator();

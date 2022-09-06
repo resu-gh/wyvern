@@ -4,10 +4,14 @@
 
 /// symbol associativity
 enum class gsymbolassoc {
-    ASSOCIATE_NULL,  ///< undefined associativity
-    ASSOCIATE_NONE,  ///< no associativity
-    ASSOCIATE_LEFT,  ///< left associativity
-    ASSOCIATE_RIGHT, ///< right associativity
+    /// undefined associativity
+    ASSOCIATE_NULL,
+    /// no associativity
+    ASSOCIATE_NONE,
+    /// left associativity
+    ASSOCIATE_LEFT,
+    /// right associativity
+    ASSOCIATE_RIGHT
 };
 
 inline std::ostream &operator<<(std::ostream &o, const gsymbolassoc &t) {

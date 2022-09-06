@@ -4,7 +4,8 @@
 
 /// error codes
 enum class ecode {
-    E_SYNTAX, ///< syntax error occurred while parsing input
+    /// syntax error occurred while parsing input
+    E_SYNTAX,
 };
 
 inline std::ostream &operator<<(std::ostream &o, const ecode &t) {
