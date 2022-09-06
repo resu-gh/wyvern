@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./mlogger.hpp"
-#include "./mtype.hpp"
+#include "ylogger.hpp"
+#include "ytype.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -11,14 +11,14 @@
 
 /// @brief cli flags/args parser
 
-class mparser {
+class yparser {
   private:
     using args = std::vector<std::string>;
     using arg_citer = args::const_iterator;
-    using argst = std::vector<mtype>;
+    using argst = std::vector<ytype>;
     args m_args;
     argst m_argst;
-    mlogger m_log;
+    ylogger m_log;
 
   private:
     bool m_help;
@@ -26,7 +26,7 @@ class mparser {
     std::string m_ofile;
 
   public:
-    mparser(int, char **);
+    yparser(int, char **);
 
   public:
     const std::string &ifile() const;
@@ -38,5 +38,5 @@ class mparser {
     void check();
     void build();
     bool try_flag(arg_citer);
-    bool try_arg(arg_citer);
+    bool try_arg();
 };

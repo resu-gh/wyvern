@@ -1,4 +1,4 @@
-#include "./include/gcompiler.hpp"
+#include "include/gcompiler.hpp"
 
 #include <iostream>
 
@@ -6,8 +6,8 @@ gcompiler::gcompiler()
     : m_grammar(std::make_shared<ggrammar>()) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
-    printf("gcom [b, e)  = [%p, %p)\n", &*begin, &*end);
-    printf("gcom grammar = %p %ld\n", &*m_grammar, m_grammar.use_count());
+    printf("gcom [b, e)  = [%p, %p)\n", (void *)&*begin, (void *)&*end);
+    printf("gcom grammar = %p %ld\n", (void *)&*m_grammar, m_grammar.use_count());
 
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);

@@ -1,13 +1,13 @@
-#include "./include/mstream.hpp"
+#include "include/ystream.hpp"
 
-mstream::mstream(const std::string &ifile, const std::string &ofile)
+ystream::ystream(const std::string &ifile, const std::string &ofile)
     : m_log(),
       source() {
     try_read(ifile);
     try_write(ofile);
 }
 
-void mstream::try_read(const std::string &ifile) {
+void ystream::try_read(const std::string &ifile) {
     m_istream.open(ifile);
     if (m_istream.fail()) {
         m_log.out << m_log.cred << "[ERROR] ";
@@ -23,7 +23,7 @@ void mstream::try_read(const std::string &ifile) {
     source.assign(sbuf_iter(m_istream), sbuf_iter());
 }
 
-void mstream::try_write(const std::string &ofile) {
+void ystream::try_write(const std::string &ofile) {
     if (!ofile.empty()) {
         out.open(ofile);
         m_log.out << m_log.cblue << "[INFO] ";

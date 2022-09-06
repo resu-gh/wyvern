@@ -1,15 +1,15 @@
-#include "../libwyv/include/gcompiler.hpp"
-#include "../libwyvcc/include/mparser.hpp"
-#include "../libwyvcc/include/mstream.hpp"
+#include "../lib/ycc/include/yparser.hpp"
+#include "../lib/ycc/include/ystream.hpp"
+#include "../lib/yv/include/gcompiler.hpp"
 
 int main(int argc, char *argv[]) {
-    mparser mp(argc, argv);
-    mstream ms(mp.ifile(), mp.ofile());
+    yparser mp(argc, argv);
+    ystream ms(mp.ifile(), mp.ofile());
 
     gcompiler compiler;
     std::string::iterator begin = ms.source.begin();
     std::string::iterator end = ms.source.end();
-    printf("main [b, e)  = [%p, %p)\n", &*begin, &*end);
+    printf("main [b, e)  = [%p, %p)\n", (void *)&*begin, (void *)&*end);
 
     int errors = compiler.compile(begin, end);
 

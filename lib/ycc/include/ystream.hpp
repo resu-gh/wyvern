@@ -1,15 +1,15 @@
 #pragma once
 
-#include "./mlogger.hpp"
+#include "ylogger.hpp"
 
 #include <fstream>
 #include <iostream>
 
 /// @brief io streams manager
 
-class mstream {
+class ystream {
   private:
-    mlogger m_log;
+    ylogger m_log;
     std::ifstream m_istream;
 
   public:
@@ -17,7 +17,7 @@ class mstream {
     std::string source;
 
   public:
-    mstream(const std::string &ifile, const std::string &ofile);
+    ystream(const std::string &ifile, const std::string &ofile);
 
   private:
     void try_read(const std::string &);

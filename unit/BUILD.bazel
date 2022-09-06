@@ -1,0 +1,11 @@
+cc_test(
+    name = "yvu",
+    size = "small",
+    srcs = [
+        "gparser.cpp",
+    ],
+    deps = [
+        "//lib/yv:libyv",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

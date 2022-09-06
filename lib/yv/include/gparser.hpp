@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./glogger.hpp"
+#include "glogger.hpp"
 
 #include <memory>
 #include <string>

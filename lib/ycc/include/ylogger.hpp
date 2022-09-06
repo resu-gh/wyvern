@@ -4,7 +4,7 @@
 
 /// @brief generic logger
 
-class mlogger final {
+class ylogger final {
 
   public:
     std::ostream &out;
@@ -20,5 +20,5 @@ class mlogger final {
     const std::string cwhite;
 
   public:
-    mlogger();
+    ylogger();
 };

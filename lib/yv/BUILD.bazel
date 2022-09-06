@@ -1,0 +1,13 @@
+cc_library(
+    name = "libyv",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.hpp"]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-std=c++17",
+        "-g",
+    ],
+    visibility = ["//visibility:public"],
+)
