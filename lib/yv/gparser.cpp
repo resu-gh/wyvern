@@ -31,6 +31,7 @@ int gparser::parse(std::string::iterator &start,
     printf("gpar grammar = %p %ld\n", (void *)&*m_grammar, m_grammar.use_count());
     m_line = 1;
     m_errors = 0;
+    return 0; // TODO remove
     if (!match_grammar()) {
         ++m_errors;
         m_log.err << m_log.cblue << "[gparser] " << m_log.creset;
