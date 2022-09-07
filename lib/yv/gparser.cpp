@@ -32,11 +32,13 @@ int gparser::parse(std::string::iterator &start,
     m_line = 1;
     m_errors = 0;
     if (!match_grammar()) {
+        // error begin
         ++m_errors;
         m_log.err << m_log.cblue << "[gparser] " << m_log.creset;
         m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
         m_log.err << m_log.cmagenta << "[1] " << m_log.creset;
         m_log.err << "parsing grammar failed\n";
+        // error end
     }
     return m_errors;
 }
@@ -167,7 +169,7 @@ bool gparser::match_regex() {
 
 bool gparser::match_whitespace_statement() {
     if (match("%whitespace")) {
-        m_grammar->whitespace();
+        m_grammar->whitespace(m_line);
         if (match_regex()) {
             // m_grammar->regex(m_lexeme.c_str(),m_line);
         }
@@ -179,11 +181,11 @@ bool gparser::match_whitespace_statement() {
 
 bool gparser::match_production_statement() {
     if (match_identifier()) {
-        // m_grammar->production(m_lexeme.c_str(), m_line);
+        m_grammar->production(m_lexeme.c_str(), m_line);
         expect(":");
         match_expressions();
         expect(";");
-        // m_grammar->end_production();
+        m_grammar->end_production(); // done
         return true;
     }
     return false;
@@ -205,7 +207,7 @@ bool gparser::match_expression() {
 
 bool gparser::match_precedence() {
     if (match("%precedence")) {
-        m_grammar->precedence();
+        m_grammar->precedence(m_line);
         match_symbol();
         return true;
     }

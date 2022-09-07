@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
     gcompiler compiler;
     std::string::iterator begin = ms.source.begin();
     std::string::iterator end = ms.source.end();
+
+    ylogger ylog;
     printf("main [b, e)  = [%p, %p)\n", (void *)&*begin, (void *)&*end);
 
     int errors = compiler.compile(begin, end);
