@@ -118,7 +118,7 @@ bool gparser::match_symbols() {
 
 bool gparser::match_symbol() {
     if (match_error()) {
-        // m_grammar->error(m_line);
+        m_grammar->error(m_line);
         return true;
     } else if (match_literal()) {
         // m_grammar->literal(m_lexeme.c_str(), m_line);

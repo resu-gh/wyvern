@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glexemetype.hpp"
+#include "gsymbolassoc.hpp"
 #include "gsymboltype.hpp"
 
 #include <string>
@@ -18,6 +19,10 @@ class gsymbol {
     gsymboltype m_symbol_type;
     /// symbol's lexeme type (regex or literal)
     glexemetype m_lexeme_type;
+    /// symbol associativity
+    gsymbolassoc m_associativity;
+    /// symbol precedence
+    int m_precedence;
 
   public:
     gsymbol(const std::string &lexeme);
@@ -26,11 +31,15 @@ class gsymbol {
     int index() const;
     const std::string &lexeme() const;
     gsymboltype symbol_type() const;
+    gsymbolassoc associativity() const;
+    int precedence() const;
 
   public:
     void set_line(int line);
     void set_symbol_type(gsymboltype symbol_type);
     void set_lexeme_type(glexemetype lexeme_type);
+    void set_associativity(gsymbolassoc associativity);
+    void set_precedence(int precedence);
 
   public:
     bool matches(const std::string &lexeme, gsymboltype symbol_type);

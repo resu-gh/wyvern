@@ -28,11 +28,19 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);
 
+    return 0;
+
     // debug begin
     m_log.out << m_log.cgcomp << "yv::gcomp = ";
     m_log.out << "ggrammar ident = ";
     m_log.out << m_grammar->identifier();
     m_log.out << m_log.creset << "\n";
+
+    /// convert into m_grammar.dump()
+    m_log.out << m_log.cgcomp;
+    for (auto s : m_grammar->symbols())
+        m_log.out << "                             " << s->lexeme() << "\n";
+    m_log.out << m_log.creset;
     // debug end
 
     if (errors == 0) {

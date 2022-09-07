@@ -31,6 +31,12 @@ class ggrammar {
     std::shared_ptr<gproduction> m_active_production;
     /// currently active symbol
     std::shared_ptr<gsymbol> m_active_symbol;
+    /// start symbol
+    std::shared_ptr<gsymbol> m_start_symbol;
+    /// end symbol
+    std::shared_ptr<gsymbol> m_end_symbol;
+    /// error symbol
+    std::shared_ptr<gsymbol> m_error_symbol;
     /// logger
     glogger m_log;
 
@@ -39,9 +45,12 @@ class ggrammar {
 
   public:
     const std::string &identifier() const;
+    std::vector<std::shared_ptr<gsymbol>> &symbols();
+    const std::shared_ptr<gsymbol>&error_symbol() const;
 
   public:
     // why ggrammar& returns ?
+    // rm `int line` param if not used
     ggrammar &grammar(const std::string &identifier);
     ggrammar &left(int line);
     ggrammar &right(int line);
@@ -50,6 +59,7 @@ class ggrammar {
     ggrammar &precedence(int line);
     ggrammar &production(const std::string &identifier, int line);
     ggrammar &end_production();
+    ggrammar &error(int line);
 
   public:
     const std::shared_ptr<gsymbol> &non_terminal_symbol(const std::string &lexeme, int line);

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -16,10 +17,25 @@ ggrammar::ggrammar()
       m_associativity(gsymbolassoc::ASSOCIATE_NULL),
       m_precedence(0),
       m_active_production(nullptr),
-      m_active_symbol(nullptr) {}
+      m_active_symbol(nullptr),
+      m_start_symbol(nullptr),
+      m_end_symbol(nullptr),
+      m_error_symbol(nullptr) {
+    m_start_symbol = add_symbol(".start", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NON_TERMINAL);
+    m_end_symbol = add_symbol(".end", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_END);
+    m_error_symbol = add_symbol("error", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NULL);
+}
 
 const std::string &ggrammar::identifier() const {
     return m_identifier;
+}
+
+std::vector<std::shared_ptr<gsymbol>> &ggrammar::symbols() {
+    return m_symbols;
+}
+
+const std::shared_ptr<gsymbol> &ggrammar::error_symbol() const {
+    return m_error_symbol;
 }
 
 ggrammar &ggrammar::grammar(const std::string &identifier) {
@@ -133,6 +149,20 @@ ggrammar &ggrammar::end_production() {
     m_active_precedence_directive = false;
     m_active_production = nullptr;
     m_active_symbol = nullptr;
+    return *this;
+}
+
+ggrammar &ggrammar::error(int line) {
+    assert(line >= 1);
+    if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
+        const std::shared_ptr<gsymbol>& symbol = error_symbol();
+        symbol->set_associativity(m_associativity);
+        symbol->set_precedence(m_precedence);
+    } else if (m_active_symbol) {
+        // TODO
+        if (!m_active_production)
+            ;
+    }
     return *this;
 }
 
