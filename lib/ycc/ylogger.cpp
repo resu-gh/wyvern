@@ -10,4 +10,5 @@ ylogger::ylogger()
       cblue("\033[34m"),
       cmagenta("\033[35m"),
       ccyan("\033[36m"),
-      cwhite("\033[37m") {}
+      cwhite("\033[37m"),
+      cmain("\033[38;5;250m") {}

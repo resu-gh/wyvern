@@ -19,6 +19,8 @@ class ylogger final {
     const std::string ccyan;
     const std::string cwhite;
 
+    const std::string cmain;
+
   public:
     ylogger();
 };

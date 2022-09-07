@@ -1,6 +1,7 @@
 #include "../lib/ycc/include/yparser.hpp"
 #include "../lib/ycc/include/ystream.hpp"
 #include "../lib/yv/include/gcompiler.hpp"
+#include <cstddef>
 
 int main(int argc, char *argv[]) {
     yparser mp(argc, argv);
@@ -11,7 +12,12 @@ int main(int argc, char *argv[]) {
     std::string::iterator end = ms.source.end();
 
     ylogger ylog;
-    printf("main [b, e)  = [%p, %p)\n", (void *)&*begin, (void *)&*end);
+    ylog.out << ylog.cmain;
+    ylog.out << "ycc::main = ";
+    ylog.out << "[b, e) = ";
+    ylog.out << "[" << (void *)&*begin;
+    ylog.out << ", " << (void *)&*end << ")\n";
+    ylog.out << ylog.creset;
 
     int errors = compiler.compile(begin, end);
 

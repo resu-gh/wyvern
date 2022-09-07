@@ -10,4 +10,6 @@ glogger::glogger()
       cblue("\033[34m"),
       cmagenta("\033[35m"),
       ccyan("\033[36m"),
-      cwhite("\033[37m") {}
+      cwhite("\033[37m"),
+      cgcomp("\033[38;5;42m"),
+      cggram("\033[38;5;201m") {}

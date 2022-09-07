@@ -112,10 +112,11 @@ ggrammar &ggrammar::production(const std::string &identifier, int line) {
     m_active_production = nullptr;
     m_active_symbol = non_terminal_symbol(identifier, line);
     // debug begin
-    m_log.out << m_log.cmagenta << "[ggrammr] ";
-    m_log.out << m_log.cgreen << "chk PROD ";
-    m_log.out << m_log.cyellow << &*m_active_symbol << " " << m_active_symbol->lexeme();
-    m_log.out << " " << m_active_symbol.use_count();
+    m_log.out << m_log.cggram << "yv::ggram = ";
+    m_log.out << "active PRODUCTION ";
+    m_log.out << (void *)&*m_active_symbol << " `";
+    m_log.out << m_active_symbol->lexeme() << "` ";
+    m_log.out << "[uses: " << m_active_symbol.use_count() << "]";
     m_log.out << m_log.creset << "\n";
     // debug end
     return *this;
@@ -124,10 +125,11 @@ ggrammar &ggrammar::production(const std::string &identifier, int line) {
 ggrammar &ggrammar::end_production() {
     assert(m_active_symbol);
     // debug begin
-    m_log.out << m_log.cmagenta << "[ggrammr] ";
-    m_log.out << m_log.cgreen << "end PROD ";
-    m_log.out << m_log.cyellow << &*m_active_symbol << " " << m_active_symbol->lexeme();
-    m_log.out << " " << m_active_symbol.use_count();
+    m_log.out << m_log.cggram << "yv::ggram = ";
+    m_log.out << "end of PRODUCTION ";
+    m_log.out << (void *)&*m_active_symbol << " `";
+    m_log.out << m_active_symbol->lexeme() << "` ";
+    m_log.out << "[uses: " << m_active_symbol.use_count() << "]";
     m_log.out << m_log.creset << "\n";
     // debug end
     m_associativity = gsymbolassoc::ASSOCIATE_NULL;
@@ -157,23 +159,33 @@ ggrammar::add_symbol(const std::string &lexeme, int line, glexemetype lexeme_typ
         symbol->set_lexeme_type(lexeme_type);
         symbol->set_symbol_type(symbol_type);
         // debug begin
-        m_log.out << m_log.cmagenta << "[ggrammr] ";
-        m_log.out << m_log.cgreen << "new PROD ";
-        m_log.out << m_log.cyellow << &*symbol << " " << symbol->lexeme();
-        m_log.out << " " << symbol.use_count();
+        m_log.out << m_log.cggram << "yv::ggram = ";
+        m_log.out << "new    PRODUCTION ";
+        m_log.out << (void *)&*symbol << " `";
+        m_log.out << symbol->lexeme() << "` ";
+        m_log.out << "[uses: " << symbol.use_count() << "]";
         m_log.out << m_log.creset << "\n";
         // debug end
         m_symbols.push_back(std::move(symbol));
         // debug begin
-        m_log.out << m_log.cmagenta << "[ggrammr] ";
-        m_log.out << m_log.cgreen << "add PROD ";
-        m_log.out << m_log.cyellow << &*m_symbols.back() << " " << m_symbols.back()->lexeme();
-        m_log.out << " " << m_symbols.back().use_count();
+        m_log.out << m_log.cggram << "yv::ggram = ";
+        m_log.out << "pushed PRODUCTION ";
+        m_log.out << (void *)&*m_symbols.back() << " `";
+        m_log.out << m_symbols.back()->lexeme() << "` ";
+        m_log.out << "[uses: " << m_symbols.back().use_count() << "]";
         m_log.out << m_log.creset << "\n";
         // debug end
         return m_symbols.back();
     }
     assert(i->get());
     assert(i->get()->symbol_type() == symbol_type);
+    // debug begin
+    m_log.out << m_log.cggram << "yv::ggram = ";
+    m_log.out << "found  PRODUCTION ";
+    m_log.out << (void *)&*i << " `";
+    m_log.out << i->get()->lexeme() << "` ";
+    m_log.out << "[uses: " << i->use_count() << "]";
+    m_log.out << m_log.creset << "\n";
+    // debug end
     return *i;
 }

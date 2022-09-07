@@ -31,7 +31,7 @@ class ggrammar {
     std::shared_ptr<gproduction> m_active_production;
     /// currently active symbol
     std::shared_ptr<gsymbol> m_active_symbol;
-
+    /// logger
     glogger m_log;
 
   public:
