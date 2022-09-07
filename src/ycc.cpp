@@ -1,7 +1,6 @@
 #include "../lib/ycc/include/yparser.hpp"
 #include "../lib/ycc/include/ystream.hpp"
 #include "../lib/yv/include/gcompiler.hpp"
-#include <cstddef>
 
 int main(int argc, char *argv[]) {
     yparser mp(argc, argv);

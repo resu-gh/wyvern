@@ -19,8 +19,11 @@ class glogger final {
     const std::string ccyan;
     const std::string cwhite;
 
+    const std::string cerror;
     const std::string cgcomp;
     const std::string cggram;
+    const std::string cgpars;
+    const std::string cggenr;
 
   public:
     glogger();

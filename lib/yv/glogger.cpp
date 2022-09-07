@@ -11,5 +11,8 @@ glogger::glogger()
       cmagenta("\033[35m"),
       ccyan("\033[36m"),
       cwhite("\033[37m"),
-      cgcomp("\033[38;5;42m"),
-      cggram("\033[38;5;201m") {}
+      cerror("\033[48;5;89m"),
+      cgcomp("\033[38;5;45m"),
+      cggram("\033[38;5;135m"),
+      cgpars("\033[38;5;214m"),
+      cggenr("\033[38;5;112m") {}

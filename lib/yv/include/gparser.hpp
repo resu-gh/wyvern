@@ -21,7 +21,7 @@ class gparser {
     int m_errors;
     /// currently parsed lexeme
     std::string m_lexeme;
-
+    /// logger
     glogger m_log;
 
   public:
@@ -55,6 +55,7 @@ class gparser {
     bool match_action();                                         // match_action
     bool match_end();                                            // match_post
 
+  public:
     bool match(const std::string &);
     bool expect(const std::string &);
     bool is_new_line(std::string::iterator &);                // is_nl
