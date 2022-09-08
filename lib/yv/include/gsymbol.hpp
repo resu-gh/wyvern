@@ -39,6 +39,7 @@ class gsymbol {
     gsymboltype symbol_type() const;
     gsymbolassoc associativity() const;
     int precedence() const;
+    const std::vector<std::shared_ptr<gproduction>>& productions() const;
 
   public:
     void set_line(int line);

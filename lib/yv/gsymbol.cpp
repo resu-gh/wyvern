@@ -2,6 +2,7 @@
 #include "include/gsymboltype.hpp"
 
 #include <cassert>
+#include <vector>
 
 gsymbol::gsymbol(const std::string &lexeme)
     : m_index(-1),
@@ -31,6 +32,10 @@ gsymbolassoc gsymbol::associativity() const {
 
 int gsymbol::precedence() const {
     return m_precedence;
+}
+
+    const std::vector<std::shared_ptr<gproduction>>& gsymbol::productions() const {
+    return m_productions;
 }
 
 void gsymbol::set_line(int line) {
