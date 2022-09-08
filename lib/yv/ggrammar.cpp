@@ -434,6 +434,7 @@ ggrammar &ggrammar::end_production() {
     return *this;
 }
 
+// TODO comments
 ggrammar &ggrammar::error(int line) {
     assert(line >= 1);
     if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
@@ -443,7 +444,7 @@ ggrammar &ggrammar::error(int line) {
     } else if (m_active_symbol) {
         if (!m_active_production)
             m_active_production = add_production(m_active_symbol, line);
-        // TODO
+        m_active_production->append_symbol(error_symbol());
     }
     return *this;
 }
@@ -570,5 +571,56 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
         /*debug*/ m_log.out << m_log.cggram << "\n";
         return m_productions.back();
     }
-    exit(0);
+    std::shared_ptr<gproduction> production = std::make_shared<gproduction>(int(m_productions.size()), symbol, line, -1, nullptr);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
+    /*debug*/ m_log.out << "create PRODUC " << m_log.cwhite;
+    /*debug*/ m_log.out << (void *)&*production << " ";
+    /*debug*/ m_log.out << "[uc: " << production.use_count() << "] ";
+    /*debug*/ m_log.out << m_log.cggram << "(add_production)\n";
+    /*debug*/ m_log.out << "                on SYMBOL ";
+    /*debug*/ m_log.out << m_log.creset;
+    /*debug*/ m_log.out << &*production.get()->symbol() << " ";
+    /*debug*/ m_log.out << "[uc: " << production.get()->symbol().use_count() << "] ";
+    /*debug*/ m_log.out << production.get()->symbol()->index() << " ";
+    /*debug*/ m_log.out << production.get()->symbol()->lexeme() << "\n";
+    /*debug*/ m_log.out << m_log.cggram << "              with ACTION ";
+    /*debug*/ m_log.out << m_log.cwhite;
+    /*debug*/ m_log.out << production.get()->action() << " ";
+    /*debug*/ m_log.out << (production.get()->action() ? "[uc: " : "");
+    /*debug*/ m_log.out << (production.get()->action() ? std::to_string(production.get()->action().use_count()) : "");
+    /*debug*/ m_log.out << (production.get()->action() ? "] " : "");
+    /*debug*/ m_log.out << (production.get()->action() ? std::to_string(production.get()->action()->index()) : "");
+    /*debug*/ m_log.out << (production.get()->action() ? " " : "");
+    /*debug*/ m_log.out << (production.get()->action() ? production.get()->action()->identifier() : "");
+    /*debug*/ m_log.out << m_log.cggram << "\n                      ---";
+    /*debug*/ m_log.out << m_log.creset << "\n";
+    symbol->append_production(production);
+    /*debug*/ m_log.out << m_log.cggram << "            ";
+    /*debug*/ m_log.out << "pushed PRODUC " << m_log.cwhite;
+    /*debug*/ m_log.out << (void *)&*production << " ";
+    /*debug*/ m_log.out << "[uc: " << production.use_count() << "] ";
+    /*debug*/ m_log.out << m_log.cggram << "\n";
+    /*debug*/ m_log.out << "              to-> SYMBOL " << m_log.cwhite;
+    /*debug*/ m_log.out << (void *)&*symbol << " ";
+    /*debug*/ m_log.out << "[uc: " << symbol.use_count() << "] ";
+    /*debug*/ m_log.out << symbol->index() << " ";
+    /*debug*/ m_log.out << symbol->lexeme() << " ";
+    /*debug*/ m_log.out << m_log.cggram << "\n";
+    /*debug*/ m_log.out << "             check  START " << m_log.cwhite;
+    /*debug*/ m_log.out << &*symbol->productions().back() << " ";
+    /*debug*/ m_log.out << "[uc: " << symbol->productions().back().use_count() << "] ";
+    /*debug*/ m_log.out << m_log.cggram << "\n                      ---";
+    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << m_log.cggram << "            ";
+    /*debug*/ m_log.out << "<-move PRODUC " << m_log.cwhite;
+    /*debug*/ m_log.out << (void *)&*production << " ";
+    /*debug*/ m_log.out << "[uc: " << production.use_count() << "] ";
+    /*debug*/ m_log.out << m_log.cggram << "\n";
+    m_productions.push_back(std::move(production));
+    /*debug*/ m_log.out << m_log.cggram << "            ";
+    /*debug*/ m_log.out << " check PRODUC " << m_log.cwhite;
+    /*debug*/ m_log.out << (void *)&*m_productions.back() << " ";
+    /*debug*/ m_log.out << "[uc: " << m_productions.back().use_count() << "] ";
+    /*debug*/ m_log.out << m_log.cggram << "\n";
+    return m_productions.back();
 }

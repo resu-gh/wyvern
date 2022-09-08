@@ -4,7 +4,7 @@ SRCS := $(shell find $(SRCD) -name "*.cpp" -or -name "*.hpp")
 BAZELCC := clang++
 BAZELBIN := bazelisk # bazel
 
-ARGS := -i $(shell pwd)/unit/grammar/errcalc.g
+ARGS := -i $(shell pwd)/unit/grammar/json.g
 
 .SILENT: run
 .PHONY: run
