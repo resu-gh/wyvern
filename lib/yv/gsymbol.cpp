@@ -10,7 +10,8 @@ gsymbol::gsymbol(const std::string &lexeme)
       m_symbol_type(gsymboltype::SYMBOL_NULL),
       m_lexeme_type(glexemetype::LEXEME_NULL),
       m_associativity(gsymbolassoc::ASSOCIATE_NULL),
-      m_precedence(0) {}
+      m_precedence(0),
+      m_productions() {}
 
 int gsymbol::index() const {
     return m_index;
@@ -59,4 +60,9 @@ void gsymbol::set_precedence(int precedence) {
 
 bool gsymbol::matches(const std::string &lexeme, gsymboltype symbol_type) {
     return m_lexeme == lexeme && m_symbol_type == symbol_type;
+}
+
+void gsymbol::append_production(const std::shared_ptr<gproduction> &production) {
+    assert(production);
+    m_productions.push_back(production);
 }

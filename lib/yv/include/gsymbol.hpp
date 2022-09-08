@@ -4,7 +4,11 @@
 #include "gsymbolassoc.hpp"
 #include "gsymboltype.hpp"
 
+#include <memory>
 #include <string>
+#include <vector>
+
+class gproduction;
 
 /// grammar symbol
 class gsymbol {
@@ -23,6 +27,8 @@ class gsymbol {
     gsymbolassoc m_associativity;
     /// symbol precedence
     int m_precedence;
+    /// the productions that reduce to this symbol
+    std::vector<std::shared_ptr<gproduction>> m_productions;
 
   public:
     gsymbol(const std::string &lexeme);
@@ -43,4 +49,5 @@ class gsymbol {
 
   public:
     bool matches(const std::string &lexeme, gsymboltype symbol_type);
+    void append_production(const std::shared_ptr<gproduction>& production);
 };

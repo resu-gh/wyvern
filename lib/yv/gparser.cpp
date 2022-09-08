@@ -81,10 +81,7 @@ bool gparser::match_statements() {
 }
 
 bool gparser::match_statement() {
-    return                                 //
-        match_associativity_statement() || //
-        match_whitespace_statement() ||    //
-        match_production_statement();      //
+    return match_associativity_statement() || match_whitespace_statement() || match_production_statement();
 }
 
 bool gparser::match_associativity_statement() {

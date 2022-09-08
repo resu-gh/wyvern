@@ -19,6 +19,8 @@ class ggrammar {
     std::string m_identifier;
     /// the symbols in the grammar
     std::vector<std::shared_ptr<gsymbol>> m_symbols;
+    /// the productions in the grammar
+    std::vector<std::shared_ptr<gproduction>> m_productions;
     /// true iff a whitespace directive is active
     bool m_active_whitespace_directive;
     /// true iff a precedence directive is active
@@ -67,4 +69,6 @@ class ggrammar {
   public:
     const std::shared_ptr<gsymbol> &
     add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type);
+    const std::shared_ptr<gproduction> &
+    add_production(const std::shared_ptr<gsymbol> &symbol, int line);
 };
