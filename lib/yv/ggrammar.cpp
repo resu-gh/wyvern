@@ -129,7 +129,8 @@ ggrammar &ggrammar::left(int line) {
 
 ggrammar &ggrammar::right(int line) {
     /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
-    /*debug*/ m_log.out << "proces  RIGHT " << m_log.cwhite << "%right\n";
+    /*debug*/ m_log.out << "proces  RIGHT " << m_log.cwhite << "%right ";
+    /*debug*/ m_log.out << m_log.cggram << "(right)\n";
     /*debug*/ m_log.out << m_log.cggram << "               set  ASSOC ";
     /*debug*/ m_log.out << m_log.cwhite << m_associativity << " -> ";
     m_associativity = gsymbolassoc::ASSOCIATE_RIGHT;
@@ -187,7 +188,8 @@ ggrammar &ggrammar::right(int line) {
 
 ggrammar &ggrammar::none(int line) {
     /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
-    /*debug*/ m_log.out << "proces   NONE " << m_log.cwhite << "%none\n";
+    /*debug*/ m_log.out << "proces   NONE " << m_log.cwhite << "%none ";
+    /*debug*/ m_log.out << m_log.cggram << "(none)\n";
     /*debug*/ m_log.out << m_log.cggram << "               set  ASSOC ";
     /*debug*/ m_log.out << m_log.cwhite << m_associativity << " -> ";
     m_associativity = gsymbolassoc::ASSOCIATE_NONE;
@@ -245,7 +247,8 @@ ggrammar &ggrammar::none(int line) {
 
 ggrammar &ggrammar::whitespace(int line) {
     /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
-    /*debug*/ m_log.out << "proces WHITES " << m_log.cwhite << "%whitespace\n";
+    /*debug*/ m_log.out << "proces WHITES " << m_log.cwhite << "%whitespace ";
+    /*debug*/ m_log.out << m_log.cggram << "(whitespace)\n";
     /*debug*/ m_log.out << m_log.cggram << "               set  ASSOC ";
     /*debug*/ m_log.out << m_log.cwhite << m_associativity << " -> ";
     m_associativity = gsymbolassoc::ASSOCIATE_NULL;
@@ -299,7 +302,8 @@ ggrammar &ggrammar::whitespace(int line) {
 
 ggrammar &ggrammar::precedence(int line) {
     /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
-    /*debug*/ m_log.out << "proces PRECED " << m_log.cwhite << "%precedence\n";
+    /*debug*/ m_log.out << "proces PRECED " << m_log.cwhite << "%precedence ";
+    /*debug*/ m_log.out << m_log.cggram << "(precedence)\n";
     assert(m_active_symbol);
     /*debug*/ m_log.out << m_log.cggram << "               get ASYMBO ";
     /*debug*/ m_log.out << m_log.cwhite;
@@ -382,7 +386,7 @@ ggrammar &ggrammar::end_production() {
     assert(m_active_symbol);
     /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
     /*debug*/ m_log.out << "   end PRODUC " << m_log.cwhite << m_active_symbol->lexeme();
-    /*debug*/ m_log.out << m_log.cggram << " (production)\n";
+    /*debug*/ m_log.out << m_log.cggram << " (end_production)\n";
     /*debug*/ m_log.out << m_log.cggram << "               set  ASSOC ";
     /*debug*/ m_log.out << m_log.cwhite << m_associativity << " -> ";
     m_associativity = gsymbolassoc::ASSOCIATE_NULL;
@@ -437,14 +441,74 @@ ggrammar &ggrammar::end_production() {
 // TODO comments
 ggrammar &ggrammar::error(int line) {
     assert(line >= 1);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram = proces  ERROR (error)\n";
     if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
+        /*debug*/ m_log.out << m_log.cggram << "                if  ";
+        /*debug*/ m_log.out << m_log.ccyan << "ASSOC == ASSOCIATE_NULL (case 1)\n";
         const std::shared_ptr<gsymbol> &symbol = error_symbol();
+        /*debug*/ m_log.out << m_log.cggram << "            ";
+        /*debug*/ m_log.out << "create SYMBOL ";
+        /*debug*/ m_log.out << m_log.cwhite << (void *)&*symbol;
+        /*debug*/ m_log.out << " [uc: " << symbol.use_count() << "] ";
+        /*debug*/ m_log.out << symbol->index() << " ";
+        /*debug*/ m_log.out << symbol->lexeme() << "\n";
+        /*debug*/ m_log.out << m_log.cggram << "                      ---\n";
+        /*debug*/ m_log.out << "             SYBMOL ASSOC ";
+        /*debug*/ m_log.out << m_log.cwhite << symbol->associativity() << " -> ";
         symbol->set_associativity(m_associativity);
+        /*debug*/ m_log.out << m_log.cmagenta << symbol->associativity() << "\n";
+        /*debug*/ m_log.out << m_log.cggram;
+        /*debug*/ m_log.out << "             SYBMOL PRECE ";
+        /*debug*/ m_log.out << m_log.cwhite << symbol->precedence() << " -> ";
         symbol->set_precedence(m_precedence);
+        /*debug*/ m_log.out << m_log.cmagenta << symbol->precedence() << "";
+        /*debug*/ m_log.out << m_log.creset << "\n";
     } else if (m_active_symbol) {
-        if (!m_active_production)
+        /*debug*/ m_log.out << m_log.cggram << "                if ";
+        /*debug*/ m_log.out << m_log.ccyan << "ASYMBO != nullptr (case 2)\n";
+        /*debug*/ m_log.out << m_log.cggram << "             check APRODU ";
+        /*debug*/ m_log.out << m_log.cwhite;
+        /*debug*/ m_log.out << (void *)&*m_active_production;
+        /*debug*/ m_log.out << (m_active_production ? " [uc: " : "");
+        /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production.use_count()) : "");
+        /*debug*/ m_log.out << (m_active_production ? "] " : "");
+        /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production->index()) : "");
+        /*debug*/ m_log.out << " -> " << m_log.cyellow << "APRODU\n" << m_log.cwhite;
+        if (!m_active_production) {
+            /*debug*/ m_log.out << m_log.cggram << "                if ";
+            /*debug*/ m_log.out << m_log.ccyan << "APRODU == nullptr (case 3)\n";
             m_active_production = add_production(m_active_symbol, line);
+            /*debug*/ m_log.out << m_log.cyellow << "               ... APRODU ";
+            /*debug*/ m_log.out << m_log.cwhite;
+            /*debug*/ m_log.out << (void *)&*m_active_production;
+            /*debug*/ m_log.out << (m_active_production ? " [uc: " : "");
+            /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production.use_count()) : "");
+            /*debug*/ m_log.out << (m_active_production ? "] " : "");
+            /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production->index()) : "");
+            /*debug*/ m_log.out << m_log.cggram << " (error)\n";
+        }
         m_active_production->append_symbol(error_symbol());
+        /*debug*/ m_log.out << m_log.cggram << "            pushed SYMBOL ";
+        /*debug*/ m_log.out << m_log.cwhite << &*error_symbol() << " [uc: ";
+        /*debug*/ m_log.out << m_log.cwhite << error_symbol().use_count() << "] ";
+        /*debug*/ m_log.out << m_log.cwhite << error_symbol()->index() << " ";
+        /*debug*/ m_log.out << m_log.cwhite << error_symbol()->lexeme() << "\n";
+        /*debug*/ m_log.out << m_log.cggram << "                to APRODU ";
+        /*debug*/ m_log.out << m_log.cwhite;
+        /*debug*/ m_log.out << (void *)&*m_active_production;
+        /*debug*/ m_log.out << (m_active_production ? " [uc: " : "");
+        /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production.use_count()) : "");
+        /*debug*/ m_log.out << (m_active_production ? "] " : "");
+        /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production->index()) : "");
+        /*debug*/ m_log.out << "\n";
+        /*debug*/ m_log.out << m_log.cggram << "             check SYMBOL ";
+        /*debug*/ m_log.out << m_log.cwhite;
+        /*debug*/ m_log.out << (void *)&*m_active_production->symbols().back() << " [uc: ";
+        /*debug*/ m_log.out << m_active_production->symbols().back().use_count() << "] ";
+        /*debug*/ m_log.out << m_active_production->symbols().back()->index() << " ";
+        /*debug*/ m_log.out << m_active_production->symbols().back()->lexeme() << " ";
+        /*debug*/ m_log.out << m_log.creset << "\n";
+        exit(0);
     }
     return *this;
 }
@@ -501,7 +565,7 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
     if (m_productions.empty()) {
         assert(m_start_symbol);
         std::shared_ptr<gproduction> production = std::make_shared<gproduction>(int(m_productions.size()), m_start_symbol, 0, 0, nullptr);
-        /*debug*/ m_log.out << m_log.cggram << "yv::ggram = ";
+        /*debug*/ m_log.out << m_log.cggram << "            ";
         /*debug*/ m_log.out << "create PRODUC " << m_log.cwhite;
         /*debug*/ m_log.out << (void *)&*production << " ";
         /*debug*/ m_log.out << "[uc: " << production.use_count() << "] ";
