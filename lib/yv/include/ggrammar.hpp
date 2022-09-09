@@ -6,6 +6,7 @@
 #include "gsymboltype.hpp"
 
 #include "gsymbol.hpp" // ?
+#include "xtoken.hpp"
 
 #include <memory>
 #include <vector>
@@ -21,6 +22,8 @@ class ggrammar {
     std::vector<std::shared_ptr<gsymbol>> m_symbols;
     /// the productions in the grammar
     std::vector<std::shared_ptr<gproduction>> m_productions;
+    /// regexs that define whitespace in this grammar
+    std::vector<xtoken> m_whitespace_tokens;
     /// true iff a whitespace directive is active
     bool m_active_whitespace_directive;
     /// true iff a precedence directive is active
@@ -62,9 +65,11 @@ class ggrammar {
     ggrammar &production(const std::string &identifier, int line);
     ggrammar &end_production();
     ggrammar &error(int line);
+    ggrammar &literal(const std::string &literal, int line);
 
-  public:
+  private:
     const std::shared_ptr<gsymbol> &non_terminal_symbol(const std::string &lexeme, int line);
+    const std::shared_ptr<gsymbol> &literal_symbol(const std::string &lexeme, int line);
 
   public:
     const std::shared_ptr<gsymbol> &

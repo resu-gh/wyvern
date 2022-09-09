@@ -35,8 +35,10 @@ class gsymbol {
 
   public:
     int index() const;
+    int line() const;
     const std::string &lexeme() const;
     gsymboltype symbol_type() const;
+    glexemetype lexeme_type() const;
     gsymbolassoc associativity() const;
     int precedence() const;
     const std::vector<std::shared_ptr<gproduction>>& productions() const;

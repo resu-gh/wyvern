@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gaction.hpp"
+#include "glogger.hpp"
 #include "gsymbol.hpp"
 
 #include <memory>
@@ -24,14 +25,12 @@ class gproduction {
     /// rhs symbols of this production
     std::vector<std::shared_ptr<gsymbol>> m_symbols;
     /// the symbol that defines precedence for this production
-    const std::shared_ptr<gsymbol> m_precedence_symbol;
+    std::shared_ptr<gsymbol> m_precedence_symbol;
+    /// logger
+    glogger m_log;
 
   public:
-    gproduction(int index,
-                const std::shared_ptr<gsymbol> &symbol,
-                int line,
-                int column,
-                const std::shared_ptr<gaction> &action);
+    gproduction(int index, const std::shared_ptr<gsymbol> &symbol, int line, int column, const std::shared_ptr<gaction> &action);
 
   public:
     int index() const;
@@ -43,7 +42,13 @@ class gproduction {
     const std::shared_ptr<gsymbol> &precedence_symbol() const;
 
   public:
+    void set_precedence_symbol(const std::shared_ptr<gsymbol> &symbol);
+
+  public:
     void append_symbol(const std::shared_ptr<gsymbol> &symbol);
+
+  public:
+    void dump(int separator, const std::string &color);
 
   public:
     static const int INVALID_INDEX = -1;

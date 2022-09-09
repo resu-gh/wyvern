@@ -18,12 +18,20 @@ int gsymbol::index() const {
     return m_index;
 }
 
+int gsymbol::line() const {
+    return m_line;
+}
+
 const std::string &gsymbol::lexeme() const {
     return m_lexeme;
 }
 
 gsymboltype gsymbol::symbol_type() const {
     return m_symbol_type;
+}
+
+glexemetype gsymbol::lexeme_type() const {
+    return m_lexeme_type;
 }
 
 gsymbolassoc gsymbol::associativity() const {
@@ -34,7 +42,7 @@ int gsymbol::precedence() const {
     return m_precedence;
 }
 
-    const std::vector<std::shared_ptr<gproduction>>& gsymbol::productions() const {
+const std::vector<std::shared_ptr<gproduction>> &gsymbol::productions() const {
     return m_productions;
 }
 
