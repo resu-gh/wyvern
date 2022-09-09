@@ -66,10 +66,12 @@ class ggrammar {
     ggrammar &end_production();
     ggrammar &error(int line);
     ggrammar &literal(const std::string &literal, int line);
+    ggrammar &regex(const std::string &regex, int line);
 
   private:
     const std::shared_ptr<gsymbol> &non_terminal_symbol(const std::string &lexeme, int line);
     const std::shared_ptr<gsymbol> &literal_symbol(const std::string &lexeme, int line);
+    const std::shared_ptr<gsymbol> &regex_symbol(const std::string &lexeme, int line);
 
   public:
     const std::shared_ptr<gsymbol> &

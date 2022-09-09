@@ -525,6 +525,7 @@ ggrammar &ggrammar::error(int line) {
         /*debug*/ m_log.out << m_log.cmagenta << symbol->precedence() << "";
         /*debug*/ m_log.out << m_log.creset << "\n";
     } else if (m_active_symbol) {
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
         /*debug*/ m_log.out << m_log.cggram << "      if   ";
         /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol == nullptr (case 2)\n";
         if (!m_active_production) {
@@ -549,7 +550,6 @@ ggrammar &ggrammar::error(int line) {
             /*debug*/ m_log.out << (m_active_production ? "] " : "");
             /*debug*/ m_log.out << (m_active_production ? std::to_string(m_active_production->index()) : "");
             /*debug*/ m_log.out << m_log.cggram << " (error)\n";
-            exit(0);
         }
         m_active_production->append_symbol(error_symbol());
         /*debug*/ m_log.out << m_log.cggram << "    push    error SYMBOL ";
@@ -584,7 +584,6 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
         m_whitespace_tokens.push_back(xtoken(xtokentype::TOKEN_LITERAL, 0, 0, nullptr, literal));
         /*debug*/ m_log.out << m_log.creset << "\n";
         /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
-        exit(0);
     } else if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
         /*debug*/ m_log.out << m_log.cggram << "      if   ";
         /*debug*/ m_log.out << m_log.ccyan << ".m_associativity != ASSOCIATE_NULL (case 2)\n";
@@ -596,8 +595,8 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
         /*debug*/ m_log.out << m_log.cggram << "     set   new SYMBOL .precedence ";
         /*debug*/ m_log.out << m_log.cwhite << symbol->precedence() << "\n";
     } else if (m_active_symbol) {
-            /*debug*/ m_log.out << m_log.cggram << "      if   ";
-            /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 3)\n";
+        /*debug*/ m_log.out << m_log.cggram << "      if   ";
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 3)\n";
         if (!m_active_production) {
             /*debug*/ m_log.out << m_log.cggram << "      if   ";
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 4)\n";
@@ -620,6 +619,40 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
     return *this;
 }
 
+ggrammar &ggrammar::regex(const std::string &regex, int line) {
+    assert(!regex.empty());
+    assert(line >= 0);
+    assert(m_active_whitespace_directive || m_associativity != gsymbolassoc::ASSOCIATE_NULL || m_active_symbol);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
+    /*debug*/ m_log.out << m_log.cmagenta << "    call   regex()\n";
+    if (m_active_whitespace_directive) {
+        /*debug*/ m_log.out << m_log.cggram << "    if  ";
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_whitespace_directive == true (case 1)\n";
+        m_whitespace_tokens.push_back(xtoken(xtokentype::TOKEN_REGULAR_EXPRESSION, 0, 0, nullptr, regex));
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+    } else if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
+        std::shared_ptr<gsymbol> symbol = regex_symbol(regex, line);
+        symbol->set_associativity(m_associativity);
+        symbol->set_precedence(m_precedence);
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+    } else if (m_active_symbol) {
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        if (!m_active_production) {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production = add_production(m_active_symbol, line);
+        }
+        if (m_active_precedence_directive) {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production->set_precedence_symbol(regex_symbol(regex, line));
+            m_active_precedence_directive = false;
+        } else {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production->append_symbol(regex_symbol(regex, line));
+        }
+    }
+    return *this;
+}
+
 const std::shared_ptr<gsymbol> &ggrammar::non_terminal_symbol(const std::string &lexeme, int line) {
     assert(!lexeme.empty());
     assert(line >= 0);
@@ -630,6 +663,12 @@ const std::shared_ptr<gsymbol> &ggrammar::literal_symbol(const std::string &lexe
     assert(!lexeme.empty());
     assert(line >= 0);
     return add_symbol(lexeme, line, glexemetype::LEXEME_LITERAL, gsymboltype::SYMBOL_TERMINAL);
+}
+
+const std::shared_ptr<gsymbol> &ggrammar::regex_symbol(const std::string &lexeme, int line) {
+    assert(!lexeme.empty());
+    assert(line >= 0);
+    return add_symbol(lexeme, line, glexemetype::LEXEME_REGULAR_EXPRESSION, gsymboltype::SYMBOL_TERMINAL);
 }
 
 const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type) {

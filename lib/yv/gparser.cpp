@@ -111,7 +111,7 @@ bool gparser::match_symbol() {
         m_grammar->literal(m_lexeme, m_line);
         return true;
     } else if (match_regex()) {
-        // m_grammar->regex(m_lexeme.c_str(), m_line)
+        m_grammar->regex(m_lexeme, m_line);
         return true;
     } else if (match_identifier()) {
         // m_grammar->identifier(m_lexeme.c_str(), m_line);
