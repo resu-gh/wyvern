@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gaction.hpp"
 #include "glexemetype.hpp"
 #include "glogger.hpp"
 #include "gsymbolassoc.hpp"
@@ -22,6 +23,8 @@ class ggrammar {
     std::vector<std::shared_ptr<gsymbol>> m_symbols;
     /// the productions in the grammar
     std::vector<std::shared_ptr<gproduction>> m_productions;
+    /// the productions in the grammar
+    std::vector<std::shared_ptr<gaction>> m_actions;
     /// regexs that define whitespace in this grammar
     std::vector<xtoken> m_whitespace_tokens;
     /// true iff a whitespace directive is active
@@ -64,9 +67,12 @@ class ggrammar {
     ggrammar &precedence(int line);
     ggrammar &production(const std::string &identifier, int line);
     ggrammar &end_production();
+    ggrammar &end_expression(int line);
     ggrammar &error(int line);
+    ggrammar &action(const std::string &identifier, int line);
     ggrammar &literal(const std::string &literal, int line);
     ggrammar &regex(const std::string &regex, int line);
+    ggrammar &identifier(const std::string &identifier, int line);
 
   private:
     const std::shared_ptr<gsymbol> &non_terminal_symbol(const std::string &lexeme, int line);
@@ -78,4 +84,6 @@ class ggrammar {
     add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type);
     const std::shared_ptr<gproduction> &
     add_production(const std::shared_ptr<gsymbol> &symbol, int line);
+    const std::shared_ptr<gaction> &
+    add_action(const std::string &identifier);
 };

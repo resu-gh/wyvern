@@ -46,6 +46,10 @@ void gproduction::set_precedence_symbol(const std::shared_ptr<gsymbol> &symbol) 
     m_precedence_symbol = symbol;
 }
 
+void gproduction::set_action(const std::shared_ptr<gaction> &action) {
+    m_action = action;
+}
+
 void gproduction::append_symbol(const std::shared_ptr<gsymbol> &symbol) {
     m_symbols.push_back(symbol);
 }

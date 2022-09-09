@@ -1,7 +1,7 @@
 errcalc {
     %whitespace "[ \t\r\n]*";
-    %left '(' ')';
     %none error;
+    %left '(' ')';
     %left '+' '-';
     %left '*' '/';
     %none integer;

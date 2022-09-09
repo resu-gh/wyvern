@@ -114,7 +114,7 @@ bool gparser::match_symbol() {
         m_grammar->regex(m_lexeme, m_line);
         return true;
     } else if (match_identifier()) {
-        // m_grammar->identifier(m_lexeme.c_str(), m_line);
+        m_grammar->identifier(m_lexeme, m_line);
         return true;
     }
     return false;
@@ -178,7 +178,7 @@ bool gparser::match_whitespace_statement() {
     if (match("%whitespace")) {
         m_grammar->whitespace(m_line);
         if (match_regex()) {
-            // m_grammar->regex(m_lexeme.c_str(),m_line);
+            m_grammar->regex(m_lexeme.c_str(),m_line);
         }
         expect(";");
         return true;
@@ -192,7 +192,7 @@ bool gparser::match_production_statement() {
         expect(":");
         match_expressions();
         expect(";");
-        m_grammar->end_production(); // done
+        m_grammar->end_production();
         return true;
     }
     return false;
@@ -224,12 +224,12 @@ bool gparser::match_precedence() {
 bool gparser::match_action() {
     if (match("[")) {
         if (match_identifier()) {
-            // m_grammar->action(m_lexeme.c_str(), m_line);
+            m_grammar->action(m_lexeme, m_line);
         }
         expect("]");
         return true;
     }
-    // m_grammar->end_expression(m_line);
+    m_grammar->end_expression(m_line);
     return false;
 }
 

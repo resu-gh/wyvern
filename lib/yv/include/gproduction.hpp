@@ -21,7 +21,7 @@ class gproduction {
     /// the column where this production is defined
     int m_column;
     /// the action to take when this production is reduced (null = no action)
-    const std::shared_ptr<gaction> m_action;
+    std::shared_ptr<gaction> m_action;
     /// rhs symbols of this production
     std::vector<std::shared_ptr<gsymbol>> m_symbols;
     /// the symbol that defines precedence for this production
@@ -43,6 +43,7 @@ class gproduction {
 
   public:
     void set_precedence_symbol(const std::shared_ptr<gsymbol> &symbol);
+    void set_action(const std::shared_ptr<gaction> &action);
 
   public:
     void append_symbol(const std::shared_ptr<gsymbol> &symbol);

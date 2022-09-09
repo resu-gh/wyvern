@@ -17,6 +17,7 @@ ggrammar::ggrammar()
     : m_identifier(),
       m_symbols(),
       m_productions(),
+      m_actions(),
       m_whitespace_tokens(),
       m_active_whitespace_directive(false),
       m_active_precedence_directive(false),
@@ -653,6 +654,68 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
     return *this;
 }
 
+ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
+    assert(!identifier.empty());
+    assert(line >= 0);
+    assert(m_active_symbol || m_associativity != gsymbolassoc::ASSOCIATE_NULL);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
+    /*debug*/ m_log.out << m_log.cmagenta << "    call   identifier()\n";
+    if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        std::shared_ptr<gsymbol> symbol = non_terminal_symbol(identifier, line);
+        symbol->set_associativity(m_associativity);
+        symbol->set_precedence(m_precedence);
+    } else if (m_active_symbol) {
+        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        if (!m_active_production) {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production = add_production(m_active_symbol, line);
+        }
+        if (m_active_precedence_directive) {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production->set_precedence_symbol(non_terminal_symbol(identifier, line));
+            m_active_precedence_directive = false;
+        } else {
+            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            m_active_production->append_symbol(non_terminal_symbol(identifier, line));
+        }
+    }
+    return *this;
+}
+
+ggrammar &ggrammar::action(const std::string &identifier, int line) {
+    assert(!identifier.empty());
+    assert(line >= 1);
+    assert(m_active_symbol);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
+    /*debug*/ m_log.out << m_log.cmagenta << "    call   action()\n";
+    if (m_active_symbol) {
+        if (!m_active_production) {
+            m_active_production = add_production(m_active_symbol, line);
+        }
+        m_active_production->set_action(add_action(identifier));
+        m_active_production = nullptr;
+    }
+    return *this;
+}
+
+ggrammar &ggrammar::end_expression(int line) {
+    assert(line >= 1);
+    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
+    /*debug*/ m_log.out << m_log.cmagenta << "    call   end_expression()\n";
+    // if active_symbol but not active_production
+    // an empty production is being specified
+    // the nil action marks the end of a production
+    // for which no symbols have been specified
+    if (m_active_symbol) {
+        if (!m_active_production) {
+            m_active_production = add_production(m_active_symbol, line);
+        }
+    }
+    m_active_production = nullptr;
+    return *this;
+}
+
 const std::shared_ptr<gsymbol> &ggrammar::non_terminal_symbol(const std::string &lexeme, int line) {
     assert(!lexeme.empty());
     assert(line >= 0);
@@ -859,4 +922,20 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
     /*debug*/ m_log.out << "[uc: " << m_productions.back().use_count() << "] ";
     /*debug*/ m_log.out << m_log.cggram << "\n";
     return m_productions.back();
+}
+
+const std::shared_ptr<gaction> &ggrammar::add_action(const std::string &identifier) {
+    assert(!identifier.empty());
+    /*debug*/ m_log.out << m_log.cmagenta;
+    /*debug*/ m_log.out << "    call   add_action()\n";
+    std::vector<std::shared_ptr<gaction>>::const_iterator i = m_actions.begin();
+    while (i != m_actions.end() && i->get()->identifier() != identifier)
+        ++i;
+    if (i == m_actions.end()) {
+        int index = int(m_actions.size());
+        std::shared_ptr<gaction> action = std::make_shared<gaction>(index, identifier);
+        m_actions.push_back(std::move(action));
+        return m_actions.back();
+    }
+    return *i;
 }
