@@ -11,44 +11,27 @@ gcompiler::gcompiler()
       m_log() {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
-    // debug begin
-    m_log.out << m_log.cgcomp << "yv::gcomp = ";
-    m_log.out << "[b, e) = ";
-    m_log.out << "[" << (void *)&*begin;
-    m_log.out << ", " << (void *)&*end << ")";
-    m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << m_log.cgcomp << "yv::gcomp = ";
+    /*debug*/ m_log.out << "[b, e) = ";
+    /*debug*/ m_log.out << "[" << (void *)&*begin;
+    /*debug*/ m_log.out << ", " << (void *)&*end << ")";
+    /*debug*/ m_log.out << m_log.creset << "\n";
 
-    m_log.out << m_log.cgcomp << "yv::gcomp = ";
-    m_log.out << "&ggrammar = ";
-    m_log.out << (void *)&*m_grammar;
-    m_log.out << " [uses: " << m_grammar.use_count() << "]";
-    m_log.out << m_log.creset << "\n";
-    // debug end
+    /*debug*/ m_log.out << m_log.cgcomp << "yv::gcomp = ";
+    /*debug*/ m_log.out << "&ggrammar = ";
+    /*debug*/ m_log.out << (void *)&*m_grammar;
+    /*debug*/ m_log.out << " [uses: " << m_grammar.use_count() << "]";
+    /*debug*/ m_log.out << m_log.creset << "\n";
 
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);
-
-    return 0;
-
-    // debug begin
-    m_log.out << m_log.cgcomp << "yv::gcomp = ";
-    m_log.out << "ggrammar ident = ";
-    m_log.out << m_grammar->identifier();
-    m_log.out << m_log.creset << "\n";
-
-    /// convert into m_grammar.dump()
-    m_log.out << m_log.cgcomp;
-    for (auto s : m_grammar->symbols())
-        m_log.out << "                             " << s->lexeme() << "\n";
-    m_log.out << m_log.creset;
-    // debug end
 
     if (errors == 0) {
         ggenerator generator;
         errors = generator.generate(m_grammar);
 
         if (errors == 0) {
-            printf("gcom ok\n");
+            printf("gcom no errors\n");
         }
     }
 

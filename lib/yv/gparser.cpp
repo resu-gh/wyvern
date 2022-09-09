@@ -178,7 +178,7 @@ bool gparser::match_whitespace_statement() {
     if (match("%whitespace")) {
         m_grammar->whitespace(m_line);
         if (match_regex()) {
-            m_grammar->regex(m_lexeme.c_str(),m_line);
+            m_grammar->regex(m_lexeme.c_str(), m_line);
         }
         expect(";");
         return true;

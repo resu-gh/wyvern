@@ -41,7 +41,7 @@ class gsymbol {
     glexemetype lexeme_type() const;
     gsymbolassoc associativity() const;
     int precedence() const;
-    const std::vector<std::shared_ptr<gproduction>>& productions() const;
+    const std::vector<std::shared_ptr<gproduction>> &productions() const;
 
   public:
     void set_line(int line);
@@ -52,5 +52,5 @@ class gsymbol {
 
   public:
     bool matches(const std::string &lexeme, gsymboltype symbol_type);
-    void append_production(const std::shared_ptr<gproduction>& production);
+    void append_production(const std::shared_ptr<gproduction> &production);
 };

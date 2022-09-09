@@ -939,3 +939,70 @@ const std::shared_ptr<gaction> &ggrammar::add_action(const std::string &identifi
     }
     return *i;
 }
+
+void ggrammar::dump() const {
+    const std::string cc = "\033[38;5;240m";
+    const std::string cc2 = "\033[38;5;245m";
+    m_log.out << "\n";
+    m_log.out << m_log.cred << "IDENTIFIER: ";
+    m_log.out << m_log.cmagenta << m_identifier;
+    m_log.out << m_log.creset << "\n";
+    m_log.out << m_log.cred << "\nSYMBOLS:\n" << m_log.creset;
+    for (auto s : m_symbols) {
+        m_log.out << m_log.cgreen << s->index() << " ";
+        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*s) << " <";
+        m_log.out << m_log.ccyan << s.use_count() << "> ";
+        m_log.out << m_log.cmagenta << s->lexeme() << " ";
+        m_log.out << cc;
+        m_log.out << s->precedence() << " ";
+        m_log.out << s->symbol_type() << " ";
+        m_log.out << s->lexeme_type() << " ";
+        m_log.out << s->associativity() << " ";
+        if (s->productions().size()) {
+            m_log.out << "[";
+            m_log.out << cc2;
+            for (auto p : s->productions()) {
+                m_log.out << p->index();
+                if (&*p != &*(s->productions().end() - 1)->get())
+                    m_log.out << cc << "," << cc2;
+            }
+            m_log.out << cc;
+            m_log.out << "]";
+        }
+        m_log.out << "\n";
+    }
+    m_log.out << m_log.creset << "\n";
+    m_log.out << m_log.cred << "PRODUCTIONS:\n" << m_log.creset;
+    for (auto p : m_productions) {
+        if (p->index() < 10)
+            m_log.out << " ";
+        m_log.out << m_log.cgreen << p->index() << " ";
+        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*p) << " <";
+        m_log.out << m_log.ccyan << p.use_count() << "> ";
+        m_log.out << m_log.cmagenta << p->symbol()->lexeme() << " ";
+        m_log.out << cc;
+        m_log.out << "[";
+        m_log.out << cc2;
+        for (auto es : p->symbols()) {
+            m_log.out << es->lexeme();
+            if (&*es != &*(p->symbols().end() - 1)->get())
+                m_log.out << cc << "," << cc2;
+        }
+        m_log.out << cc;
+        m_log.out << "] ";
+        if (p->action())
+            m_log.out << "(" << p->action()->identifier() << ") ";
+        m_log.out << "\n";
+    }
+    m_log.out << m_log.creset << "\n";
+    m_log.out << m_log.cred << "WHITESPACE TOKENS:\n" << m_log.creset;
+    for (auto t : m_whitespace_tokens) {
+        m_log.out << m_log.cgreen << t.line() << " ";
+        m_log.out << m_log.ccyan << "." << reinterpret_cast<std::uintptr_t>(&t) << " ";
+        m_log.out << m_log.cmagenta << t.lexeme() << " ";
+        m_log.out << cc;
+        m_log.out << t.type();
+        m_log.out << "\n";
+    }
+    m_log.out << m_log.creset << "\n";
+}

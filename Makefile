@@ -1,4 +1,4 @@
-SRCD := src
+SRCD := src lib
 SRCS := $(shell find $(SRCD) -name "*.cpp" -or -name "*.hpp")
 
 BAZELCC := clang++

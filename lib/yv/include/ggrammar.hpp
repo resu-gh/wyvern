@@ -54,7 +54,7 @@ class ggrammar {
   public:
     const std::string &identifier() const;
     std::vector<std::shared_ptr<gsymbol>> &symbols();
-    const std::shared_ptr<gsymbol>&error_symbol() const;
+    const std::shared_ptr<gsymbol> &error_symbol() const;
 
   public:
     // why ggrammar& returns ?
@@ -80,10 +80,10 @@ class ggrammar {
     const std::shared_ptr<gsymbol> &regex_symbol(const std::string &lexeme, int line);
 
   public:
-    const std::shared_ptr<gsymbol> &
-    add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type);
-    const std::shared_ptr<gproduction> &
-    add_production(const std::shared_ptr<gsymbol> &symbol, int line);
-    const std::shared_ptr<gaction> &
-    add_action(const std::string &identifier);
+    const std::shared_ptr<gsymbol> &add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type);
+    const std::shared_ptr<gproduction> &add_production(const std::shared_ptr<gsymbol> &symbol, int line);
+    const std::shared_ptr<gaction> &add_action(const std::string &identifier);
+
+  public:
+    void dump() const;
 };
