@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 
     /*debug*/ ylogger ylog;
     /*debug*/ ylog.out << ylog.cmain;
-    /*debug*/ ylog.out << "ycc:main:main()           ";
+    /*debug*/ ylog.out << "ycc:main:main()             ";
     /*debug*/ ylog.out << ylog.cmagenta << "get ";
     /*debug*/ ylog.out << "\033[38;5;240m";
     /*debug*/ ylog.out << "[begin, end) ";

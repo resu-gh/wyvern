@@ -7,10 +7,10 @@
 
 ggenerator::ggenerator()
     : m_identifier(),
-      m_errors(0),
       m_actions(),
       m_productions(),
       m_symbols(),
+      m_errors(0),
       m_log("ggenr", 40) {}
 
 int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {

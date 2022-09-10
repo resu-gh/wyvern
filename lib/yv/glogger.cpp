@@ -43,8 +43,21 @@ std::ostream &glogger::trace(int cont) const {
     return out << m_col << s.str() << cnr;
 }
 
+std::ostream &glogger::etrace(int cont) const {
+    std::stringstream s;
+    if (cont)
+        s << std::string(sep, ' ');
+    else
+        s << m_loc << m_fun;
+    if (s.str().size() < sep)
+        s << std::string(sep - s.str().size(), ' ');
+    return err << m_col << s.str() << cred;
+}
+
 std::string glogger::op(const std::string &op) const {
     std::stringstream s;
+    if (op.size() < osep)
+        s << std::string(osep - op.size(), ' ');
     s << cmagenta << op << " " << cnr;
     return s.str();
 }

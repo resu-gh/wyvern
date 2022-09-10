@@ -27,7 +27,8 @@ class glogger final {
     const std::string cnr = "\033[38;5;240m";
     const std::string chl = "\033[38;5;245m";
 
-    int sep = 25;
+    uint32_t sep = 25;
+    uint32_t osep = 6;
 
   private:
     std::string m_loc;
@@ -45,4 +46,5 @@ class glogger final {
     std::string bg(int) const;
     std::string op(const std::string&) const;
     std::ostream &trace(int) const;
+    std::ostream &etrace(int) const;
 };
