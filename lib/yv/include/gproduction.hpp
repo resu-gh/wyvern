@@ -49,7 +49,7 @@ class gproduction {
     void append_symbol(const std::shared_ptr<gsymbol> &symbol);
 
   public:
-    void dump(int separator, const std::string &color);
+    std::string microdump()const;
 
   public:
     static const int INVALID_INDEX = -1;

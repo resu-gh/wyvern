@@ -1,5 +1,6 @@
 #include "include/gproduction.hpp"
 #include <cassert>
+#include <sstream>
 
 gproduction::gproduction(int index, const std::shared_ptr<gsymbol> &symbol, int line, int column, const std::shared_ptr<gaction> &action)
     : m_index(index),
@@ -54,10 +55,9 @@ void gproduction::append_symbol(const std::shared_ptr<gsymbol> &symbol) {
     m_symbols.push_back(symbol);
 }
 
-void gproduction::dump(int separator, const std::string &color) {
-    std::string sep(separator, ' ');
-    m_log.out << sep << color << "&*this ";
-    m_log.out << m_log.cwhite << (void *)&*this << "\n";
-    m_log.out << sep << color << ".index ";
-    m_log.out << m_log.cwhite << m_index << "\n";
+std::string gproduction::microdump() const {
+    std::stringstream s;
+    s << (void*)&*this << " ";
+    s << m_index << " ";
+    return s.str();
 }

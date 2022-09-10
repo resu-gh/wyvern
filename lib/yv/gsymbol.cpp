@@ -2,6 +2,7 @@
 #include "include/gsymboltype.hpp"
 
 #include <cassert>
+#include <sstream>
 #include <vector>
 
 gsymbol::gsymbol(const std::string &lexeme)
@@ -78,4 +79,12 @@ bool gsymbol::matches(const std::string &lexeme, gsymboltype symbol_type) {
 void gsymbol::append_production(const std::shared_ptr<gproduction> &production) {
     assert(production);
     m_productions.push_back(production);
+}
+
+std::string gsymbol::microdump() const {
+    std::stringstream s;
+    s << (void *)&*this << " ";
+    s << m_index << " ";
+    s << m_lexeme << " ";
+    return s.str();
 }

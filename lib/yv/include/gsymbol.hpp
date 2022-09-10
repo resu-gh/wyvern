@@ -53,4 +53,7 @@ class gsymbol {
   public:
     bool matches(const std::string &lexeme, gsymboltype symbol_type);
     void append_production(const std::shared_ptr<gproduction> &production);
+
+    public:
+    std::string microdump()const;
 };
