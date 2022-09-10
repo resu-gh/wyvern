@@ -510,7 +510,7 @@ ggrammar &ggrammar::error(int line) {
     return *this;
 }
 
-// TODO comment
+// TODO end comment
 ggrammar &ggrammar::literal(const std::string &literal, int line) {
     /*debug*/ m_log.set_function("literal");
 
@@ -562,20 +562,20 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
 
             m_active_production = add_production(m_active_symbol, line);
             /*debug*/ m_log.set_function("literal");
-            /*debug*/ m_log.trace(0) << m_log.op("test") << "continue from here\n";
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "comment" << m_log.creset << "\n";
         }
         if (m_active_precedence_directive) {
             /*debug*/ m_log.trace(1) << m_log.op("if");
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 5)\n";
 
-            /*debug*/ m_log.out << m_log.cerror << "TODO debug" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->set_precedence_symbol(literal_symbol(literal, line));
             m_active_precedence_directive = false;
         } else {
             /*debug*/ m_log.trace(1) << m_log.op("if");
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 6)\n";
 
-            /*debug*/ m_log.out << m_log.cerror << "TODO debug" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->append_symbol(literal_symbol(literal, line));
         }
     }
@@ -583,103 +583,161 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
     return *this;
 }
 
-// TODO comment
+// TODO end comment
 ggrammar &ggrammar::regex(const std::string &regex, int line) {
+    /*debug*/ m_log.set_function("regex");
+
     assert(!regex.empty());
     assert(line >= 0);
     assert(m_active_whitespace_directive || m_associativity != gsymbolassoc::ASSOCIATE_NULL || m_active_symbol);
-    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
-    /*debug*/ m_log.out << m_log.cmagenta << "    call   regex()\n";
+
     if (m_active_whitespace_directive) {
-        /*debug*/ m_log.out << m_log.cggram << "    if  ";
+        /*debug*/ m_log.trace(1) << m_log.op("if");
         /*debug*/ m_log.out << m_log.ccyan << ".m_active_whitespace_directive == true (case 1)\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
         m_whitespace_tokens.push_back(xtoken(xtokentype::TOKEN_REGULAR_EXPRESSION, 0, 0, nullptr, regex));
-        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+
     } else if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_associativity != ASSOCIATE_NULL (case 2)\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
         std::shared_ptr<gsymbol> symbol = regex_symbol(regex, line);
         symbol->set_associativity(m_associativity);
         symbol->set_precedence(m_precedence);
-        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+
     } else if (m_active_symbol) {
-        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 3)\n";
+
         if (!m_active_production) {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 4)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production = add_production(m_active_symbol, line);
         }
         if (m_active_precedence_directive) {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 5)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->set_precedence_symbol(regex_symbol(regex, line));
             m_active_precedence_directive = false;
+
         } else {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 6)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->append_symbol(regex_symbol(regex, line));
         }
     }
     return *this;
 }
 
-// TODO comment
+// TODO end comment
 ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
+    /*debug*/ m_log.set_function("identifier");
+
     assert(!identifier.empty());
     assert(line >= 0);
     assert(m_active_symbol || m_associativity != gsymbolassoc::ASSOCIATE_NULL);
-    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
-    /*debug*/ m_log.out << m_log.cmagenta << "    call   identifier()\n";
+
     if (m_associativity != gsymbolassoc::ASSOCIATE_NULL) {
-        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_associativity == ASSOCIATE_NULL (case 1)\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
         std::shared_ptr<gsymbol> symbol = non_terminal_symbol(identifier, line);
         symbol->set_associativity(m_associativity);
         symbol->set_precedence(m_precedence);
+
     } else if (m_active_symbol) {
-        /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 2)\n";
+
         if (!m_active_production) {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 3)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production = add_production(m_active_symbol, line);
         }
         if (m_active_precedence_directive) {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 4)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->set_precedence_symbol(non_terminal_symbol(identifier, line));
             m_active_precedence_directive = false;
+
         } else {
-            /*debug*/ m_log.out << m_log.cerror << "TODO comment" << m_log.creset << "\n";
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 5)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production->append_symbol(non_terminal_symbol(identifier, line));
         }
     }
     return *this;
 }
 
-// TODO comment
+// TODO end comment
 ggrammar &ggrammar::action(const std::string &identifier, int line) {
+    /*debug*/ m_log.set_function("action");
+
     assert(!identifier.empty());
     assert(line >= 1);
     assert(m_active_symbol);
-    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
-    /*debug*/ m_log.out << m_log.cmagenta << "    call   action()\n";
+
     if (m_active_symbol) {
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 1)\n";
+
         if (!m_active_production) {
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 2)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production = add_production(m_active_symbol, line);
         }
+
+        /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
         m_active_production->set_action(add_action(identifier));
         m_active_production = nullptr;
     }
+
     return *this;
 }
 
-// TODO comment
+// TODO end comment
 ggrammar &ggrammar::end_expression(int line) {
+    /*debug*/ m_log.set_function("end_expression");
+
     assert(line >= 1);
-    /*debug*/ m_log.out << m_log.cggram << "yv::ggram =\n";
-    /*debug*/ m_log.out << m_log.cmagenta << "    call   end_expression()\n";
+
     // if active_symbol but not active_production
     // an empty production is being specified
     // the nil action marks the end of a production
     // for which no symbols have been specified
     if (m_active_symbol) {
+        /*debug*/ m_log.trace(1) << m_log.op("if");
+        /*debug*/ m_log.out << m_log.ccyan << ".m_active_symbol != nullptr (case 1)\n";
+
         if (!m_active_production) {
+            /*debug*/ m_log.trace(1) << m_log.op("if");
+            /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 2)\n";
+
+            /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
             m_active_production = add_production(m_active_symbol, line);
         }
     }
+
+    /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
     m_active_production = nullptr;
+
     return *this;
 }
 
@@ -740,99 +798,69 @@ const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, 
     return *i;
 }
 
-// TODO comment
 const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_ptr<gsymbol> &symbol, int line) {
-    m_log.set_function("add_produc");
+    /*debug*/ m_log.set_function("add_produc");
 
     assert(symbol);
     assert(line > 0);
 
     if (m_productions.empty()) {
         m_log.trace(0) << m_log.op("if") << m_log.ccyan << ".m_productions is empty\n";
+
         assert(m_start_symbol);
+
+        /*debug*/ m_log.trace(0) << m_log.op("new") << "PRODUC from .m_start_symbol\n";
         std::shared_ptr<gproduction> production = std::make_shared<gproduction>(int(m_productions.size()), m_start_symbol, 0, 0, nullptr);
-        /*debug*/ m_log.out << m_log.cggram << "  create   new PRODUC ";
-        /*debug*/ m_log.out << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*production << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production) << ") ";
-        /*debug*/ m_log.out << "<" << production.use_count() << ">\n";
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "            on SYMBOL ";
-        /*debug*/ m_log.out << m_log.cwhite;
-        /*debug*/ m_log.out << &*production.get()->symbol() << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production.get()->symbol()) << ") ";
-        /*debug*/ m_log.out << "<" << production.get()->symbol().use_count() << "> ";
-        /*debug*/ m_log.out << production.get()->symbol()->index() << " ";
-        /*debug*/ m_log.out << production.get()->symbol()->lexeme() << "\n";
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "            w/ ACTION ";
-        /*debug*/ m_log.out << m_log.cwhite;
-        /*debug*/ m_log.out << production.get()->action() << " ";
-        /*debug*/ m_log.out << (production.get()->action() ? "<" : "");
-        /*debug*/ m_log.out << (production.get()->action() ? std::to_string(production.get()->action().use_count()) : "");
-        /*debug*/ m_log.out << (production.get()->action() ? "> " : "");
-        /*debug*/ m_log.out << (production.get()->action() ? std::to_string(production.get()->action()->index()) : "");
-        /*debug*/ m_log.out << (production.get()->action() ? " " : "");
-        /*debug*/ m_log.out << (production.get()->action() ? production.get()->action()->identifier() : "");
-        /*debug*/ m_log.out << m_log.creset << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+        /*debug*/ m_log.out << (void *)&*production << " ";
+        /*debug*/ m_log.out << "<" << production.use_count() << "> ";
+        /*debug*/ m_log.out << production->index() << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+        /*debug*/ m_log.out << "on " << (void *)&*production->symbol() << " ";
+        /*debug*/ m_log.out << "<" << production->symbol().use_count() << "> ";
+        /*debug*/ m_log.out << production->symbol()->index() << " ";
+        /*debug*/ m_log.out << production->symbol()->lexeme() << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+        /*debug*/ m_log.out << "w/ " << (void *)&*production->action() << " <";
+        /*debug*/ m_log.out << (production->action() ? production->action().use_count() : 0) << "> ";
+        /*debug*/ m_log.out << (production->action() ? production->action()->index() : 0) << " ";
+        /*debug*/ m_log.out << (production->action() ? production->action()->identifier() : "") << "\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("push") << "new PRODUC <- symbol (param)\n";
         production->append_symbol(symbol);
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "    push   arg SYMBOL " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*symbol << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*symbol) << ") ";
+        /*debug*/ m_log.trace(1) << m_log.op("check") << m_log.chl;
+        /*debug*/ m_log.out << (void *)&*symbol << " ";
         /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
         /*debug*/ m_log.out << symbol->index() << " ";
-        /*debug*/ m_log.out << symbol->lexeme() << " ";
-        /*debug*/ m_log.out << m_log.cggram << "\n";
-        /*debug*/ m_log.out << "            to PRODUC " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*production << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production) << ") ";
-        /*debug*/ m_log.out << "<" << production.use_count() << ">\n";
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "           chk SYMBOL " << m_log.cwhite;
-        /*debug*/ m_log.out << &*production->symbols().back() << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production->symbols().back()) << ") ";
+        /*debug*/ m_log.out << symbol->lexeme() << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cgreen;
+        /*debug*/ m_log.out << (void *)&*production->symbols().back() << " ";
         /*debug*/ m_log.out << "<" << production->symbols().back().use_count() << "> ";
         /*debug*/ m_log.out << production->symbols().back()->index() << " ";
-        /*debug*/ m_log.out << production->symbols().back()->lexeme() << " ";
-        /*debug*/ m_log.out << m_log.creset << "\n";
+        /*debug*/ m_log.out << production->symbols().back()->lexeme() << "\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("push") << ".m_start_symbol <- new PRODUC\n";
         m_start_symbol->append_production(production);
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "    push   new PRODUC " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*production << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production) << ") ";
-        /*debug*/ m_log.out << "<" << production.use_count() << ">\n";
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "            to START  " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*m_start_symbol << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_start_symbol) << ") ";
-        /*debug*/ m_log.out << "<" << m_start_symbol.use_count() << "> ";
-        /*debug*/ m_log.out << m_start_symbol->index() << " ";
-        /*debug*/ m_log.out << m_start_symbol->lexeme() << " ";
-        /*debug*/ m_log.out << m_log.cggram << "\n";
-        /*debug*/ m_log.out << "           chk START  " << m_log.cwhite;
-        /*debug*/ m_log.out << &*m_start_symbol->productions().back() << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_start_symbol->productions().back()) << ") ";
-        /*debug*/ m_log.out << "<" << m_start_symbol->productions().back().use_count() << "> ";
-        /*debug*/ m_log.out << m_log.creset << "\n";
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "  move->   .m_productions " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*production << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*production) << ") ";
+        /*debug*/ m_log.trace(1) << m_log.op("check") << m_log.chl;
+        /*debug*/ m_log.out << (void *)&*production << " ";
         /*debug*/ m_log.out << "<" << production.use_count() << "> ";
-        /*debug*/ m_log.out << m_log.cggram << "\n";
+        /*debug*/ m_log.out << production->index() << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cgreen;
+        /*debug*/ m_log.out << (void *)&*m_start_symbol->productions().back() << " ";
+        /*debug*/ m_log.out << "<" << m_start_symbol->productions().back().use_count() << "> ";
+        /*debug*/ m_log.out << m_start_symbol->productions().back()->index() << "\n";
+
+        /*debug*/ m_log.trace(1) << m_log.op("move") << ".m_productions <- new PRODUC\n";
         m_productions.push_back(std::move(production));
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "           chk PRODUC     " << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*m_productions.back() << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_productions.back()) << ") ";
+        /*debug*/ m_log.trace(1) << m_log.op("check") << m_log.cgreen;
+        /*debug*/ m_log.out << (void *)&*m_productions.back() << " ";
         /*debug*/ m_log.out << "<" << m_productions.back().use_count() << "> ";
-        /*debug*/ m_log.out << m_log.cggram << "\n";
+        /*debug*/ m_log.out << m_productions.back()->index() << "\n";
 
         return m_productions.back();
     }
 
-    /*debug*/ m_log.trace(0) << m_log.op("new") << "PRODUC\n";
+    /*debug*/ m_log.trace(0) << m_log.op("new") << "PRODUC from symbol (param)\n";
     std::shared_ptr<gproduction> production = std::make_shared<gproduction>(int(m_productions.size()), symbol, line, -1, nullptr);
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << (void *)&*production << " ";
@@ -872,18 +900,23 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
 
 // TODO comment
 const std::shared_ptr<gaction> &ggrammar::add_action(const std::string &identifier) {
+    /*debug*/ m_log.set_function("add_produc");
+
     assert(!identifier.empty());
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   add_action()\n";
+
+    /*debug*/ m_log.trace(1) << m_log.op("todo") << m_log.cerror << "debug/comment" << m_log.creset << "\n";
     std::vector<std::shared_ptr<gaction>>::const_iterator i = m_actions.begin();
+
     while (i != m_actions.end() && i->get()->identifier() != identifier)
         ++i;
+
     if (i == m_actions.end()) {
         int index = int(m_actions.size());
         std::shared_ptr<gaction> action = std::make_shared<gaction>(index, identifier);
         m_actions.push_back(std::move(action));
         return m_actions.back();
     }
+
     return *i;
 }
 
