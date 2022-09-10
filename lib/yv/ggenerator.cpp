@@ -25,40 +25,46 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     m_end_symbol = m_grammar->end_symbol();
     m_error_symbol = m_grammar->error_symbol();
 
-#ifndef DEBUG
-    /*debug*/ m_log.trace(0) << m_log.op("copy") << "ggram              ->" << m_log.chl << " .m_grammar\n";
-    /*debug*/ m_log.trace(0) << m_log.op("copy") << "ggram.identifier   ->" << m_log.chl << " .m_identifier\n";
-    /*debug*/ m_log.trace(0) << m_log.op("swap") << "ggram.actions      ->" << m_log.chl << " .m_actions\n";
-    /*debug*/ m_log.trace(0) << m_log.op("swap") << "ggram.productions  ->" << m_log.chl << " .m_productions\n";
-    /*debug*/ m_log.trace(0) << m_log.op("swap") << "ggram.symbols      ->" << m_log.chl << " .m_symbols\n";
-    /*debug*/ m_log.trace(0) << m_log.op("copy") << "ggram.start_symbol ->" << m_log.chl << " .m_start_symbol\n";
-    /*debug*/ m_log.trace(0) << m_log.op("copy") << "ggram.end_symbol   ->" << m_log.chl << " .m_end_symbol\n";
-    /*debug*/ m_log.trace(0) << m_log.op("copy") << "ggram.error_symbol ->" << m_log.chl << " .m_error_symbol\n";
-    /*debug*/ m_log.trace(0) << m_log.op("init") << "m_errors            =" << m_log.chl << " 0\n";
-#endif // !DEBUG
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "grammar              -> " << m_log.chl << ".m_grammar\n";
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "grammar.identifier   -> " << m_log.chl << ".m_identifier\n";
+    /*debug*/ m_log.trace(0) << m_log.op("move");
+    /*debug*/ m_log.out << "grammar.actions      -> " << m_log.chl << ".m_actions\n";
+    /*debug*/ m_log.trace(0) << m_log.op("move");
+    /*debug*/ m_log.out << "grammar.productions  -> " << m_log.chl << ".m_productions\n";
+    /*debug*/ m_log.trace(0) << m_log.op("move");
+    /*debug*/ m_log.out << "grammar.symbols      -> " << m_log.chl << ".m_symbols\n";
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "grammar.start_symbol -> " << m_log.chl << ".m_start_symbol\n";
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "grammar.end_symbol   -> " << m_log.chl << ".m_end_symbol\n";
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "grammar.error_symbol -> " << m_log.chl << ".m_error_symbol\n";
+    /*debug*/ m_log.trace(0) << m_log.op("init");
+    /*debug*/ m_log.out << "m_errors              = " << m_log.chl << "0\n";
 
     m_errors = 0;
 
-#ifndef DEBUG
     // clang-format off
-    /*debug*/ m_log.trace(0) << ".m_identifier " << m_log.chl << m_identifier << "\n";
-    /*debug*/ m_log.trace(1) << ".m_errors " << m_log.chl << m_actions.size() << "\n";
-    /*debug*/ m_log.trace(1) << ".m_actions\n";
+    /*debug*/ m_log.trace(0) << m_log.op("dump") << ".m_identifier ";
+    /*debug*/ m_log.out << m_log.chl << m_identifier << "\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_errors ";
+    /*debug*/ m_log.out << m_log.chl << m_errors << "\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_actions\n";
     /*debug*/ for (auto a : m_actions) {
-    /*debug*/     m_log.trace(1) << m_log.chl;
-    /*debug*/     m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*a);
-    /*debug*/     m_log.out << " <" << a.use_count() << "> ";
-    /*debug*/     m_log.out << a->index() << " ";
-    /*debug*/     m_log.out << m_log.cwhite << a->identifier() << "\n";
+    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+    /*debug*/     m_log.out << "<" << a.use_count() << "> ";
+    /*debug*/     m_log.out << m_log.cwhite << a->microdump() << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << ".m_productions\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_productions\n";
     /*debug*/ for (auto p : m_productions) {
-    /*debug*/     m_log.trace(1) << m_log.chl;
-    /*debug*/     m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*p);
-    /*debug*/     m_log.out << " <" << p.use_count() << "> ";
-    /*debug*/     m_log.out << p->index() << " ";
-    /*debug*/     m_log.out << m_log.cwhite << p->symbol()->lexeme() << " ";
-    /*debug*/     m_log.out << m_log.cnr << "[";
+    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+    /*debug*/     m_log.out << "<" << p.use_count() << "> ";
+    /*debug*/     m_log.out << m_log.cwhite << p->microdump();
+    /*debug*/     m_log.out << m_log.chl << "on " << m_log.cwhite;
+    /*debug*/     m_log.out << p->symbol()->lexeme() << " ";
+    /*debug*/     m_log.out << m_log.cnr << "to [";
     /*debug*/     m_log.out << m_log.chl;
     /*debug*/     for (auto s : p->symbols()) {
     /*debug*/         m_log.out << s->lexeme();
@@ -66,15 +72,18 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/             m_log.out << m_log.cnr << "," << m_log.chl;
     /*debug*/     }
     /*debug*/     m_log.out << m_log.cnr;
-    /*debug*/     m_log.out << "]\n";
+    /*debug*/     m_log.out << "]" << m_log.chl;
+    /*debug*/     if (p->action()) {
+    /*debug*/         m_log.out << " w/ " << m_log.cwhite;
+    /*debug*/         m_log.out << p->action()->identifier();
+    /*debug*/     }
+    /*debug*/     m_log.out << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << ".m_symbols\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_symbols\n";
     /*debug*/ for (auto s : m_symbols) {
-    /*debug*/     m_log.trace(1) << m_log.chl;
-    /*debug*/     m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*s);
+    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
     /*debug*/     m_log.out << " <" << s.use_count() << "> ";
-    /*debug*/     m_log.out << s->index() << " ";
-    /*debug*/     m_log.out << m_log.cwhite << s->lexeme() << " ";
+    /*debug*/     m_log.out << m_log.cwhite << s->microdump();
     /*debug*/     m_log.out << m_log.cnr << s->precedence() << " ";
     /*debug*/     m_log.out << s->symbol_type() << " ";
     /*debug*/     m_log.out << s->lexeme_type() << " ";
@@ -91,12 +100,10 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/     m_log.out << m_log.cnr;
     /*debug*/     m_log.out << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << ".m_start_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.chl;
-    /*debug*/ m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*m_start_symbol);
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_start_symbol\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_start_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_start_symbol->index() << " ";
-    /*debug*/ m_log.out << m_log.cwhite << m_start_symbol->lexeme() << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_start_symbol->microdump();
     /*debug*/ m_log.out << m_log.cnr << m_start_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_start_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_start_symbol->lexeme_type() << " ";
@@ -112,12 +119,10 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/ }
     /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
-    /*debug*/ m_log.trace(1) << ".m_end_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.chl;
-    /*debug*/ m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*m_end_symbol);
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_end_symbol\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_end_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_end_symbol->index() << " ";
-    /*debug*/ m_log.out << m_log.cwhite << m_end_symbol->lexeme() << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_end_symbol->microdump();
     /*debug*/ m_log.out << m_log.cnr << m_end_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_end_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_end_symbol->lexeme_type() << " ";
@@ -133,12 +138,10 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/ }
     /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
-    /*debug*/ m_log.trace(1) << ".m_error_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.chl;
-    /*debug*/ m_log.out << " *" << reinterpret_cast<std::uintptr_t>(&*m_error_symbol);
+    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_error_symbol\n";
+    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_error_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_error_symbol->index() << " ";
-    /*debug*/ m_log.out << m_log.cwhite << m_error_symbol->lexeme() << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_error_symbol->microdump();
     /*debug*/ m_log.out << m_log.cnr << m_error_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_error_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_error_symbol->lexeme_type() << " ";
@@ -154,10 +157,28 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/ }
     /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
-// clang-format on
-#endif // !DEBUG
+    // clang-format on
 
-    m_grammar->dump();
+    // m_grammar->dump();
 
-    return 0;
+    // calculate_identifiers();
+    // check_for_undefined_symbol_errors();
+    // check_for_unreferenced_symbol_errors();
+    // check_for_error_symbol_on_left_hand_side_errors();
+
+    if (m_errors == 0) {
+        // calculate_terminal_and_non_terminal_symbols();
+        // calculate_implicit_terminal_symbols();
+        // calculate_symbol_indices();
+        // calculate_first();
+        // calculate_follow();
+        // calculate_precedence_of_productions();
+        // generate_states( m_start_symbol, m_end_symbol, m_symbols );
+    }
+
+    // TODO why this strange swap
+    int errors = m_errors;
+    m_errors = 0;
+
+    return errors;
 }

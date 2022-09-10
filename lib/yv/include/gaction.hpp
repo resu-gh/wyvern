@@ -22,5 +22,8 @@ class gaction {
     const std::string &identifier() const;
 
   public:
+    std::string microdump() const;
+
+  public:
     static const int INVALID_INDEX = -1;
 };
