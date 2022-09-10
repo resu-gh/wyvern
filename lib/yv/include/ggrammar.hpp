@@ -54,6 +54,11 @@ class ggrammar {
   public:
     const std::string &identifier() const;
     std::vector<std::shared_ptr<gsymbol>> &symbols();
+    std::vector<std::shared_ptr<gproduction>> &productions();
+    std::vector<std::shared_ptr<gaction>> &actions();
+    const std::vector<xtoken> &whitespace_tokens();
+    const std::shared_ptr<gsymbol> &start_symbol() const;
+    const std::shared_ptr<gsymbol> &end_symbol() const;
     const std::shared_ptr<gsymbol> &error_symbol() const;
 
   public:

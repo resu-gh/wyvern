@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
@@ -14,7 +15,7 @@ gparser::gparser()
       m_line(1),
       m_errors(0),
       m_lexeme(),
-      m_log() {
+      m_log("gpars", 214) {
     m_lexeme.reserve(256);
 }
 
@@ -22,24 +23,24 @@ int gparser::parse(std::string::iterator &start, std::string::iterator &finish, 
     assert(&start);
     assert(&finish);
     assert(grammar.get());
-    /*debug*/ m_log.out << m_log.cgpars << "yv::gpars = ";
-    /*debug*/ m_log.out << "[b, e) = ";
+    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.trace(0) << m_log.op(" get");
+    /*debug*/ m_log.out << "[begin, end) " << m_log.chl;
     /*debug*/ m_log.out << "[" << (void *)&*start;
-    /*debug*/ m_log.out << ", " << (void *)&*finish << ")";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << ", " << (void *)&*finish << ")\n";
     m_position = start;
     m_end = finish;
-    /*debug*/ m_log.out << m_log.cgpars << "yv::gpars = ";
-    /*debug*/ m_log.out << "[p, f) = ";
+    /*debug*/ m_log.trace(0) << m_log.op(" get");
+    /*debug*/ m_log.out << "[posit, fin) " << m_log.chl;
     /*debug*/ m_log.out << "[" << (void *)&*m_position;
-    /*debug*/ m_log.out << ", " << (void *)&*m_end << ")";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << ", " << (void *)&*m_end << ")\n";
     m_grammar = grammar;
-    /*debug*/ m_log.out << m_log.cgpars << "yv::gpars = ";
-    /*debug*/ m_log.out << "&ggrammar = ";
+    /*debug*/ m_log.trace(0) << m_log.op("copy");
+    /*debug*/ m_log.out << "ggrammar " << m_log.chl;
     /*debug*/ m_log.out << (void *)&*m_grammar << " ";
-    /*debug*/ m_log.out << "[uses: " << m_grammar.use_count() << "]";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << "<" << m_grammar.use_count() << ">";
+    /*debug*/ m_log.out << m_log.cnr << " to .m_grammar\n";
+    exit(0); // TODO comment
     m_line = 1;
     m_errors = 0;
     if (!match_grammar()) {

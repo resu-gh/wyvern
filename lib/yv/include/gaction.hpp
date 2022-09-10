@@ -22,8 +22,5 @@ class gaction {
     const std::string &identifier() const;
 
   public:
-    void dump(int separator, const std::string &color);
-
-  public:
     static const int INVALID_INDEX = -1;
 };

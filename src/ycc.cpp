@@ -10,13 +10,16 @@ int main(int argc, char *argv[]) {
     std::string::iterator begin = ms.source.begin();
     std::string::iterator end = ms.source.end();
 
-    ylogger ylog;
-    ylog.out << ylog.cmain;
-    ylog.out << "ycc::main = ";
-    ylog.out << "[b, e) = ";
-    ylog.out << "[" << (void *)&*begin;
-    ylog.out << ", " << (void *)&*end << ")\n";
-    ylog.out << ylog.creset;
+    /*debug*/ ylogger ylog;
+    /*debug*/ ylog.out << ylog.cmain;
+    /*debug*/ ylog.out << "ycc:main:main()           ";
+    /*debug*/ ylog.out << ylog.cmagenta << "get ";
+    /*debug*/ ylog.out << "\033[38;5;240m";
+    /*debug*/ ylog.out << "[begin, end) ";
+    /*debug*/ ylog.out << "\033[38;5;245m";
+    /*debug*/ ylog.out << "[" << (void *)&*begin;
+    /*debug*/ ylog.out << ", " << (void *)&*end << ")\n";
+    /*debug*/ ylog.out << ylog.creset;
 
     int errors = compiler.compile(begin, end);
 

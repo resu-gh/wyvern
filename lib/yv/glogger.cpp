@@ -1,18 +1,50 @@
 #include "include/glogger.hpp"
 
-glogger::glogger()
-    : out(std::cout),
-      err(std::cerr),
-      creset("\033[0m"),
-      cred("\033[31m"),
-      cgreen("\033[32m"),
-      cyellow("\033[33m"),
-      cblue("\033[34m"),
-      cmagenta("\033[35m"),
-      ccyan("\033[36m"),
-      cwhite("\033[37m"),
-      cerror("\033[48;5;89m"),
-      cgcomp("\033[38;5;45m"),
-      cggram("\033[38;5;135m"),
-      cgpars("\033[38;5;214m"),
-      cggenr("\033[38;5;112m") {}
+#include <sstream>
+#include <stdexcept>
+#include <string>
+
+glogger::glogger(const std::string &loc, int col)
+    : m_loc("yyv:" + loc + ":"),
+      m_col(fg(col)) {}
+
+void glogger::set_function(const std::string &fun) {
+    m_fun = fun + "()";
+}
+
+std::string glogger::fg(int col) const {
+    if (col < 0 || col > 255)
+        throw std::runtime_error("invalid ansi escape code\n");
+    std::stringstream s;
+    s << "\033[38;5;";
+    s << std::to_string(col);
+    s << "m";
+    return s.str();
+}
+
+std::string glogger::bg(int col) const {
+    if (col < 0 || col > 255)
+        throw std::runtime_error("invalid ansi escape code\n");
+    std::stringstream s;
+    s << "\033[48;5;";
+    s << std::to_string(col);
+    s << "m";
+    return s.str();
+}
+
+std::ostream &glogger::trace(int cont) const {
+    std::stringstream s;
+    if (cont)
+        s << std::string(sep, ' ');
+    else
+        s << m_loc << m_fun;
+    if (s.str().size() < sep)
+        s << std::string(sep - s.str().size(), ' ');
+    return out << m_col << s.str() << cnr;
+}
+
+std::string glogger::op(const std::string &op) const {
+    std::stringstream s;
+    s << cmagenta << op << " " << cnr;
+    return s.str();
+}

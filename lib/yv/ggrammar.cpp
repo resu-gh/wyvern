@@ -27,59 +27,41 @@ ggrammar::ggrammar()
       m_active_symbol(nullptr),
       m_start_symbol(nullptr),
       m_end_symbol(nullptr),
-      m_error_symbol(nullptr) {
-    /*debug*/ m_log.out << m_log.cggram;
-    /*debug*/ m_log.out << "yv::ggram =\n";
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   constructor()\n";
+      m_error_symbol(nullptr),
+      m_log("ggram", 135) {
     m_start_symbol = add_symbol(".start", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NON_TERMINAL);
     assert(m_start_symbol->lexeme() == ".start");
     assert(m_start_symbol->line() == 0);
     assert(m_start_symbol->lexeme_type() == glexemetype::LEXEME_NULL);
     assert(m_start_symbol->symbol_type() == gsymboltype::SYMBOL_NON_TERMINAL);
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   constructor()\n";
-    /*debug*/ m_log.out << m_log.cggram;
-    /*debug*/ m_log.out << "   check   .m_start_symbol ";
-    /*debug*/ m_log.out << m_log.cwhite;
-    /*debug*/ m_log.out << (void *)&*m_start_symbol << "(";
-    /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_start_symbol) << ") ";
+    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_start_symbol ";
+    /*debug*/ m_log.out << m_log.chl << (void *)&*m_start_symbol << " ";
     /*debug*/ m_log.out << "<" << m_start_symbol.use_count() << "> ";
     /*debug*/ m_log.out << m_start_symbol->index() << " ";
-    /*debug*/ m_log.out << m_start_symbol->lexeme() << " ";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << m_start_symbol->lexeme() << "\n";
     m_end_symbol = add_symbol(".end", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_END);
     assert(m_end_symbol->lexeme() == ".end");
     assert(m_end_symbol->line() == 0);
     assert(m_end_symbol->lexeme_type() == glexemetype::LEXEME_NULL);
     assert(m_end_symbol->symbol_type() == gsymboltype::SYMBOL_END);
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   constructor()\n";
-    /*debug*/ m_log.out << m_log.cggram;
-    /*debug*/ m_log.out << "   check   .m_end_symbol   ";
-    /*debug*/ m_log.out << m_log.cwhite;
-    /*debug*/ m_log.out << (void *)&*m_end_symbol << "(";
-    /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_end_symbol) << ") ";
+    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_end_symbol ";
+    /*debug*/ m_log.out << m_log.chl << (void *)&*m_end_symbol << " ";
     /*debug*/ m_log.out << "<" << m_end_symbol.use_count() << "> ";
     /*debug*/ m_log.out << m_end_symbol->index() << " ";
-    /*debug*/ m_log.out << m_end_symbol->lexeme() << " ";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << m_end_symbol->lexeme() << "\n";
     m_error_symbol = add_symbol("error", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NULL);
     assert(m_error_symbol->lexeme() == "error");
     assert(m_error_symbol->line() == 0);
     assert(m_error_symbol->lexeme_type() == glexemetype::LEXEME_NULL);
     assert(m_error_symbol->symbol_type() == gsymboltype::SYMBOL_NULL);
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   constructor()\n";
-    /*debug*/ m_log.out << m_log.cggram;
-    /*debug*/ m_log.out << "   check   .m_error_symbol ";
-    /*debug*/ m_log.out << m_log.cwhite;
-    /*debug*/ m_log.out << (void *)&*m_error_symbol << "(";
-    /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_error_symbol) << ") ";
+    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_error_symbol ";
+    /*debug*/ m_log.out << m_log.chl << (void *)&*m_error_symbol << " ";
     /*debug*/ m_log.out << "<" << m_error_symbol.use_count() << "> ";
     /*debug*/ m_log.out << m_error_symbol->index() << " ";
-    /*debug*/ m_log.out << m_error_symbol->lexeme() << " ";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << m_error_symbol->lexeme() << "\n";
 }
 
 const std::string &ggrammar::identifier() const {
@@ -88,6 +70,26 @@ const std::string &ggrammar::identifier() const {
 
 std::vector<std::shared_ptr<gsymbol>> &ggrammar::symbols() {
     return m_symbols;
+}
+
+std::vector<std::shared_ptr<gproduction>> &ggrammar::productions() {
+    return m_productions;
+}
+
+std::vector<std::shared_ptr<gaction>> &ggrammar::actions() {
+    return m_actions;
+}
+
+const std::vector<xtoken> &ggrammar::whitespace_tokens() {
+    return m_whitespace_tokens;
+}
+
+const std::shared_ptr<gsymbol> &ggrammar::start_symbol() const {
+    return m_start_symbol;
+}
+
+const std::shared_ptr<gsymbol> &ggrammar::end_symbol() const {
+    return m_end_symbol;
 }
 
 const std::shared_ptr<gsymbol> &ggrammar::error_symbol() const {
@@ -737,8 +739,8 @@ const std::shared_ptr<gsymbol> &ggrammar::regex_symbol(const std::string &lexeme
 const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type) {
     assert(!lexeme.empty());
     assert(line >= 0);
-    /*debug*/ m_log.out << m_log.cmagenta;
-    /*debug*/ m_log.out << "    call   add_symbol()\n";
+    /*debug*/ m_log.set_function("add_symbol");
+    /*debug*/ m_log.trace(0);
     std::vector<std::shared_ptr<gsymbol>>::const_iterator i = m_symbols.begin();
     while (i != m_symbols.end() && !i->get()->matches(lexeme, symbol_type))
         ++i;
@@ -747,38 +749,29 @@ const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, 
         symbol->set_line(line);
         symbol->set_lexeme_type(lexeme_type);
         symbol->set_symbol_type(symbol_type);
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "  create   new SYMBOL      ";
-        /*debug*/ m_log.out << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*symbol << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*symbol) << ") ";
+        /*debug*/ m_log.out << m_log.op(" new") << "SYMBOL ";
+        /*debug*/ m_log.out << m_log.chl;
+        /*debug*/ m_log.out << (void *)&*symbol << " ";
         /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
         /*debug*/ m_log.out << symbol->index() << " ";
-        /*debug*/ m_log.out << symbol->lexeme() << " ";
-        /*debug*/ m_log.out << m_log.creset << "\n";
+        /*debug*/ m_log.out << symbol->lexeme() << "\n";
         m_symbols.push_back(std::move(symbol));
-        /*debug*/ m_log.out << m_log.cggram;
-        /*debug*/ m_log.out << "  move->   .m_symbols.back ";
-        /*debug*/ m_log.out << m_log.cwhite;
-        /*debug*/ m_log.out << (void *)&*m_symbols.back() << "(";
-        /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*m_symbols.back()) << ") ";
+        /*debug*/ m_log.trace(1) << m_log.op("move") << ".m_symbols ";
+        /*debug*/ m_log.out << m_log.chl;
+        /*debug*/ m_log.out << (void *)&*m_symbols.back() << " ";
         /*debug*/ m_log.out << "<" << m_symbols.back().use_count() << "> ";
         /*debug*/ m_log.out << m_symbols.back()->index() << " ";
-        /*debug*/ m_log.out << m_symbols.back()->lexeme();
-        /*debug*/ m_log.out << m_log.creset << "\n";
+        /*debug*/ m_log.out << m_symbols.back()->lexeme() << "\n";
         return m_symbols.back();
     }
     assert(i->get());
     assert(i->get()->symbol_type() == symbol_type);
-    /*debug*/ m_log.out << m_log.cggram;
-    /*debug*/ m_log.out << "   found   SYMBOL ";
-    /*debug*/ m_log.out << m_log.cwhite;
-    /*debug*/ m_log.out << (void *)&*i << "(";
-    /*debug*/ m_log.out << reinterpret_cast<std::uintptr_t>(&*i) << ") ";
+    /*debug*/ m_log.out << m_log.op("find") << "SYMBOL ";
+    /*debug*/ m_log.out << m_log.chl;
+    /*debug*/ m_log.out << (void *)&*i << " ";
     /*debug*/ m_log.out << "<" << i->use_count() << "> ";
     /*debug*/ m_log.out << i->get()->index() << " ";
-    /*debug*/ m_log.out << i->get()->lexeme() << " ";
-    /*debug*/ m_log.out << m_log.creset << "\n";
+    /*debug*/ m_log.out << i->get()->lexeme() << "\n";
     return *i;
 }
 
@@ -946,8 +939,74 @@ void ggrammar::dump() const {
     m_log.out << "\n";
     m_log.out << m_log.cred << "IDENTIFIER: ";
     m_log.out << m_log.cmagenta << m_identifier;
-    m_log.out << m_log.creset << "\n";
-    m_log.out << m_log.cred << "\nSYMBOLS:\n" << m_log.creset;
+    m_log.out << m_log.creset << "\n\n";
+    m_log.out << m_log.cred << "START STATE: ";
+    m_log.out << m_log.cgreen << m_start_symbol->index() << " ";
+    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_start_symbol) << " <";
+    m_log.out << m_log.ccyan << m_start_symbol.use_count() << "> ";
+    m_log.out << m_log.cmagenta << m_start_symbol->lexeme() << " ";
+    m_log.out << cc;
+    m_log.out << m_start_symbol->precedence() << " ";
+    m_log.out << m_start_symbol->symbol_type() << " ";
+    m_log.out << m_start_symbol->lexeme_type() << " ";
+    m_log.out << m_start_symbol->associativity() << " ";
+    if (m_start_symbol->productions().size()) {
+        m_log.out << "[";
+        m_log.out << cc2;
+        for (auto p : m_start_symbol->productions()) {
+            m_log.out << p->index();
+            if (&*p != &*(m_start_symbol->productions().end() - 1)->get())
+                m_log.out << cc << "," << cc2;
+        }
+        m_log.out << cc;
+        m_log.out << "]";
+    }
+    m_log.out << m_log.creset << "\n\n";
+    m_log.out << m_log.cred << "END STATE: ";
+    m_log.out << m_log.cgreen << m_end_symbol->index() << " ";
+    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_end_symbol) << " <";
+    m_log.out << m_log.ccyan << m_end_symbol.use_count() << "> ";
+    m_log.out << m_log.cmagenta << m_end_symbol->lexeme() << " ";
+    m_log.out << cc;
+    m_log.out << m_end_symbol->precedence() << " ";
+    m_log.out << m_end_symbol->symbol_type() << " ";
+    m_log.out << m_end_symbol->lexeme_type() << " ";
+    m_log.out << m_end_symbol->associativity() << " ";
+    if (m_end_symbol->productions().size()) {
+        m_log.out << "[";
+        m_log.out << cc2;
+        for (auto p : m_end_symbol->productions()) {
+            m_log.out << p->index();
+            if (&*p != &*(m_end_symbol->productions().end() - 1)->get())
+                m_log.out << cc << "," << cc2;
+        }
+        m_log.out << cc;
+        m_log.out << "]";
+    }
+    m_log.out << m_log.creset << "\n\n";
+    m_log.out << m_log.cred << "ERROR STATE: ";
+    m_log.out << m_log.cgreen << m_error_symbol->index() << " ";
+    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_error_symbol) << " <";
+    m_log.out << m_log.ccyan << m_error_symbol.use_count() << "> ";
+    m_log.out << m_log.cmagenta << m_error_symbol->lexeme() << " ";
+    m_log.out << cc;
+    m_log.out << m_error_symbol->precedence() << " ";
+    m_log.out << m_error_symbol->symbol_type() << " ";
+    m_log.out << m_error_symbol->lexeme_type() << " ";
+    m_log.out << m_error_symbol->associativity() << " ";
+    if (m_error_symbol->productions().size()) {
+        m_log.out << "[";
+        m_log.out << cc2;
+        for (auto p : m_error_symbol->productions()) {
+            m_log.out << p->index();
+            if (&*p != &*(m_error_symbol->productions().end() - 1)->get())
+                m_log.out << cc << "," << cc2;
+        }
+        m_log.out << cc;
+        m_log.out << "]";
+    }
+    m_log.out << m_log.creset << "\n\n";
+    m_log.out << m_log.cred << "SYMBOLS:\n" << m_log.creset;
     for (auto s : m_symbols) {
         m_log.out << m_log.cgreen << s->index() << " ";
         m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*s) << " <";
@@ -1002,6 +1061,15 @@ void ggrammar::dump() const {
         m_log.out << m_log.cmagenta << t.lexeme() << " ";
         m_log.out << cc;
         m_log.out << t.type();
+        m_log.out << "\n";
+    }
+    m_log.out << m_log.creset << "\n";
+    m_log.out << m_log.cred << "ACTIONS:\n" << m_log.creset;
+    for (auto a : m_actions) {
+        m_log.out << m_log.cgreen << a->index() << " ";
+        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*a) << " <";
+        m_log.out << m_log.ccyan << a.use_count() << "> ";
+        m_log.out << m_log.cmagenta << a->identifier() << " ";
         m_log.out << "\n";
     }
     m_log.out << m_log.creset << "\n";
