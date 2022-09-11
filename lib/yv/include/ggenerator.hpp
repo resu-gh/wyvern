@@ -37,4 +37,9 @@ class ggenerator {
 
   public:
     int generate(const std::shared_ptr<ggrammar> &);
+
+  private:
+    void calculate_identifiers();
+    void check_for_undefined_symbol_errors();
+    void check_for_unreferenced_symbol_errors();
 };

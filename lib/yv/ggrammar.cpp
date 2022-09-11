@@ -941,7 +941,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.creset << "\n\n";
     m_log.out << m_log.cred << "START STATE: ";
     m_log.out << m_log.cgreen << m_start_symbol->index() << " ";
-    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_start_symbol) << " <";
+    m_log.out << m_log.ccyan << (void*)&*m_start_symbol << " <";
     m_log.out << m_log.ccyan << m_start_symbol.use_count() << "> ";
     m_log.out << m_log.cmagenta << m_start_symbol->lexeme() << " ";
     m_log.out << cc;
@@ -963,7 +963,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.creset << "\n\n";
     m_log.out << m_log.cred << "END STATE: ";
     m_log.out << m_log.cgreen << m_end_symbol->index() << " ";
-    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_end_symbol) << " <";
+    m_log.out << m_log.ccyan << (void*)&*m_end_symbol << " <";
     m_log.out << m_log.ccyan << m_end_symbol.use_count() << "> ";
     m_log.out << m_log.cmagenta << m_end_symbol->lexeme() << " ";
     m_log.out << cc;
@@ -985,7 +985,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.creset << "\n\n";
     m_log.out << m_log.cred << "ERROR STATE: ";
     m_log.out << m_log.cgreen << m_error_symbol->index() << " ";
-    m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*m_error_symbol) << " <";
+    m_log.out << m_log.ccyan << (void*)&*m_error_symbol << " <";
     m_log.out << m_log.ccyan << m_error_symbol.use_count() << "> ";
     m_log.out << m_log.cmagenta << m_error_symbol->lexeme() << " ";
     m_log.out << cc;
@@ -1008,7 +1008,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.cred << "SYMBOLS:\n" << m_log.creset;
     for (auto s : m_symbols) {
         m_log.out << m_log.cgreen << s->index() << " ";
-        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*s) << " <";
+        m_log.out << m_log.ccyan << (void*)&*s << " <";
         m_log.out << m_log.ccyan << s.use_count() << "> ";
         m_log.out << m_log.cmagenta << s->lexeme() << " ";
         m_log.out << cc;
@@ -1035,7 +1035,7 @@ void ggrammar::dump() const {
         if (p->index() < 10)
             m_log.out << " ";
         m_log.out << m_log.cgreen << p->index() << " ";
-        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*p) << " <";
+        m_log.out << m_log.ccyan << (void*)&*p << " <";
         m_log.out << m_log.ccyan << p.use_count() << "> ";
         m_log.out << m_log.cmagenta << p->symbol()->lexeme() << " ";
         m_log.out << cc;
@@ -1056,7 +1056,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.cred << "WHITESPACE TOKENS:\n" << m_log.creset;
     for (auto t : m_whitespace_tokens) {
         m_log.out << m_log.cgreen << t.line() << " ";
-        m_log.out << m_log.ccyan << "." << reinterpret_cast<std::uintptr_t>(&t) << " ";
+        m_log.out << m_log.ccyan << "." << (void*)&t << " ";
         m_log.out << m_log.cmagenta << t.lexeme() << " ";
         m_log.out << cc;
         m_log.out << t.type();
@@ -1066,7 +1066,7 @@ void ggrammar::dump() const {
     m_log.out << m_log.cred << "ACTIONS:\n" << m_log.creset;
     for (auto a : m_actions) {
         m_log.out << m_log.cgreen << a->index() << " ";
-        m_log.out << m_log.ccyan << "*" << reinterpret_cast<std::uintptr_t>(&*a) << " <";
+        m_log.out << m_log.ccyan << (void*)&*a << " <";
         m_log.out << m_log.ccyan << a.use_count() << "> ";
         m_log.out << m_log.cmagenta << a->identifier() << " ";
         m_log.out << "\n";

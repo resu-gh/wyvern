@@ -1,14 +1,18 @@
 #include "include/gsymbol.hpp"
 #include "include/gsymboltype.hpp"
 
+#include <array>
 #include <cassert>
+#include <cctype>
 #include <sstream>
+#include <string>
 #include <vector>
 
 gsymbol::gsymbol(const std::string &lexeme)
     : m_index(-1),
       m_line(0),
       m_lexeme(lexeme),
+      m_identifier(),
       m_symbol_type(gsymboltype::SYMBOL_NULL),
       m_lexeme_type(glexemetype::LEXEME_NULL),
       m_associativity(gsymbolassoc::ASSOCIATE_NULL),
@@ -26,6 +30,10 @@ int gsymbol::line() const {
 
 const std::string &gsymbol::lexeme() const {
     return m_lexeme;
+}
+
+const std::string &gsymbol::identifier() const {
+    return m_identifier;
 }
 
 gsymboltype gsymbol::symbol_type() const {
@@ -80,6 +88,61 @@ bool gsymbol::matches(const std::string &lexeme, gsymboltype symbol_type) {
 void gsymbol::append_production(const std::shared_ptr<gproduction> &production) {
     assert(production);
     m_productions.push_back(production);
+}
+
+void gsymbol::calculate_identifier() {
+    /*debug*/ m_log.set_fun("calc_ident");
+
+    assert(!m_lexeme.empty());
+    /*debug*/ m_log.trace(0) << m_log.op("test") << m_log.cwhite << "OK ";
+    /*debug*/ m_log.out << m_log.chl << m_lexeme << m_log.cnr << " is not empty()\n";
+
+    // clang-format off
+    std::array<std::string, 128> char_names = {
+        "nul", "soh", "stx", "etx", "eot", "enq", "ack", "bel",
+        "bs", "tab", "lf", "vt", "ff", "cr", "so", "si",
+        "dle", "dc1", "dc2", "dc3", "dc4", "nak", "syn", "etb",
+        "can", "em", "sub", "esc", "fs", "gs", "rs", "us",
+        "space", "bang", "double_quote", "hash", "dollar", "percent", "amp", "single_quote",
+        "left_paren", "right_paren", "star", "plus", "comma", "minus", "dot", "slash",
+        "0", "1", "2", "3", "4", "5", "6", "7",
+        "8", "9", "colon", "semi_colon", "lt", "eq", "gt", "question",
+        "at", "A", "B", "C", "D", "E", "F", "G",
+        "H", "I", "J", "K", "L", "M", "N", "O",
+        "P", "Q", "R", "S", "T", "U", "V", "W",
+        "X", "Y", "Z", "left_square_paren", "backslash", "right_square_paren", "hat", "underscore",
+        "backtick", "a", "b", "c", "d", "e", "f", "g",
+        "h", "i", "j", "k", "l", "m", "n", "o",
+        "p", "q", "r", "s", "t", "u", "v", "w",
+        "x", "y", "z", "left_curly_brace", "pipe", "right_curly_brace", "tilde", "del",
+    };
+    // clang-format on
+
+    m_identifier.reserve(m_lexeme.size());
+    std::string::const_iterator i = m_lexeme.begin();
+
+    while (i != m_lexeme.end()) {
+
+        if (std::isalnum(*i) || *i == '_') {
+            m_identifier.push_back(*i);
+            ++i;
+
+        } else {
+            if (i != m_lexeme.begin())
+                m_identifier.append("_");
+
+            int character = *i;
+            assert(character >= 0 && character < 128);
+            m_identifier.append(char_names[character]);
+            ++i;
+
+            if (i != m_lexeme.end())
+                m_identifier.append("_");
+        }
+    }
+
+    if(m_symbol_type == gsymboltype::SYMBOL_TERMINAL)
+        m_identifier.append("_terminal");
 }
 
 std::string gsymbol::microdump() const {

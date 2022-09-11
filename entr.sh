@@ -1,3 +1,3 @@
 #!/bin/sh
 
-fd -e cpp -e hpp | entr make
+fd -e cpp -e hpp -e g | entr make

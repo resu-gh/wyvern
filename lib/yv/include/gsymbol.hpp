@@ -20,6 +20,8 @@ class gsymbol {
     int m_line;
     /// symbol lexeme
     std::string m_lexeme;
+    /// symbol identifier (generated from lexeme)
+    std::string m_identifier;
     /// symbol type (terminal, non-terminal or end)
     gsymboltype m_symbol_type;
     /// symbol's lexeme type (regex or literal)
@@ -40,6 +42,7 @@ class gsymbol {
     int index() const;
     int line() const;
     const std::string &lexeme() const;
+    const std::string &identifier() const;
     gsymboltype symbol_type() const;
     glexemetype lexeme_type() const;
     gsymbolassoc associativity() const;
@@ -56,6 +59,7 @@ class gsymbol {
   public:
     bool matches(const std::string &lexeme, gsymboltype symbol_type);
     void append_production(const std::shared_ptr<gproduction> &production);
+    void calculate_identifier();
 
     public:
     std::string microdump()const;

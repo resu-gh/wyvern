@@ -1,7 +1,9 @@
 #include "include/ggenerator.hpp"
+#include "include/ecode.hpp"
 #include "include/ggrammar.hpp"
 #include "include/gproduction.hpp"
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 
@@ -17,13 +19,14 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     m_log.set_fun("generate");
 
     m_grammar = grammar;
-    m_identifier = m_grammar->identifier();
-    m_actions.swap(m_grammar->actions());
-    m_productions.swap(m_grammar->productions());
-    m_symbols.swap(m_grammar->symbols());
-    m_start_symbol = m_grammar->start_symbol();
-    m_end_symbol = m_grammar->end_symbol();
-    m_error_symbol = m_grammar->error_symbol();
+    m_identifier = m_grammar->identifier();       // if useless remove grammar shared ref
+    m_actions.swap(m_grammar->actions());         // ownership moved
+    m_productions.swap(m_grammar->productions()); // ownership moved
+    m_symbols.swap(m_grammar->symbols());         // ownership moved
+    m_start_symbol = m_grammar->start_symbol();   // if useless remove grammar shared ref
+    m_end_symbol = m_grammar->end_symbol();       // if useless remove grammar shared ref
+    m_error_symbol = m_grammar->error_symbol();   // if useless remove grammar shared ref
+    m_errors = 0;                                 // init error
 
     /*debug*/ m_log.trace(0) << m_log.op("copy");
     /*debug*/ m_log.out << "grammar              -> " << m_log.chl << ".m_grammar\n";
@@ -43,8 +46,6 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/ m_log.out << "grammar.error_symbol -> " << m_log.chl << ".m_error_symbol\n";
     /*debug*/ m_log.trace(0) << m_log.op("init");
     /*debug*/ m_log.out << "m_errors              = " << m_log.chl << "0\n";
-
-    m_errors = 0;
 
     // clang-format off
     /*debug*/ m_log.trace(0) << m_log.op("dump") << ".m_identifier ";
@@ -161,9 +162,9 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
 
     // m_grammar->dump();
 
-    // calculate_identifiers();
-    // check_for_undefined_symbol_errors();
-    // check_for_unreferenced_symbol_errors();
+    calculate_identifiers();
+    check_for_undefined_symbol_errors();
+    check_for_unreferenced_symbol_errors();
     // check_for_error_symbol_on_left_hand_side_errors();
 
     if (m_errors == 0) {
@@ -181,4 +182,107 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     m_errors = 0;
 
     return errors;
+}
+
+/// calculate identifiers for all symbols
+void ggenerator::calculate_identifiers() {
+    /*debug*/ m_log.set_fun("calc_idents");
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+        /*debug*/ m_log.set_fun("calc_idents");
+        /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
+        /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << "\n";
+
+        assert(i->get());
+        /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+        /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+        i->get()->calculate_identifier();
+        /*debug*/ m_log.set_fun("calc_idents");
+        /*debug*/ m_log.trace(0) << m_log.op("get") << "(symbol).iden ";
+        /*debug*/ m_log.out << m_log.chl << i->get()->identifier() << "\n";
+    }
+}
+
+/// check for symbols in the grammar that
+/// are referenced but never defined
+void ggenerator::check_for_undefined_symbol_errors() {
+    /*debug*/ m_log.set_fun("ck_undef_sym");
+
+    if (m_errors == 0) {
+        /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+
+        using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+        for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+            /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
+            /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << "\n";
+
+            assert(i->get());
+            /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+            /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+            std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr
+
+            if (symbol->symbol_type() == gsymboltype::SYMBOL_NON_TERMINAL && symbol->productions().empty() && symbol->precedence() <= 0) {
+                ++m_errors;
+                /*error*/ m_log.etrace(0) << m_log.op("error");
+                /*error*/ m_log.err << m_log.cred << ecode::E_PARSER_UNDEF_SYMBOL << " ";
+                /*error*/ m_log.err << "(line " << symbol->line() << ")\n";
+                /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "undefined symbol ";
+                /*error*/ m_log.err << m_log.cwhite << symbol->identifier() << "\n";
+            }
+        }
+    }
+}
+
+/// check for symbols in the grammar that are defined but never referenced
+void ggenerator::check_for_unreferenced_symbol_errors() {
+    /*debug*/ m_log.set_fun("ck_unref_sym");
+
+    if (m_errors == 0) {
+        /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+
+        using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+        for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+            /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
+            /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << "\n";
+
+            assert(i->get());
+            /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+            /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+            int references = 0;
+            std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr
+
+            if (symbol != m_start_symbol && symbol != m_end_symbol && symbol->lexeme() != m_error_symbol->lexeme()) {
+
+                using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
+                for (prod_iter i = m_productions.begin(); i != m_productions.end(); ++i) {
+                    /*debug*/ m_log.trace(1) << m_log.op("proc") << "production: ";
+                    /*debug*/ m_log.out << m_log.chl << i->get()->index() << "\n";
+
+                    assert(i->get());
+                    /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+                    /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+                    std::shared_ptr<gproduction> production = *i;
+
+                    if (production->symbol()->symbol_type() != gsymboltype::SYMBOL_NON_TERMINAL) {
+                        ;
+                    }
+                }
+
+                if (references == 0) {
+                    ++m_errors;
+                    /*error*/ m_log.etrace(0) << m_log.op("error");
+                    /*error*/ m_log.err << m_log.cred << ecode::E_PARSER_UNREF_SYMBOL << " ";
+                    /*error*/ m_log.err << "(line " << symbol->line() << ")\n";
+                    /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "unreferenced symbol ";
+                    /*error*/ m_log.err << m_log.cwhite << symbol->identifier() << "\n";
+                }
+            }
+        }
+    }
 }
