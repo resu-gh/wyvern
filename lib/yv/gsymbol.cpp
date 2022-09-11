@@ -13,7 +13,8 @@ gsymbol::gsymbol(const std::string &lexeme)
       m_lexeme_type(glexemetype::LEXEME_NULL),
       m_associativity(gsymbolassoc::ASSOCIATE_NULL),
       m_precedence(0),
-      m_productions() {}
+      m_productions(),
+      m_log("yyv", "gsymb", 255) {}
 
 int gsymbol::index() const {
     return m_index;

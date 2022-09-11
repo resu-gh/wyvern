@@ -4,11 +4,27 @@
 #include <stdexcept>
 #include <string>
 
-glogger::glogger(const std::string &loc, int col)
-    : m_loc("yyv:" + loc + ":"),
+glogger::glogger(const std::string &mod, const std::string &loc, int col)
+    : out(std::cout),
+      err(std::cerr),
+      creset(fg(0)),
+      cred(fg(1)),
+      cgreen(fg(2)),
+      cyellow(fg(3)),
+      cblue(fg(4)),
+      cmagenta(fg(5)),
+      ccyan(fg(6)),
+      cwhite(fg(7)),
+      cnr(fg(240)),
+      chl(fg(245)),
+      sep(25),
+      osep(6),
+      m_mod(mod),
+      m_loc(mod + ":" + loc + ":"),
+      m_fun(),
       m_col(fg(col)) {}
 
-void glogger::set_function(const std::string &fun) {
+void glogger::set_fun(const std::string &fun) {
     m_fun = fun + "()";
 }
 
@@ -32,7 +48,7 @@ std::string glogger::bg(int col) const {
     return s.str();
 }
 
-std::ostream &glogger::trace(int cont) const {
+std::ostream &glogger::trace(int cont, std::ostream &o) const {
     std::stringstream s;
     if (cont)
         s << std::string(sep, ' ');
@@ -40,18 +56,11 @@ std::ostream &glogger::trace(int cont) const {
         s << m_loc << m_fun;
     if (s.str().size() < sep)
         s << std::string(sep - s.str().size(), ' ');
-    return out << m_col << s.str() << cnr;
+    return o << m_col << s.str() << cnr;
 }
 
 std::ostream &glogger::etrace(int cont) const {
-    std::stringstream s;
-    if (cont)
-        s << std::string(sep, ' ');
-    else
-        s << m_loc << m_fun;
-    if (s.str().size() < sep)
-        s << std::string(sep - s.str().size(), ' ');
-    return err << m_col << s.str() << cred;
+    return trace(cont, err);
 }
 
 std::string glogger::op(const std::string &op) const {

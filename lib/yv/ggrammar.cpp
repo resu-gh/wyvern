@@ -28,23 +28,23 @@ ggrammar::ggrammar()
       m_start_symbol(nullptr),
       m_end_symbol(nullptr),
       m_error_symbol(nullptr),
-      m_log("ggram", 135) {
+      m_log("yyv", "ggram", 135) {
     m_start_symbol = add_symbol(".start", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NON_TERMINAL);
-    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.set_fun("constructor");
     /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_start_symbol\n";
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
     /*debug*/ m_log.out << "<" << m_start_symbol.use_count() << "> ";
     /*debug*/ m_log.out << m_start_symbol->microdump() << "\n";
 
     m_end_symbol = add_symbol(".end", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_END);
-    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.set_fun("constructor");
     /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_end_symbol\n";
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
     /*debug*/ m_log.out << "<" << m_end_symbol.use_count() << "> ";
     /*debug*/ m_log.out << m_end_symbol->microdump() << "\n";
 
     m_error_symbol = add_symbol("error", 0, glexemetype::LEXEME_NULL, gsymboltype::SYMBOL_NULL);
-    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.set_fun("constructor");
     /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_error_symbol\n";
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
     /*debug*/ m_log.out << "<" << m_error_symbol.use_count() << "> ";
@@ -89,7 +89,7 @@ ggrammar &ggrammar::grammar(const std::string &identifier) {
 }
 
 ggrammar &ggrammar::left(int line) {
-    /*debug*/ m_log.set_function("left");
+    /*debug*/ m_log.set_fun("left");
 
     /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_associativity ";
     /*debug*/ m_log.out << m_log.chl << m_associativity << " -> ";
@@ -133,7 +133,7 @@ ggrammar &ggrammar::left(int line) {
 }
 
 ggrammar &ggrammar::right(int line) {
-    /*debug*/ m_log.set_function("right");
+    /*debug*/ m_log.set_fun("right");
 
     /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_associativity ";
     /*debug*/ m_log.out << m_log.chl << m_associativity << " -> ";
@@ -177,7 +177,7 @@ ggrammar &ggrammar::right(int line) {
 }
 
 ggrammar &ggrammar::none(int line) {
-    /*debug*/ m_log.set_function("none");
+    /*debug*/ m_log.set_fun("none");
 
     /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_associativity ";
     /*debug*/ m_log.out << m_log.chl << m_associativity << " -> ";
@@ -221,7 +221,7 @@ ggrammar &ggrammar::none(int line) {
 }
 
 ggrammar &ggrammar::whitespace(int line) {
-    /*debug*/ m_log.set_function("whitespace");
+    /*debug*/ m_log.set_fun("whitespace");
 
     /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_associativity ";
     /*debug*/ m_log.out << m_log.chl << m_associativity << " -> ";
@@ -260,7 +260,7 @@ ggrammar &ggrammar::whitespace(int line) {
 }
 
 ggrammar &ggrammar::precedence(int line) {
-    /*debug*/ m_log.set_function("precedence");
+    /*debug*/ m_log.set_fun("precedence");
 
     assert(m_active_symbol);
     /*debug*/ m_log.trace(1) << m_log.op("set") << ".m_active_symbol\n";
@@ -282,7 +282,7 @@ ggrammar &ggrammar::precedence(int line) {
 }
 
 ggrammar &ggrammar::production(const std::string &identifier, int line) {
-    /*debug*/ m_log.set_function("produc");
+    /*debug*/ m_log.set_fun("produc");
 
     assert(!identifier.empty());
 
@@ -315,7 +315,7 @@ ggrammar &ggrammar::production(const std::string &identifier, int line) {
     /*debug*/ m_log.out << "<" << m_active_symbol.use_count() << "> ";
     /*debug*/ m_log.out << (m_active_symbol ? m_active_symbol->microdump() : "nullptr") << "\n";
     m_active_symbol = non_terminal_symbol(identifier, line);
-    /*debug*/ m_log.set_function("produc");
+    /*debug*/ m_log.set_fun("produc");
     /*debug*/ m_log.trace(1) << m_log.op("..set") << m_log.cwhite;
     /*debug*/ m_log.out << "<" << m_active_symbol.use_count() << "> ";
     /*debug*/ m_log.out << (m_active_symbol ? m_active_symbol->microdump() : "nullptr") << "\n";
@@ -324,7 +324,7 @@ ggrammar &ggrammar::production(const std::string &identifier, int line) {
 }
 
 ggrammar &ggrammar::end_production() {
-    /*debug*/ m_log.set_function("end_produc");
+    /*debug*/ m_log.set_fun("end_produc");
 
     assert(m_active_symbol);
 
@@ -365,7 +365,7 @@ ggrammar &ggrammar::end_production() {
 }
 
 ggrammar &ggrammar::error(int line) {
-    /*debug*/ m_log.set_function("error");
+    /*debug*/ m_log.set_fun("error");
 
     assert(line >= 1);
 
@@ -402,7 +402,7 @@ ggrammar &ggrammar::error(int line) {
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
             /*debug*/ m_log.out << (m_active_production ? m_active_production->microdump() : "nullptr") << "\n";
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("error");
+            /*debug*/ m_log.set_fun("error");
             /*debug*/ m_log.trace(0) << m_log.op("..set") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
             /*debug*/ m_log.out << (m_active_production ? m_active_production->microdump() : "nullptr") << "\n";
@@ -422,7 +422,7 @@ ggrammar &ggrammar::error(int line) {
 }
 
 ggrammar &ggrammar::literal(const std::string &literal, int line) {
-    /*debug*/ m_log.set_function("literal");
+    /*debug*/ m_log.set_fun("literal");
 
     assert(!literal.empty());
     assert(line >= 0);
@@ -442,7 +442,7 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
         /*debug*/ m_log.out << m_log.ccyan << ".m_associativity != ASSOCIATE_NULL (case 2)\n";
 
         std::shared_ptr<gsymbol> symbol = literal_symbol(literal, line);
-        /*debug*/ m_log.set_function("literal");
+        /*debug*/ m_log.set_fun("literal");
         /*debug*/ m_log.trace(0) << m_log.op("get") << "(symbol) <- literal_symbol()\n";
         /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
         /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
@@ -467,7 +467,7 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 4)\n";
 
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("literal");
+            /*debug*/ m_log.set_fun("literal");
             /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
@@ -478,7 +478,7 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 5)\n";
 
             m_active_production->set_precedence_symbol(literal_symbol(literal, line));
-            /*debug*/ m_log.set_function("literal");
+            /*debug*/ m_log.set_fun("literal");
             /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_active_production.precedence_symbol\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << " <- literal_symbol()\n ";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
@@ -494,7 +494,7 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 6)\n";
 
             m_active_production->append_symbol(literal_symbol(literal, line));
-            /*debug*/ m_log.set_function("literal");
+            /*debug*/ m_log.set_fun("literal");
             /*debug*/ m_log.trace(0) << m_log.op("push") << ".m_active_production.symbols <- literal_symbol()\n";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production->symbols().back().use_count() << "> ";
@@ -506,7 +506,7 @@ ggrammar &ggrammar::literal(const std::string &literal, int line) {
 }
 
 ggrammar &ggrammar::regex(const std::string &regex, int line) {
-    /*debug*/ m_log.set_function("regex");
+    /*debug*/ m_log.set_fun("regex");
 
     assert(!regex.empty());
     assert(line >= 0);
@@ -525,7 +525,7 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
         /*debug*/ m_log.out << m_log.ccyan << ".m_associativity != ASSOCIATE_NULL (case 2)\n";
 
         std::shared_ptr<gsymbol> symbol = regex_symbol(regex, line);
-        /*debug*/ m_log.set_function("regex");
+        /*debug*/ m_log.set_fun("regex");
         /*debug*/ m_log.trace(0) << m_log.op("get") << "(symbol) (temp) <- .regex_symbol()\n";
         /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
         /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
@@ -550,7 +550,7 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 4)\n";
 
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("regex");
+            /*debug*/ m_log.set_fun("regex");
             /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
@@ -561,7 +561,7 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 5)\n";
 
             m_active_production->set_precedence_symbol(regex_symbol(regex, line));
-            /*debug*/ m_log.set_function("regex");
+            /*debug*/ m_log.set_fun("regex");
             /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_active_production.precedence_symbol\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << " <- regex_symbol()\n ";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
@@ -578,7 +578,7 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 6)\n";
 
             m_active_production->append_symbol(regex_symbol(regex, line));
-            /*debug*/ m_log.set_function("regex");
+            /*debug*/ m_log.set_fun("regex");
             /*debug*/ m_log.trace(0) << m_log.op("push") << ".m_active_production.symbols <- regex_symbol()\n";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production->symbols().back().use_count() << "> ";
@@ -590,7 +590,7 @@ ggrammar &ggrammar::regex(const std::string &regex, int line) {
 }
 
 ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
-    /*debug*/ m_log.set_function("identifier");
+    /*debug*/ m_log.set_fun("identifier");
 
     assert(!identifier.empty());
     assert(line >= 0);
@@ -601,7 +601,7 @@ ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
         /*debug*/ m_log.out << m_log.ccyan << ".m_associativity == ASSOCIATE_NULL (case 1)\n";
 
         std::shared_ptr<gsymbol> symbol = non_terminal_symbol(identifier, line);
-        /*debug*/ m_log.set_function("identifier");
+        /*debug*/ m_log.set_fun("identifier");
         /*debug*/ m_log.trace(0) << m_log.op("get") << "(symbol) (temp) <- .non_terminal_symbol()\n";
         /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
         /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
@@ -626,7 +626,7 @@ ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 3)\n";
 
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("identifier");
+            /*debug*/ m_log.set_fun("identifier");
             /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
@@ -637,7 +637,7 @@ ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == true (case 4)\n";
 
             m_active_production->set_precedence_symbol(non_terminal_symbol(identifier, line));
-            /*debug*/ m_log.set_function("identifier");
+            /*debug*/ m_log.set_fun("identifier");
             /*debug*/ m_log.trace(0) << m_log.op("set") << ".m_active_production.precedence_symbol\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << " <- non_terminal_symbol()\n ";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
@@ -654,7 +654,7 @@ ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_precedence_directive == false (case 5)\n";
 
             m_active_production->append_symbol(non_terminal_symbol(identifier, line));
-            /*debug*/ m_log.set_function("identifier");
+            /*debug*/ m_log.set_fun("identifier");
             /*debug*/ m_log.trace(0) << m_log.op("push") << ".m_active_production.symbols\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << "<- non_terminal_symbol()\n";
             /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
@@ -666,7 +666,7 @@ ggrammar &ggrammar::identifier(const std::string &identifier, int line) {
 }
 
 ggrammar &ggrammar::action(const std::string &identifier, int line) {
-    /*debug*/ m_log.set_function("action");
+    /*debug*/ m_log.set_fun("action");
 
     assert(!identifier.empty());
     assert(line >= 1);
@@ -681,7 +681,7 @@ ggrammar &ggrammar::action(const std::string &identifier, int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 2)\n";
 
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("action");
+            /*debug*/ m_log.set_fun("action");
             /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
@@ -689,7 +689,7 @@ ggrammar &ggrammar::action(const std::string &identifier, int line) {
         }
 
         m_active_production->set_action(add_action(identifier));
-        /*debug*/ m_log.set_function("action");
+        /*debug*/ m_log.set_fun("action");
         /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production.action\n";
         /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
         /*debug*/ m_log.out << "<" << m_active_production->action().use_count() << "> ";
@@ -709,7 +709,7 @@ ggrammar &ggrammar::action(const std::string &identifier, int line) {
 }
 
 ggrammar &ggrammar::end_expression(int line) {
-    /*debug*/ m_log.set_function("end_expr");
+    /*debug*/ m_log.set_fun("end_expr");
 
     assert(line >= 1);
 
@@ -726,7 +726,7 @@ ggrammar &ggrammar::end_expression(int line) {
             /*debug*/ m_log.out << m_log.ccyan << ".m_active_production == nullptr (case 2)\n";
 
             m_active_production = add_production(m_active_symbol, line);
-            /*debug*/ m_log.set_function("end_expr");
+            /*debug*/ m_log.set_fun("end_expr");
             /*debug*/ m_log.trace(0) << m_log.op("test") << ".m_active_production\n";
             /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cwhite;
             /*debug*/ m_log.out << "<" << m_active_production.use_count() << "> ";
@@ -765,7 +765,7 @@ const std::shared_ptr<gsymbol> &ggrammar::regex_symbol(const std::string &lexeme
 }
 
 const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, int line, glexemetype lexeme_type, gsymboltype symbol_type) {
-    /*debug*/ m_log.set_function("add_symbol");
+    /*debug*/ m_log.set_fun("add_symbol");
 
     assert(!lexeme.empty());
     assert(line >= 0);
@@ -818,7 +818,7 @@ const std::shared_ptr<gsymbol> &ggrammar::add_symbol(const std::string &lexeme, 
 }
 
 const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_ptr<gsymbol> &symbol, int line) {
-    /*debug*/ m_log.set_function("add_produc");
+    /*debug*/ m_log.set_fun("add_produc");
 
     assert(symbol);
     assert(line > 0);
@@ -898,7 +898,7 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
 }
 
 const std::shared_ptr<gaction> &ggrammar::add_action(const std::string &identifier) {
-    /*debug*/ m_log.set_function("add_action");
+    /*debug*/ m_log.set_fun("add_action");
 
     assert(!identifier.empty());
 

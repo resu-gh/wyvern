@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glogger.hpp"
 #include "xtokentype.hpp"
 
 #include <memory>
@@ -20,6 +21,8 @@ class xtoken {
     std::string m_lexeme;
     /// the tokens that this token has conflicted with
     mutable std::vector<std::shared_ptr<xtoken>> m_conflicted_with;
+    /// logger
+    glogger m_log;
 
   public:
     xtoken(xtokentype type, int line, int column, const std::shared_ptr<void> symbol, const std::string &lexeme);

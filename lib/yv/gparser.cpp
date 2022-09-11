@@ -16,7 +16,7 @@ gparser::gparser()
       m_line(1),
       m_errors(0),
       m_lexeme(),
-      m_log("gpars", 214) {
+      m_log("yyv", "gpars", 214) {
     m_lexeme.reserve(256);
 }
 
@@ -24,7 +24,7 @@ int gparser::parse(std::string::iterator &start, std::string::iterator &finish, 
     assert(&start);
     assert(&finish);
     assert(grammar.get());
-    /*debug*/ m_log.set_function("constructor");
+    /*debug*/ m_log.set_fun("constructor");
     /*debug*/ m_log.trace(0) << m_log.op("get");
     /*debug*/ m_log.out << "[begin, end) " << m_log.chl;
     /*debug*/ m_log.out << "[" << (void *)&*start;
@@ -45,7 +45,7 @@ int gparser::parse(std::string::iterator &start, std::string::iterator &finish, 
     m_errors = 0;
     if (!match_grammar()) {
         ++m_errors;
-        /*error*/ m_log.set_function("constructor");
+        /*error*/ m_log.set_fun("constructor");
         /*error*/ m_log.etrace(0) << m_log.op("error");
         /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
         /*error*/ m_log.err << "(line 1)\n";
@@ -136,7 +136,7 @@ bool gparser::match_literal() {
         }
         if (position == m_end || !is_new_line(position)) {
             m_lexeme.assign(m_position, position);
-            /*debug*/ m_log.set_function("match_literal");
+            /*debug*/ m_log.set_fun("match_literal");
             /*debug*/ m_log.trace(0) << m_log.op("match");
             /*debug*/ m_log.out << m_log.cnr << "literal ";
             /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
@@ -145,7 +145,7 @@ bool gparser::match_literal() {
             return true;
         }
         ++m_errors;
-        /*error*/ m_log.set_function("match_literal");
+        /*error*/ m_log.set_fun("match_literal");
         /*error*/ m_log.etrace(0) << m_log.op("error");
         /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
         /*error*/ m_log.err << "(line " << m_line << ")\n       ";
@@ -165,7 +165,7 @@ bool gparser::match_regex() {
             ++position;
         }
         m_lexeme.assign(m_position, position);
-        /*debug*/ m_log.set_function("match_regex");
+        /*debug*/ m_log.set_fun("match_regex");
         /*debug*/ m_log.trace(0) << m_log.op("match");
         /*debug*/ m_log.out << m_log.cnr << "regex ";
         /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
@@ -244,7 +244,7 @@ bool gparser::match_identifier() {
         while (position != m_end && (std::isalnum(*position) || std::isdigit(*position) || *position == '_'))
             ++position;
         m_lexeme.assign(m_position, position);
-        /*debug*/ m_log.set_function("match_ident");
+        /*debug*/ m_log.set_fun("match_ident");
         /*debug*/ m_log.trace(0) << m_log.op("match");
         /*debug*/ m_log.out << m_log.cnr << "identifier ";
         /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
@@ -280,7 +280,7 @@ bool gparser::match_line_comment() {
         std::string::iterator position = m_position;
         while (position != m_end && !is_new_line(position))
             ++position;
-        /*debug*/ m_log.set_function("match_lcomm");
+        /*debug*/ m_log.set_fun("match_lcomm");
         /*debug*/ m_log.trace(0) << m_log.op("match");
         /*debug*/ m_log.out << m_log.cnr << "line comment ";
         /*debug*/ auto s = std::string(m_position, position);
@@ -309,7 +309,7 @@ bool gparser::match_block_comment() {
                 ++position;
             }
         }
-        /*debug*/ m_log.set_function("match_bcomm");
+        /*debug*/ m_log.set_fun("match_bcomm");
         /*debug*/ m_log.trace(0) << m_log.op("match");
         /*debug*/ m_log.out << m_log.cnr << "block comment ";
         /*debug*/ auto s = std::string(m_position, position);
@@ -329,7 +329,7 @@ bool gparser::match_without_skipping_whitespace(const std::string &plexeme) {
         ++lexeme;
     }
     if (*lexeme == 0) {
-        /*debug*/ m_log.set_function("match_noskip");
+        /*debug*/ m_log.set_fun("match_noskip");
         /*debug*/ m_log.trace(0) << m_log.op("!skip");
         /*debug*/ m_log.out << m_log.cnr << "symbol ";
         /*debug*/ auto s = std::string(m_position, position);
@@ -355,7 +355,7 @@ bool gparser::expect(const std::string &lexeme) {
         return true;
     m_position = m_end;
     ++m_errors;
-    /*error*/ m_log.set_function("match_literal");
+    /*error*/ m_log.set_fun("match_literal");
     /*error*/ m_log.etrace(0) << m_log.op("error");
     /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
     /*error*/ m_log.err << "(line " << m_line << ")\n       ";

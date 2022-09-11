@@ -6,7 +6,8 @@ xtoken::xtoken(xtokentype type, int line, int column, const std::shared_ptr<void
       m_column(column),
       m_symbol(symbol),
       m_lexeme(lexeme),
-      m_conflicted_with() {}
+      m_conflicted_with(),
+      m_log("yyv", "xtokn", 255) {}
 
 xtokentype xtoken::type() const {
     return m_type;

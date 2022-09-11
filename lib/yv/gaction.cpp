@@ -5,7 +5,7 @@
 gaction::gaction(int index, const std::string &identifier)
     : m_index(index),
       m_identifier(identifier),
-      m_log() {}
+      m_log("yyv", "gacti", 255) {}
 
 int gaction::index() const {
     return m_index;

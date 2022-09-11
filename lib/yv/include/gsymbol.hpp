@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glexemetype.hpp"
+#include "glogger.hpp"
 #include "gsymbolassoc.hpp"
 #include "gsymboltype.hpp"
 
@@ -29,6 +30,8 @@ class gsymbol {
     int m_precedence;
     /// the productions that reduce to this symbol
     std::vector<std::shared_ptr<gproduction>> m_productions;
+    /// logger
+    glogger m_log;
 
   public:
     gsymbol(const std::string &lexeme);

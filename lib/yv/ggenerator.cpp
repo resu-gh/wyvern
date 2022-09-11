@@ -11,10 +11,10 @@ ggenerator::ggenerator()
       m_productions(),
       m_symbols(),
       m_errors(0),
-      m_log("ggenr", 40) {}
+      m_log("yyv", "ggenr", 40) {}
 
 int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
-    m_log.set_function("generate");
+    m_log.set_fun("generate");
 
     m_grammar = grammar;
     m_identifier = m_grammar->identifier();

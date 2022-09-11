@@ -9,10 +9,10 @@
 
 gcompiler::gcompiler()
     : m_grammar(std::make_shared<ggrammar>()),
-      m_log("gcomp", 45) {}
+      m_log("yyv", "gcomp", 45) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
-    m_log.set_function("compile");
+    m_log.set_fun("compile");
 
     /*debug*/ m_log.trace(0) << m_log.op("get") << "[begin, end) ";
     /*debug*/ m_log.out << m_log.chl << "[" << (void *)&*begin << ", ";

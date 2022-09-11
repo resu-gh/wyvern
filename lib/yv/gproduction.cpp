@@ -9,7 +9,7 @@ gproduction::gproduction(int index, const std::shared_ptr<gsymbol> &symbol, int 
       m_column(column),
       m_action(action),
       m_precedence_symbol(nullptr),
-      m_log() {
+      m_log("yyv", "gprod", 255) {
     assert(m_symbol);
 }
 
@@ -57,7 +57,7 @@ void gproduction::append_symbol(const std::shared_ptr<gsymbol> &symbol) {
 
 std::string gproduction::microdump() const {
     std::stringstream s;
-    s << (void*)&*this << " ";
+    s << (void *)&*this << " ";
     s << m_index << " ";
     return s.str();
 }
