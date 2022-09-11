@@ -4,12 +4,12 @@ SRCS := $(shell find $(SRCD) -name "*.cpp" -or -name "*.hpp")
 BAZELCC := clang++
 BAZELBIN := bazelisk # bazel
 
-ARGS := -i $(shell pwd)/unit/grammar/errcalc.g
+ARGS := ./unit/grammar/errcalc.g
 
 .SILENT: run
 .PHONY: run
 run:
-	CC=$(BAZELCC) $(BAZELBIN) run //src:ycc -- $(ARGS)
+	CC=$(BAZELCC) $(BAZELBIN) run //src:ycc -- -i $(shell realpath $(ARGS))
 
 .SILENT: bld
 .PHONY: bld

@@ -269,8 +269,8 @@ void ggenerator::check_for_unreferenced_symbol_errors() {
 
                     std::shared_ptr<gproduction> production = *i;
 
-                    if (production->symbol()->symbol_type() != gsymboltype::SYMBOL_NON_TERMINAL) {
-                        ;
+                    if (production->symbol()->symbol_type() != gsymboltype::SYMBOL_TERMINAL) {
+                        references += production->count_references_to_symbol(symbol);
                     }
                 }
 

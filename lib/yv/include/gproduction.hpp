@@ -47,6 +47,7 @@ class gproduction {
 
   public:
     void append_symbol(const std::shared_ptr<gsymbol> &symbol);
+    int count_references_to_symbol(const std::shared_ptr<gsymbol> &symbol);
 
   public:
     std::string microdump()const;
