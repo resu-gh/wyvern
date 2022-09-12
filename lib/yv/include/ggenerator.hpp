@@ -42,4 +42,6 @@ class ggenerator {
     void calculate_identifiers();
     void check_for_undefined_symbol_errors();
     void check_for_unreferenced_symbol_errors();
+    void check_for_error_symbol_on_left_hand_side_errors();
+    void calculate_terminal_and_non_terminal_symbols();
 };

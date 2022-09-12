@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 
 ggenerator::ggenerator()
@@ -165,10 +166,10 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     calculate_identifiers();
     check_for_undefined_symbol_errors();
     check_for_unreferenced_symbol_errors();
-    // check_for_error_symbol_on_left_hand_side_errors();
+    check_for_error_symbol_on_left_hand_side_errors();
 
     if (m_errors == 0) {
-        // calculate_terminal_and_non_terminal_symbols();
+        calculate_terminal_and_non_terminal_symbols();
         // calculate_implicit_terminal_symbols();
         // calculate_symbol_indices();
         // calculate_first();
@@ -186,12 +187,12 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
 
 /// calculate identifiers for all symbols
 void ggenerator::calculate_identifiers() {
-    /*debug*/ m_log.set_fun("calc_idents");
+    /*debug*/ m_log.set_fun("cmp_idents");
 
     /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
     for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
-        /*debug*/ m_log.set_fun("calc_idents");
+        /*debug*/ m_log.set_fun("cmp_idents");
         /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
         /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << "\n";
 
@@ -200,7 +201,7 @@ void ggenerator::calculate_identifiers() {
         /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
 
         i->get()->calculate_identifier();
-        /*debug*/ m_log.set_fun("calc_idents");
+        /*debug*/ m_log.set_fun("cmp_idents");
         /*debug*/ m_log.trace(0) << m_log.op("get") << "(symbol).iden ";
         /*debug*/ m_log.out << m_log.chl << i->get()->identifier() << "\n";
     }
@@ -267,7 +268,7 @@ void ggenerator::check_for_unreferenced_symbol_errors() {
                     /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
                     /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
 
-                    std::shared_ptr<gproduction> production = *i;
+                    std::shared_ptr<gproduction> production = *i; // maybe weak_ptr
 
                     if (production->symbol()->symbol_type() != gsymboltype::SYMBOL_TERMINAL) {
                         references += production->count_references_to_symbol(symbol);
@@ -282,6 +283,74 @@ void ggenerator::check_for_unreferenced_symbol_errors() {
                     /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "unreferenced symbol ";
                     /*error*/ m_log.err << m_log.cwhite << symbol->identifier() << "\n";
                 }
+            }
+        }
+    }
+}
+
+/// check for the error symbol being
+/// used in the lhs of a production
+void ggenerator::check_for_error_symbol_on_left_hand_side_errors() {
+    /*debug*/ m_log.set_fun("ck_error_lhs");
+
+    assert(m_error_symbol.get());
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+        /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
+        /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << "\n";
+
+        assert(i->get());
+        /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+        /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+        std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr
+
+        if (!symbol->productions().empty() && symbol->lexeme() == m_error_symbol->lexeme()) {
+            ++m_errors;
+            /*error*/ m_log.etrace(0) << m_log.op("error");
+            /*error*/ m_log.err << m_log.cred << ecode::E_PARSER_ERROR_ON_LHS << " ";
+            /*error*/ m_log.err << "(line " << symbol->line() << ")\n";
+            /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred;
+            /*error*/ m_log.err << "the `error` symbol appears on the lhs of this production\n";
+        }
+    }
+}
+
+/// calculate which symbols are terminal and non-terminal
+/// any symbol w/ 1 or more productions are assumed to be non-terminal
+/// any symbol w/ no productions are assumed to be terminal
+/// (.start, .end and .error are not processed)
+void ggenerator::calculate_terminal_and_non_terminal_symbols() {
+    /*debug*/ m_log.set_fun("cmp_t_nt");
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+        /*debug*/ m_log.trace(1) << m_log.op("proc") << "symbol: ";
+        /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << " ";
+        /*debug*/ m_log.out << m_log.cgreen << i->get()->symbol_type() << "\n";
+
+        assert(i->get());
+        /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite << "OK ";
+        /*debug*/ m_log.out << m_log.chl << &*i->get() << m_log.cnr << " != nullptr\n";
+
+        std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr
+
+        /// FIXME TODO maybe ... very strange check: FIX maybe !=
+        /// maybe i need to skip over .start, .end and .error
+        if (symbol->symbol_type() == gsymboltype::SYMBOL_NULL) {
+            if (symbol->productions().empty()) {
+                symbol->set_symbol_type(gsymboltype::SYMBOL_TERMINAL);
+                /*debug*/ m_log.trace(1) << m_log.op("") << "symbol: ";
+                /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << " ";
+                /*debug*/ m_log.out << m_log.cyellow << i->get()->symbol_type() << "\n";
+            } else {
+                symbol->set_symbol_type(gsymboltype::SYMBOL_NON_TERMINAL);
+                /*debug*/ m_log.trace(1) << m_log.op("") << "symbol: ";
+                /*debug*/ m_log.out << m_log.chl << i->get()->lexeme() << " ";
+                /*debug*/ m_log.out << m_log.cyellow << i->get()->symbol_type() << "\n";
             }
         }
     }
