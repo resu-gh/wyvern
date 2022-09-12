@@ -863,8 +863,6 @@ const std::shared_ptr<gproduction> &ggrammar::add_production(const std::shared_p
         /*debug*/ m_log.trace(1) << m_log.op("check") << m_log.cwhite;
         /*debug*/ m_log.out << "<" << m_productions.back().use_count() << "> ";
         /*debug*/ m_log.out << m_productions.back()->microdump() << "\n";
-
-        return m_productions.back();
     }
 
     std::shared_ptr<gproduction> production = std::make_shared<gproduction>(int(m_productions.size()), symbol, line, -1, nullptr);

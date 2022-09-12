@@ -23,7 +23,6 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
 
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);
-    exit(0);
 
     if (errors == 0) {
         ggenerator generator;

@@ -10,9 +10,9 @@
 #include <string_view>
 
 gparser::gparser()
-    : m_position(nullptr),
+    : m_grammar(nullptr),
+      m_position(nullptr),
       m_end(nullptr),
-      m_grammar(nullptr),
       m_line(1),
       m_errors(0),
       m_lexeme(),
@@ -180,7 +180,7 @@ bool gparser::match_whitespace_statement() {
     if (match("%whitespace")) {
         m_grammar->whitespace(m_line);
         if (match_regex()) {
-            m_grammar->regex(m_lexeme.c_str(), m_line);
+            m_grammar->regex(m_lexeme, m_line);
         }
         expect(";");
         return true;
@@ -190,7 +190,7 @@ bool gparser::match_whitespace_statement() {
 
 bool gparser::match_production_statement() {
     if (match_identifier()) {
-        m_grammar->production(m_lexeme.c_str(), m_line);
+        m_grammar->production(m_lexeme, m_line);
         expect(":");
         match_expressions();
         expect(";");
