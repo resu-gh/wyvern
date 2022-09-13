@@ -61,12 +61,8 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     if (m_errors == 0) {
         calculate_terminal_and_non_terminal_symbols(); // FIXME or fixed? (modified)
         dump();
-        auto i = m_symbols.size();
         calculate_implicit_terminal_symbols();
-        auto y = m_symbols.size();
         dump();
-        m_log.out << i << " " << y << "\n";
-        exit(0);
         // calculate_symbol_indices();
         // calculate_first();
         // calculate_follow();
@@ -346,43 +342,64 @@ void ggenerator::replace_references_to_symbol(const std::shared_ptr<gsymbol> &to
 
 void ggenerator::dump() const {
     // clang-format off
-    /*debug*/ m_log.trace(0) << m_log.op("dump") << ".m_identifier ";
+
+    /*debug*/ m_log.trace(0) << m_log.op("dump") << "\n";
+    /*debug*/ m_log.out << m_log.op("") << ".m_identifier ";
     /*debug*/ m_log.out << m_log.chl << m_identifier << "\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_errors ";
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_errors ";
     /*debug*/ m_log.out << m_log.chl << m_errors << "\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_actions\n";
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_actions\n";
     /*debug*/ for (auto a : m_actions) {
-    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+    /*debug*/     m_log.out << m_log.op("") << m_log.chl;
     /*debug*/     m_log.out << "<" << a.use_count() << "> ";
-    /*debug*/     m_log.out << m_log.cwhite << a->microdump() << "\n";
+    /*debug*/     m_log.out << m_log.chl << &*a << " ";
+    /*debug*/     m_log.out << a->index() << " ";
+    /*debug*/     m_log.out << m_log.cwhite << a->identifier() << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_productions\n";
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_productions\n";
     /*debug*/ for (auto p : m_productions) {
-    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+    /*debug*/     m_log.out << m_log.op("") << m_log.chl;
     /*debug*/     m_log.out << "<" << p.use_count() << "> ";
-    /*debug*/     m_log.out << m_log.cwhite << p->microdump();
-    /*debug*/     m_log.out << m_log.chl << "on " << m_log.cwhite;
-    /*debug*/     m_log.out << p->symbol()->identifier() << " ";
+    /*debug*/     m_log.out << m_log.chl << &*p << " ";
+    /*debug*/     m_log.out << m_log.cwhite << p->index() << " ";
+    /*debug*/     m_log.out << m_log.cnr << "on " << m_log.cwhite;
+    /*debug*/     if (!p->symbol()->identifier().empty())
+    /*debug*/         m_log.out << p->symbol()->identifier() << " ";
+    /*debug*/     else
+    /*debug*/         m_log.out << "`"<< p->symbol()->lexeme() << "` ";
     /*debug*/     m_log.out << m_log.cnr << "to [";
     /*debug*/     m_log.out << m_log.chl;
     /*debug*/     for (auto s : p->symbols()) {
-    /*debug*/         m_log.out << s->identifier();
+    /*debug*/         if (!s->identifier().empty())
+    /*debug*/             m_log.out << s->identifier();
+    /*debug*/         else
+    /*debug*/             m_log.out << "`" << s->lexeme() << "`";
     /*debug*/         if (&*s != &*(p->symbols().end() - 1)->get())
     /*debug*/             m_log.out << m_log.cnr << "," << m_log.chl;
     /*debug*/     }
     /*debug*/     m_log.out << m_log.cnr;
-    /*debug*/     m_log.out << "]" << m_log.chl;
+    /*debug*/     m_log.out << "]" << m_log.cnr;
     /*debug*/     if (p->action()) {
     /*debug*/         m_log.out << " w/ " << m_log.cwhite;
     /*debug*/         m_log.out << p->action()->identifier();
     /*debug*/     }
     /*debug*/     m_log.out << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_symbols\n";
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_symbols\n";
     /*debug*/ for (auto s : m_symbols) {
-    /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+    /*debug*/     m_log.out << m_log.op("") << m_log.chl;
     /*debug*/     m_log.out << " <" << s.use_count() << "> ";
-    /*debug*/     m_log.out << m_log.cwhite << s->microdump();
+    /*debug*/     m_log.out << m_log.chl << &*s << " ";
+    /*debug*/     m_log.out << m_log.cwhite << s->index() << " ";
+    /*debug*/     if (!s->identifier().empty())
+    /*debug*/         m_log.out << m_log.cwhite << s->identifier() << " ";
+    /*debug*/     else
+    /*debug*/         m_log.out << "undef ";
+    /*debug*/     m_log.out << m_log.chl << s->lexeme() << " ";
     /*debug*/     m_log.out << m_log.cnr << s->precedence() << " ";
     /*debug*/     m_log.out << s->symbol_type() << " ";
     /*debug*/     m_log.out << s->lexeme_type() << " ";
@@ -396,13 +413,19 @@ void ggenerator::dump() const {
     /*debug*/         }
     /*debug*/         m_log.out << m_log.cnr << "]";
     /*debug*/     }
-    /*debug*/     m_log.out << m_log.cnr;
     /*debug*/     m_log.out << "\n";
     /*debug*/ }
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_start_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_start_symbol\n";
+    /*debug*/ m_log.out << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_start_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_log.cwhite << m_start_symbol->microdump();
+    /*debug*/ m_log.out << m_log.chl << &*m_start_symbol << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_start_symbol->index() << " ";
+    /*debug*/ if (!m_start_symbol->identifier().empty())
+    /*debug*/     m_log.out << m_log.cwhite << m_start_symbol->identifier() << " ";
+    /*debug*/ else
+    /*debug*/     m_log.out << "undef ";
+    /*debug*/ m_log.out << m_log.chl << m_start_symbol->lexeme() << " ";
     /*debug*/ m_log.out << m_log.cnr << m_start_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_start_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_start_symbol->lexeme_type() << " ";
@@ -416,12 +439,18 @@ void ggenerator::dump() const {
     /*debug*/     }
     /*debug*/     m_log.out << m_log.cnr << "]";
     /*debug*/ }
-    /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_end_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_end_symbol\n";
+    /*debug*/ m_log.out << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_end_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_log.cwhite << m_end_symbol->microdump();
+    /*debug*/ m_log.out << m_log.chl << &*m_end_symbol << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_end_symbol->index() << " ";
+    /*debug*/ if (!m_end_symbol->identifier().empty())
+    /*debug*/     m_log.out << m_log.cwhite << m_end_symbol->identifier() << " ";
+    /*debug*/ else
+    /*debug*/     m_log.out << "undef ";
+    /*debug*/ m_log.out << m_log.chl << m_end_symbol->lexeme() << " ";
     /*debug*/ m_log.out << m_log.cnr << m_end_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_end_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_end_symbol->lexeme_type() << " ";
@@ -437,10 +466,17 @@ void ggenerator::dump() const {
     /*debug*/ }
     /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << ".m_error_symbol\n";
-    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.chl;
+
+    /*debug*/ m_log.out << m_log.op("") << ".m_error_symbol\n";
+    /*debug*/ m_log.out << m_log.op("") << m_log.chl;
     /*debug*/ m_log.out << " <" << m_error_symbol.use_count() << "> ";
-    /*debug*/ m_log.out << m_log.cwhite << m_error_symbol->microdump();
+    /*debug*/ m_log.out << m_log.chl << &*m_error_symbol << " ";
+    /*debug*/ m_log.out << m_log.cwhite << m_error_symbol->index() << " ";
+    /*debug*/ if (!m_error_symbol->identifier().empty())
+    /*debug*/     m_log.out << m_log.cwhite << m_error_symbol->identifier() << " ";
+    /*debug*/ else
+    /*debug*/     m_log.out << "undef ";
+    /*debug*/ m_log.out << m_log.chl << m_error_symbol->lexeme() << " ";
     /*debug*/ m_log.out << m_log.cnr << m_error_symbol->precedence() << " ";
     /*debug*/ m_log.out << m_error_symbol->symbol_type() << " ";
     /*debug*/ m_log.out << m_error_symbol->lexeme_type() << " ";
@@ -454,7 +490,6 @@ void ggenerator::dump() const {
     /*debug*/     }
     /*debug*/     m_log.out << m_log.cnr << "]";
     /*debug*/ }
-    /*debug*/ m_log.out << m_log.cnr;
     /*debug*/ m_log.out << "\n";
     // clang-format on
 }
