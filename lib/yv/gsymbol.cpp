@@ -1,4 +1,5 @@
 #include "include/gsymbol.hpp"
+#include "include/gproduction.hpp"
 #include "include/gsymboltype.hpp"
 
 #include <array>
@@ -94,8 +95,8 @@ void gsymbol::calculate_identifier() {
     /*debug*/ m_log.set_fun("calc_ident");
 
     assert(!m_lexeme.empty());
-    /*debug*/ m_log.trace(0) << m_log.op("test") << m_log.cwhite << "OK ";
-    /*debug*/ m_log.out << m_log.chl << m_lexeme << m_log.cnr << " is not empty()\n";
+    // /*debug*/ m_log.trace(0) << m_log.op("test") << m_log.cwhite << "OK ";
+    // /*debug*/ m_log.out << m_log.chl << m_lexeme << m_log.cnr << " is not empty()\n";
 
     // clang-format off
     std::array<std::string, 128> char_names = {
@@ -141,14 +142,43 @@ void gsymbol::calculate_identifier() {
         }
     }
 
-    if(m_symbol_type == gsymboltype::SYMBOL_TERMINAL)
+    if (m_symbol_type == gsymboltype::SYMBOL_TERMINAL)
         m_identifier.append("_terminal");
+
+    /*debug*/ m_log.trace(0) << m_log.op("to") << m_log.chl;
+    /*debug*/ m_log.out << m_identifier << "\n";
+}
+
+// TODO FIXME?
+std::shared_ptr<gsymbol> gsymbol::implicit_terminal() const {
+    std::shared_ptr<gsymbol> implicit_terminal = nullptr;
+    if (m_productions.size() == 1) {
+        std::shared_ptr<gproduction> production = m_productions.front(); // maybe weak_ptr
+        assert(production.get());
+        if (production.get()->length() == 1 && !production->action().get()) {
+            std::shared_ptr<gsymbol> symbol = production->symbols().front();
+            if (symbol->symbol_type() == gsymboltype::SYMBOL_TERMINAL)
+                implicit_terminal = symbol;
+        }
+    }
+    return implicit_terminal;
+}
+
+/// TODO FIXME?
+void gsymbol::replace_by_non_terminal(const std::shared_ptr<gsymbol> &non_terminal_symbol) {
+    assert(m_symbol_type == gsymboltype::SYMBOL_TERMINAL);
+    assert(non_terminal_symbol.get());
+    assert(non_terminal_symbol->m_symbol_type == gsymboltype::SYMBOL_NON_TERMINAL);
+    m_identifier = non_terminal_symbol->m_lexeme;
+    m_precedence = non_terminal_symbol->m_precedence;
+    m_associativity = non_terminal_symbol->m_associativity;
 }
 
 std::string gsymbol::microdump() const {
     std::stringstream s;
     s << (void *)&*this << " ";
     s << m_index << " ";
+    s << m_identifier << " ";
     s << m_lexeme << " ";
     return s.str();
 }

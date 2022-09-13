@@ -60,17 +60,44 @@ int gproduction::count_references_to_symbol(const std::shared_ptr<gsymbol> &symb
     /*debug*/ m_log.set_fun("count_refs");
     int references = 0;
 
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << "(produc).m_symbols\n";
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
     for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
-        /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cgreen << (void *)&*symbol.get() << " " << symbol->lexeme() << "\n";
-        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cgreen << (void *)&*i->get() << " " << i->get()->lexeme() << "\n";
+        /*debug*/ m_log.trace(1) << m_log.op("symbol");
+        /*debug*/ m_log.out << m_log.chl << "<" << i->use_count() << "> ";
+        /*debug*/ m_log.out << i->get()->microdump() << "\n";
+
         references += (&*symbol.get() == &*i->get() ? 1 : 0);
-        /*debug*/ m_log.trace(1) << m_log.op("") << m_log.cred << (void *)&*m_precedence_symbol.get() << "\n";
+        // clang-format off
+        /*debug*/ if (&*symbol.get() == &*i->get())
+        /*debug*/     m_log.trace(1) << m_log.op("incr") << "references: " << m_log.cwhite << references << "\n";
+        // clang-format on
     }
+
     references += (&*m_precedence_symbol.get() == &*symbol.get() ? 1 : 0);
+    // clang-format off
+    /*debug*/ if (&*m_precedence_symbol.get() == &*symbol.get())
+    /*debug*/     m_log.trace(1) << m_log.op("incr") << "references: " << m_log.cwhite << references << "\n";
+    // clang-format on
 
     return references;
+}
+
+int gproduction::length() const {
+    return int(m_symbols.size());
+}
+
+// TODO FIXME?
+void gproduction::replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol) {
+    if (m_symbol == to_symbol)
+        m_symbol = with_symbol;
+    if (m_precedence_symbol == to_symbol)
+        m_precedence_symbol = with_symbol;
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator;
+    for (symb_iter i = m_symbols.begin();i!=m_symbols.end();++i) {
+        if (i->get() == to_symbol.get())
+            *i = with_symbol;
+    }
 }
 
 std::string gproduction::microdump() const {

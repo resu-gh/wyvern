@@ -44,4 +44,9 @@ class ggenerator {
     void check_for_unreferenced_symbol_errors();
     void check_for_error_symbol_on_left_hand_side_errors();
     void calculate_terminal_and_non_terminal_symbols();
+    void calculate_implicit_terminal_symbols();
+    void replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol);
+
+  public:
+    void dump() const;
 };

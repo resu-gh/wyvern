@@ -61,6 +61,9 @@ class gsymbol {
     void append_production(const std::shared_ptr<gproduction> &production);
     void calculate_identifier();
 
-    public:
-    std::string microdump()const;
+    std::shared_ptr<gsymbol> implicit_terminal() const;                                // TODO FIXME ?
+    void replace_by_non_terminal(const std::shared_ptr<gsymbol> &non_terminal_symbol); // TODO FIXME?
+
+  public:
+    std::string microdump() const;
 };

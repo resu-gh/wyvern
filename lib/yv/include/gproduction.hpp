@@ -15,7 +15,7 @@ class gproduction {
     /// production index
     int m_index;
     /// lhs symbol of this production
-    const std::shared_ptr<gsymbol> m_symbol;
+    std::shared_ptr<gsymbol> m_symbol;
     /// the line where this production is defined
     int m_line;
     /// the column where this production is defined
@@ -46,11 +46,13 @@ class gproduction {
     void set_action(const std::shared_ptr<gaction> &action);
 
   public:
+    int length() const;
     void append_symbol(const std::shared_ptr<gsymbol> &symbol);
     int count_references_to_symbol(const std::shared_ptr<gsymbol> &symbol);
+    void replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol);
 
   public:
-    std::string microdump()const;
+    std::string microdump() const;
 
   public:
     static const int INVALID_INDEX = -1;
