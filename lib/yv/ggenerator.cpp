@@ -60,11 +60,9 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
 
     if (m_errors == 0) {
         calculate_terminal_and_non_terminal_symbols(); // FIXME or fixed? (modified)
-        dump();
         calculate_implicit_terminal_symbols();
-        dump();
-        // calculate_symbol_indices();
-        // calculate_first();
+        calculate_symbol_indices();
+        calculate_first();
         // calculate_follow();
         // calculate_precedence_of_productions();
         // generate_states( m_start_symbol, m_end_symbol, m_symbols );
@@ -331,12 +329,63 @@ void ggenerator::calculate_implicit_terminal_symbols() {
 }
 
 void ggenerator::replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol) {
+    /*debug*/ m_log.set_fun("repl_symb_refs");
+
     using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
     for (prod_iter i = m_productions.begin(); i != m_productions.end(); ++i) {
 
         std::shared_ptr<gproduction> production = *i;
         assert(production.get());
         production->replace_references_to_symbol(to_symbol, with_symbol);
+    }
+}
+
+/// calculate the index for each symbol
+void ggenerator::calculate_symbol_indices() {
+    /*debug*/ m_log.set_fun("cmp_indices");
+
+    int index = 0;
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator; // FIXME iter or const_iter ?
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+
+        std::shared_ptr<gsymbol> symbol = *i;
+        assert(i->get());
+
+        symbol->set_index(index);
+        /*debug*/ m_log.trace(1) << m_log.op("symbol");
+        /*debug*/ m_log.out << m_log.cwhite << symbol->index() << " ";
+        /*debug*/ m_log.out << m_log.chl << symbol->identifier() << "\n";
+        ++index;
+    }
+}
+
+/// calculate the first position sets for each symbol
+/// until no more terminals can be added to any first
+/// position sets
+void ggenerator::calculate_first() {
+    /*debug*/ m_log.set_fun("cmp_first");
+
+    int added = 1;
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator; // FIXME iter or const_iter ?
+                                                                       /// FIXME this is a do-while
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << "until no changes in the first sets\n";
+    while (added > 0) {
+        added = 0;
+        /*debug*/ m_log.trace(1) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+        for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+            std::shared_ptr<gsymbol> symbol = *i;
+            assert(i->get());
+            /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
+            /*debug*/ m_log.out << symbol->microdump() << "\n";
+
+            added += symbol->calculate_first();
+            /*debug*/ m_log.trace(0) << m_log.op("first") << m_log.chl << symbol->microdump() << "\n";
+            // clang-format off
+            /*debug*/ for (auto s : symbol->first())
+            /*debug*/     m_log.trace(1) << m_log.op("") << m_log.cwhite << s->microdump() << "\n";
+            // clang-format on
+        }
     }
 }
 

@@ -3,16 +3,18 @@
 #include "glexemetype.hpp"
 #include "glogger.hpp"
 #include "gsymbolassoc.hpp"
+#include "gsymbolc.hpp"
 #include "gsymboltype.hpp"
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
 class gproduction;
 
 /// grammar symbol
-class gsymbol {
+class gsymbol : public std::enable_shared_from_this<gsymbol> {
   private:
     /// symbol index (among all symbols)
     int m_index;
@@ -30,8 +32,12 @@ class gsymbol {
     gsymbolassoc m_associativity;
     /// symbol precedence
     int m_precedence;
+    /// true if symbol is nullable, otherwise false
+    bool m_nullable;
     /// the productions that reduce to this symbol
     std::vector<std::shared_ptr<gproduction>> m_productions;
+    /// the symbols that can start this symbol in a production or regex
+    std::set<std::shared_ptr<gsymbol>, gsymbolc> m_first;
     /// logger
     glogger m_log;
 
@@ -47,9 +53,12 @@ class gsymbol {
     glexemetype lexeme_type() const;
     gsymbolassoc associativity() const;
     int precedence() const;
+    bool nullable() const;
     const std::vector<std::shared_ptr<gproduction>> &productions() const;
+    const std::set<std::shared_ptr<gsymbol>, gsymbolc> &first() const;
 
   public:
+    void set_index(int index);
     void set_line(int line);
     void set_symbol_type(gsymboltype symbol_type);
     void set_lexeme_type(glexemetype lexeme_type);
@@ -63,7 +72,14 @@ class gsymbol {
 
     std::shared_ptr<gsymbol> implicit_terminal() const;                                // TODO FIXME ?
     void replace_by_non_terminal(const std::shared_ptr<gsymbol> &non_terminal_symbol); // TODO FIXME?
+    int calculate_first();
+    int add_symbol_to_first(const std::shared_ptr<gsymbol> &symbol);
+    int add_symbols_to_first(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &symbols);
 
   public:
     std::string microdump() const;
+
+    std::shared_ptr<gsymbol> self() {
+        return shared_from_this();
+    }
 };

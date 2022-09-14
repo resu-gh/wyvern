@@ -46,6 +46,8 @@ class ggenerator {
     void calculate_terminal_and_non_terminal_symbols();
     void calculate_implicit_terminal_symbols();
     void replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol);
+    void calculate_symbol_indices();
+    void calculate_first();
 
   public:
     void dump() const;
