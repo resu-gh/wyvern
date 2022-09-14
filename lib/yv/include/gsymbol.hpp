@@ -38,6 +38,8 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
     std::vector<std::shared_ptr<gproduction>> m_productions;
     /// the symbols that can start this symbol in a production or regex
     std::set<std::shared_ptr<gsymbol>, gsymbolc> m_first;
+    /// the symbols that can follow this symbol in a production or regex
+    std::set<std::shared_ptr<gsymbol>, gsymbolc> m_follow;
     /// logger
     glogger m_log;
 
@@ -56,6 +58,7 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
     bool nullable() const;
     const std::vector<std::shared_ptr<gproduction>> &productions() const;
     const std::set<std::shared_ptr<gsymbol>, gsymbolc> &first() const;
+    const std::set<std::shared_ptr<gsymbol>, gsymbolc> &follow() const;
 
   public:
     void set_index(int index);
@@ -75,6 +78,9 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
     int calculate_first();
     int add_symbol_to_first(const std::shared_ptr<gsymbol> &symbol);
     int add_symbols_to_first(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &symbols);
+    int calculate_follow();
+    int add_symbol_to_follow(const std::shared_ptr<gsymbol> &symbol);
+    int add_symbols_to_follow(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &symbols);
 
   public:
     std::string microdump() const;

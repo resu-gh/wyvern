@@ -22,6 +22,7 @@ gsymbol::gsymbol(const std::string &lexeme)
       m_nullable(false),
       m_productions(),
       m_first(),
+      m_follow(),
       m_log("yyv", "gsymb", 255) {}
 
 int gsymbol::index() const {
@@ -66,6 +67,10 @@ const std::vector<std::shared_ptr<gproduction>> &gsymbol::productions() const {
 
 const std::set<std::shared_ptr<gsymbol>, gsymbolc> &gsymbol::first() const {
     return m_first;
+}
+
+const std::set<std::shared_ptr<gsymbol>, gsymbolc> &gsymbol::follow() const {
+    return m_follow;
 }
 
 void gsymbol::set_index(int index) {
@@ -256,6 +261,74 @@ int gsymbol::add_symbols_to_first(const std::set<std::shared_ptr<gsymbol>, gsymb
     std::size_t original_size = m_first.size();
     m_first.insert(symbols.begin(), symbols.end());
     return int(m_first.size() - original_size);
+}
+
+/// calculate the follow set for this symbol
+int gsymbol::calculate_follow() {
+    /*debug*/ m_log.set_fun("cmp_follow");
+    int added = 0;
+
+    using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << ".m_productions\n";
+    for (prod_iter i = m_productions.begin(); i != m_productions.end(); ++i) {
+        std::shared_ptr<gproduction> production = *i;
+        assert(production.get());
+        /*debug*/ m_log.trace(1) << m_log.op("produc") << m_log.chl;
+        /*debug*/ m_log.out << production->microdump() << "\n";
+
+        const std::vector<std::shared_ptr<gsymbol>> &symbols = production->symbols();
+
+        if (!symbols.empty()) {
+            /*debug*/ m_log.trace(1) << m_log.op("rviter") << "(production).m_symbols\n";
+            using symb_riter = std::vector<std::shared_ptr<gsymbol>>::const_reverse_iterator;
+            symb_riter j = symbols.rbegin();
+
+            std::shared_ptr<gsymbol> symbol = *j;
+            /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
+            /*debug*/ m_log.out << symbol->microdump() << "\n";
+
+            added += symbol->add_symbols_to_follow(follow());
+            ++j;
+
+            while (j != symbols.rend() && symbol->nullable()) {
+                std::shared_ptr<gsymbol> previous_symbol = *j;
+                assert(previous_symbol.get());
+                /*debug*/ m_log.trace(1) << m_log.op("prev") << m_log.chl;
+                /*debug*/ m_log.out << previous_symbol->microdump() << "\n";
+
+                added += previous_symbol->add_symbols_to_follow(follow());
+                symbol = previous_symbol;
+
+                ++j;
+            }
+
+            while (j != symbols.rend()) {
+                std::shared_ptr<gsymbol> previous_symbol = *j;
+                assert(previous_symbol.get());
+                /*debug*/ m_log.trace(1) << m_log.op("prev") << m_log.chl;
+                /*debug*/ m_log.out << previous_symbol->microdump() << "\n";
+
+                added += previous_symbol->add_symbols_to_follow(symbol->first());
+                ++j;
+            }
+        }
+    }
+
+    return added;
+}
+
+/// add 1 symbol to the follow set of this symbol
+int gsymbol::add_symbol_to_follow(const std::shared_ptr<gsymbol> &symbol) {
+    assert(symbol.get());
+    return m_follow.insert(symbol).second ? 1 : 0;
+}
+
+/// add 1 or more symbols to the follow set of this symbol
+int gsymbol::add_symbols_to_follow(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &symbols) {
+    std::size_t original_size = m_follow.size();
+    m_follow.insert(symbols.begin(), symbols.end());
+    return int(m_follow.size() - original_size);
 }
 
 std::string gsymbol::microdump() const {

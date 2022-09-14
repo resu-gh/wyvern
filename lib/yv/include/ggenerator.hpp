@@ -48,6 +48,7 @@ class ggenerator {
     void replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol);
     void calculate_symbol_indices();
     void calculate_first();
+    void calculate_follow();
 
   public:
     void dump() const;

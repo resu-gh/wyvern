@@ -63,7 +63,7 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
         calculate_implicit_terminal_symbols();
         calculate_symbol_indices();
         calculate_first();
-        // calculate_follow();
+        calculate_follow();
         // calculate_precedence_of_productions();
         // generate_states( m_start_symbol, m_end_symbol, m_symbols );
     }
@@ -386,6 +386,38 @@ void ggenerator::calculate_first() {
             /*debug*/     m_log.trace(1) << m_log.op("") << m_log.cwhite << s->microdump() << "\n";
             // clang-format on
         }
+    }
+}
+
+/// calculate the follow positions sets for each symbol
+/// until no more terminals can be added to any follow
+/// position sets
+void ggenerator::calculate_follow() {
+    /*debug*/ m_log.set_fun("cmp_follow");
+
+    m_start_symbol->add_symbol_to_follow(m_end_symbol); // TODO maybe useless (repeated inside the loop)
+
+    int added = 1;
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator;
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << "until no changes in the follow sets\n";
+    while (added > 0) {
+        added = 0;
+        /*debug*/ m_log.trace(1) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+        for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
+            std::shared_ptr<gsymbol> symbol = *i;
+            assert(symbol.get());
+            /*debug*/ m_log.trace(0) << m_log.op("symbol") << m_log.chl;
+            /*debug*/ m_log.out << symbol->microdump() << "\n";
+
+            added += symbol->calculate_follow();
+            /*debug*/ m_log.trace(0) << m_log.op("follow") << m_log.chl << symbol->microdump() << "\n";
+            // clang-format off
+            /*debug*/ for (auto s : symbol->follow())
+            /*debug*/     m_log.trace(1) << m_log.op("") << m_log.cwhite << s->microdump() << "\n";
+            // clang-format on
+        }
+        /*debug*/ m_log.trace(1) << m_log.op("get") << "added: " << m_log.chl << added << "\n";
     }
 }
 
