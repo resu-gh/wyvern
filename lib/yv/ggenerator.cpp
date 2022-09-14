@@ -64,7 +64,7 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
         calculate_symbol_indices();
         calculate_first();
         calculate_follow();
-        // calculate_precedence_of_productions();
+        calculate_precedence_of_productions();
         // generate_states( m_start_symbol, m_end_symbol, m_symbols );
     }
 
@@ -421,9 +421,37 @@ void ggenerator::calculate_follow() {
     }
 }
 
+/// calculate the precedence of each production that
+/// hasn't had precedence set explicitly
+/// as the precedence of its rightmost terminal
+void ggenerator::calculate_precedence_of_productions() {
+    /*debug*/ m_log.set_fun("cmp_prodprec");
+
+    using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_productions\n";
+    for (prod_iter i = m_productions.begin(); i < m_productions.end(); i++) {
+        std::shared_ptr<gproduction> production = *i;
+        assert(production.get());
+        /*debug*/ m_log.trace(0) << m_log.op("produc") << m_log.chl;
+        /*debug*/ m_log.out << production->microdump() << "\n";
+
+        if (production->precedence() == 0) {
+            auto symbol = production->find_rightmost_terminal_symbol();
+            if (symbol.get()) {
+                /*debug*/ m_log.trace(1) << m_log.op("rmost") << m_log.cwhite;
+                /*debug*/ m_log.out << symbol->identifier() << " " << symbol->precedence() << "\n";
+
+                production->set_precedence_symbol(symbol);
+                /*debug*/ m_log.trace(1) << m_log.op("test") << m_log.cwhite;
+                /*debug*/ m_log.out << production->precedence() << "\n";
+            }
+        }
+    }
+}
+
 void ggenerator::dump() const {
     // clang-format off
-
     /*debug*/ m_log.trace(0) << m_log.op("dump") << "\n";
     /*debug*/ m_log.out << m_log.op("") << ".m_identifier ";
     /*debug*/ m_log.out << m_log.chl << m_identifier << "\n";

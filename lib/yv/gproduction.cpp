@@ -94,10 +94,24 @@ void gproduction::replace_references_to_symbol(const std::shared_ptr<gsymbol> &t
     if (m_precedence_symbol == to_symbol)
         m_precedence_symbol = with_symbol;
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator;
-    for (symb_iter i = m_symbols.begin();i!=m_symbols.end();++i) {
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
         if (i->get() == to_symbol.get())
             *i = with_symbol;
     }
+}
+
+int gproduction::precedence() const {
+    return m_precedence_symbol ? m_precedence_symbol->precedence() : 0;
+}
+
+std::shared_ptr<gsymbol> gproduction::find_rightmost_terminal_symbol() const {
+    using symb_riter = std::vector<std::shared_ptr<gsymbol>>::const_reverse_iterator;
+    symb_riter i = m_symbols.rbegin();
+
+    while (i!= m_symbols.rend() && i->get()->symbol_type() != gsymboltype::SYMBOL_TERMINAL)
+        ++i;
+
+    return i != m_symbols.rend() ? *i : nullptr;
 }
 
 std::string gproduction::microdump() const {

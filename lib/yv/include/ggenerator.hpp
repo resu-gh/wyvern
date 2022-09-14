@@ -49,6 +49,7 @@ class ggenerator {
     void calculate_symbol_indices();
     void calculate_first();
     void calculate_follow();
+    void calculate_precedence_of_productions();
 
   public:
     void dump() const;
