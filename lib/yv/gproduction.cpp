@@ -108,10 +108,14 @@ std::shared_ptr<gsymbol> gproduction::find_rightmost_terminal_symbol() const {
     using symb_riter = std::vector<std::shared_ptr<gsymbol>>::const_reverse_iterator;
     symb_riter i = m_symbols.rbegin();
 
-    while (i!= m_symbols.rend() && i->get()->symbol_type() != gsymboltype::SYMBOL_TERMINAL)
+    while (i != m_symbols.rend() && i->get()->symbol_type() != gsymboltype::SYMBOL_TERMINAL)
         ++i;
 
     return i != m_symbols.rend() ? *i : nullptr;
+}
+
+std::shared_ptr<gsymbol> gproduction::symbol_by_position(int position) const {
+    return (position >= 0 && position < int(m_symbols.size())) ? m_symbols[position] : nullptr;
 }
 
 std::string gproduction::microdump() const {

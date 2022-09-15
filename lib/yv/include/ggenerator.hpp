@@ -31,6 +31,8 @@ class ggenerator {
     std::shared_ptr<gsymbol> m_error_symbol;
     /// the states in the parser's state machine
     std::set<std::shared_ptr<gstate>> m_states;
+    /// the start state
+    std::shared_ptr<gstate> m_start_state;
     /// number of errors occurred during parsing and generator
     int m_errors;
     /// logger
@@ -55,6 +57,7 @@ class ggenerator {
     void calculate_follow();
     void calculate_precedence_of_productions();
     void generate_states();
+    void clojure(const std::shared_ptr<gstate>&state);
 
   public:
     void dump() const;

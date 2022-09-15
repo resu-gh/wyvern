@@ -52,6 +52,7 @@ class gproduction {
     void replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol);
     int precedence() const;
     std::shared_ptr<gsymbol> find_rightmost_terminal_symbol() const;
+    std::shared_ptr<gsymbol> symbol_by_position(int position) const;
 
   public:
     std::string microdump() const;
