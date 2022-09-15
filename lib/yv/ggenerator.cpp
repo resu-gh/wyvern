@@ -483,7 +483,8 @@ void ggenerator::generate_states() {
         /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
         /*debug*/     m_log.out << i.position() << " "; 
         /*debug*/     m_log.out << i.production()->microdump() << m_log.cnr << "on " << m_log.chl; 
-        /*debug*/     m_log.out << i.production()->symbol()->identifier() << "\n"; 
+        /*debug*/     m_log.out << "<" << i.production()->symbol().use_count() << "> "; 
+        /*debug*/     m_log.out << i.production()->symbol()->microdump() << "\n"; 
         /*debug*/ }
         // clang-format on
 
@@ -498,8 +499,9 @@ void ggenerator::generate_states() {
         /*debug*/ for (auto i : start_state->items()) {
         /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
         /*debug*/     m_log.out << i.position() << " ";
-        /*debug*/     m_log.out << i.production()->microdump() << m_log.cnr << "on " << m_log.chl;
-        /*debug*/     m_log.out << i.production()->symbol()->identifier() << "\n";
+        /*debug*/     m_log.out << i.production()->microdump() << m_log.cnr << "on " << m_log.chl; 
+        /*debug*/     m_log.out << "<" << i.production()->symbol().use_count() << "> "; 
+        /*debug*/     m_log.out << i.production()->symbol()->microdump() << "\n"; 
         /*debug*/ }
         // clang-format on
 
@@ -559,12 +561,13 @@ void ggenerator::clojure(const std::shared_ptr<gstate> &state) {
         for (item_iter item = items.begin(); item != items.end(); ++item) {
 
             std::shared_ptr<gsymbol> symbol = item->production()->symbol_by_position(item->position());
-            /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
-            /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
-            /*debug*/ m_log.out << symbol->microdump() << "\n";
 
             // != nullptr
             if (symbol.get()) {
+                /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
+                /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
+                /*debug*/ m_log.out << symbol->microdump() << "\n";
+
                 const std::vector<std::shared_ptr<gproduction>> &productions = symbol->productions();
 
                 /*debug*/ m_log.trace(1) << m_log.op("iter") << "symbols[curr].productions\n";
