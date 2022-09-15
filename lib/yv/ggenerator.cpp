@@ -2,17 +2,20 @@
 #include "include/ecode.hpp"
 #include "include/ggrammar.hpp"
 #include "include/gproduction.hpp"
+#include "include/gstate.hpp"
 
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 ggenerator::ggenerator()
     : m_identifier(),
       m_actions(),
       m_productions(),
       m_symbols(),
+      m_states(),
       m_errors(0),
       m_log("yyv", "ggenr", 40) {}
 
@@ -30,6 +33,7 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     m_end_symbol = m_grammar->end_symbol();       // if useless remove grammar shared ref
     m_error_symbol = m_grammar->error_symbol();   // if useless remove grammar shared ref
     m_errors = 0;                                 // init error
+    m_states.clear();                             // TODO maybe can be avoided
 
     /*debug*/ m_log.trace(0) << m_log.op("copy");
     /*debug*/ m_log.out << "grammar              -> " << m_log.chl << ".m_grammar\n";
@@ -66,6 +70,7 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
         calculate_follow();
         calculate_precedence_of_productions();
         // generate_states( m_start_symbol, m_end_symbol, m_symbols );
+        generate_states();
     }
 
     // TODO why this strange swap
@@ -448,6 +453,27 @@ void ggenerator::calculate_precedence_of_productions() {
             }
         }
     }
+}
+
+void ggenerator::generate_states() {
+    assert(m_start_symbol.get());
+    assert(m_end_symbol.get());
+    assert(m_states.empty());
+
+    if (!m_start_symbol->productions().empty()) {
+        m_log.out << ".m_start_symbol.productions not empty\n";
+
+        std::shared_ptr<gstate> start_state = std::make_shared<gstate>();
+
+        m_log.out << "ready to iter until no changes\n";
+        int added = 1;
+        while (added > 0) {
+            added = 0;
+
+            m_log.out << "ready to iter states\n";
+        }
+    }
+    m_log.out << "rip\n";
 }
 
 void ggenerator::dump() const {

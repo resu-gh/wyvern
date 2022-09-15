@@ -2,8 +2,10 @@
 
 #include "gaction.hpp"
 #include "glogger.hpp"
+#include "gstate.hpp"
 #include "gsymbol.hpp"
 #include <memory>
+#include <set>
 #include <vector>
 
 class ggrammar;
@@ -27,6 +29,8 @@ class ggenerator {
     std::shared_ptr<gsymbol> m_end_symbol;
     /// error state
     std::shared_ptr<gsymbol> m_error_symbol;
+    /// the states in the parser's state machine
+    std::set<std::shared_ptr<gstate>> m_states;
     /// number of errors occurred during parsing and generator
     int m_errors;
     /// logger
@@ -50,6 +54,7 @@ class ggenerator {
     void calculate_first();
     void calculate_follow();
     void calculate_precedence_of_productions();
+    void generate_states();
 
   public:
     void dump() const;
