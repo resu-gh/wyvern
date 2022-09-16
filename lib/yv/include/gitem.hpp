@@ -21,10 +21,11 @@ class gitem {
   public:
     int position() const;
     const std::shared_ptr<gproduction> &production() const;
-    const std::set<std::shared_ptr<gsymbol>, gsymbolc>& lookahead_symbols() const;
+    const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols() const;
 
   public:
     int add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols) const;
+    bool next_node(const gsymbol &symbol) const;
 
   public:
     bool operator<(const gitem &item) const;

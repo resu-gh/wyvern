@@ -3,6 +3,7 @@
 #include "gaction.hpp"
 #include "glogger.hpp"
 #include "gstate.hpp"
+#include "gstatec.hpp"
 #include "gsymbol.hpp"
 #include <memory>
 #include <set>
@@ -30,7 +31,7 @@ class ggenerator {
     /// error state
     std::shared_ptr<gsymbol> m_error_symbol;
     /// the states in the parser's state machine
-    std::set<std::shared_ptr<gstate>> m_states;
+    std::set<std::shared_ptr<gstate>, gstatec> m_states;
     /// the start state
     std::shared_ptr<gstate> m_start_state;
     /// number of errors occurred during parsing and generator
@@ -57,7 +58,9 @@ class ggenerator {
     void calculate_follow();
     void calculate_precedence_of_productions();
     void generate_states();
-    void clojure(const std::shared_ptr<gstate>&state);
+    void clojure(const std::shared_ptr<gstate> &state);
+    std::shared_ptr<gstate> goto_(const std::shared_ptr<gstate> &state, const gsymbol &symbol);
+    void generate_indices_for_states();
 
   public:
     void dump() const;

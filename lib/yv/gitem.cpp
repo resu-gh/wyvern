@@ -35,6 +35,10 @@ int gitem::add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbo
     return int(m_lookahead_symbols.size() - original_size);
 }
 
+bool gitem::next_node(const gsymbol &symbol) const {
+    return &*m_production->symbol_by_position(m_position).get() == &symbol; // TODO FIXME check
+}
+
 bool gitem::operator<(const gitem &item) const {
     return m_production->index() < item.m_production->index() || (m_production->index() == item.m_production->index() && m_position < item.m_position);
 }

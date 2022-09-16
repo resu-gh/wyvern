@@ -3,6 +3,7 @@
 #include "include/ggrammar.hpp"
 #include "include/gproduction.hpp"
 #include "include/gstate.hpp"
+#include "include/gtransition.hpp"
 
 #include <cassert>
 #include <cstdint>
@@ -488,7 +489,10 @@ void ggenerator::generate_states() {
         /*debug*/ }
         // clang-format on
 
-        m_states.insert(start_state);
+        m_start_state = start_state; // TODO added FIXME check
+        // m_states.insert(start_state);
+        m_states.insert(m_start_state); // changed (start_state) -> (m_start_state)
+
         // clang-format off
         /*debug*/ m_log.trace(1) << m_log.op("push") << ".m_states <- (start_state)\n";
         /*debug*/ m_log.trace(1) << m_log.op("test");
@@ -505,7 +509,7 @@ void ggenerator::generate_states() {
         /*debug*/ }
         // clang-format on
 
-        m_start_state = start_state;
+        // m_start_state = start_state; // TODO look 20 lines above
         /*debug*/ m_log.trace(1) << m_log.op("set") << ".m_start_state <- (start_state)\n";
         /*debug*/ m_log.trace(1) << m_log.op("test");
         /*debug*/ m_log.out << m_log.chl << "<" << m_start_state.use_count() << "> ";
@@ -524,7 +528,9 @@ void ggenerator::generate_states() {
         /*debug*/ m_log.out << &*lookahead_symbols.begin()->get() << " ";
         /*debug*/ m_log.out << lookahead_symbols.begin()->get()->index() << "\n";
 
-        start_state->add_lookahead_symbols(m_start_symbol->productions().front(), 0, lookahead_symbols);
+        // start_state->add_lookahead_symbols(m_start_symbol->productions().front(), 0, lookahead_symbols);
+        // TODO FIXME use m_start_state instead of start_state
+        m_start_state->add_lookahead_symbols(m_start_symbol->productions().front(), 0, lookahead_symbols);
         // clang-format off
         /*debug*/ for (auto i : start_state->items()) {
         /*debug*/     m_log.trace(1) << m_log.op("iter") << "(start_state).item[curr].lookaheads\n";
@@ -536,11 +542,81 @@ void ggenerator::generate_states() {
         /*debug*/ }
         // clang-format on
 
-        /// TODO FIXME complete impl
+        // TODO do-while
         int added = 1;
         while (added > 0) {
             added = 0;
+
+            /*debug*/ m_log.trace(1) << m_log.op("iter") << ".m_states\n";
+            using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::const_iterator;
+            for (state_iter i = m_states.begin(); i != m_states.end(); ++i) {
+
+                const std::shared_ptr<gstate> &state = *i;
+                assert(state.get());
+                /*debug*/ m_log.trace(1) << m_log.op("state") << "state(microdump!) " << m_log.chl;
+                /*debug*/ m_log.out << &*state << "\n";
+
+                if (!state->processed()) {
+
+                    state->set_processed(true);
+                    /*debug*/ m_log.trace(1) << m_log.op("set") << "(state).processed <- true\n";
+
+                    /*debug*/ m_log.trace(1) << m_log.op("iter") << ".m_symbols\n";
+                    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
+                    for (symb_iter j = m_symbols.begin(); j != m_symbols.end(); ++j) {
+
+                        std::shared_ptr<gsymbol> symbol = *j;
+                        assert(symbol.get());
+                        /*debug*/ m_log.set_fun("gen_states");
+                        /*debug*/ m_log.trace(0) << m_log.op("symbol") << m_log.chl;
+                        /*debug*/ m_log.out << "<" << symbol.use_count() << "> ";
+                        /*debug*/ m_log.out << symbol->microdump() << "\n";
+
+                        if (symbol != m_end_symbol) {
+                            /*debug*/ m_log.trace(1) << m_log.op("if") << m_log.ccyan;
+                            /*debug*/ m_log.out << symbol << " != " << m_end_symbol << "\n";
+
+                            // TODO FIXME check if *symbol == *symbol.get()
+                            std::shared_ptr<gstate> goto_state = goto_(state, *symbol);
+                            /*debug*/ m_log.set_fun("gen_states");
+                            /*debug*/ m_log.trace(0) << m_log.op("goto") << m_log.chl;
+                            /*debug*/ m_log.out << "<" << goto_state.use_count() << "> ";
+                            /*debug*/ m_log.out << goto_state << "\n";
+
+                            if (!goto_state->items().empty()) {
+
+                                std::shared_ptr<gstate> actual_goto_state = *m_states.insert(goto_state).first;
+                                /*debug*/ m_log.trace(1) << m_log.op("actual") << m_log.chl;
+                                /*debug*/ m_log.out << "<" << actual_goto_state.use_count() << "> ";
+                                /*debug*/ m_log.out << actual_goto_state << "\n";
+
+                                /*debug*/ m_log.trace(1) << m_log.op("if") << m_log.ccyan;
+                                /*debug*/ m_log.out << goto_state << " == " << actual_goto_state;
+                                /*debug*/ m_log.out << " " << (goto_state == actual_goto_state ? 1 : 0) << "\n";
+                                added += goto_state == actual_goto_state ? 1 : 0;
+                                state->add_transition(symbol, actual_goto_state);
+                            }
+                        }
+                        /*debug*/ m_log.trace(1) << m_log.op("test") << "added: " << m_log.chl << added << "\n";
+                    }
+                }
+            }
         }
+        // clang-format off
+        /*debug*/ m_log.trace(1) << m_log.op("get") << ".m_states.indices\n";
+        /*debug*/ for (auto s : m_states) {
+        /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+        /*debug*/     m_log.out << &*s << " " << s->index() << "\n";
+        /*debug*/ }
+        // clang-format on
+        generate_indices_for_states();
+        // clang-format off
+        /*debug*/ m_log.trace(1) << m_log.op("get") << ".m_states.indices\n";
+        /*debug*/ for (auto s : m_states) {
+        /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
+        /*debug*/     m_log.out << &*s << " " << s->index() << "\n";
+        /*debug*/ }
+        // clang-format on
     }
 }
 
@@ -584,6 +660,41 @@ void ggenerator::clojure(const std::shared_ptr<gstate> &state) {
                 }
             }
         }
+    }
+}
+
+std::shared_ptr<gstate> ggenerator::goto_(const std::shared_ptr<gstate> &state, const gsymbol &symbol) {
+    /*debug*/ m_log.set_fun("goto_");
+    assert(state.get());
+
+    std::shared_ptr<gstate> goto_state(new gstate());
+    /*debug*/ m_log.trace(0) << m_log.op("gen") << goto_state << "\n";
+    /*debug*/ m_log.trace(0) << m_log.op("state") << state << "\n";
+
+    const std::set<gitem> &items = state->items();
+
+    /*debug*/ m_log.trace(0) << m_log.op("iter") << "(goto_state).items\n";
+    using item_iter = std::set<gitem>::const_iterator;
+    for (item_iter item = items.begin(); item != items.end(); ++item)
+
+        if (item->next_node(symbol))
+            goto_state->add_item(item->production(), item->position() + 1);
+
+    clojure(goto_state);
+
+    return goto_state;
+}
+
+void ggenerator::generate_indices_for_states() {
+    int index = 0;
+
+    using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::iterator;
+    for (state_iter i = m_states.begin(); i != m_states.end(); ++i) {
+        std::shared_ptr<gstate> state = *i;
+        assert(state.get());
+
+        state->set_index(index);
+        ++index;
     }
 }
 
