@@ -616,19 +616,11 @@ void ggenerator::generate_states() {
                 added += lookahead_goto(state);
             }
         }
-        // // clang-format off
-        // /*debug*/ m_log.out << m_log.op("get") << ".m_states.indices\n";
-        // /*debug*/ for (auto s : m_states) {
-        // /*debug*/     m_log.out << m_log.cwhite;
-        // /*debug*/     m_log.out << "<" << s.use_count() << "> ";
-        // /*debug*/     s->json(0, false, 0);
-        // /*debug*/ }
-        // // clang-format on
-
-        m_start_symbol->json(0, false, 0, false, m_start_state.use_count());
-        m_error_symbol->json(0, false, 0, false, m_start_state.use_count());
-        m_end_symbol->json(0, false, 0, false, m_start_state.use_count());
-        m_start_state->json(0, false, 0, false, m_start_state.use_count());
+        // clang-format off
+        /*debug*/ m_log.trace(1) << m_log.op("get") << ".m_states.indices\n";
+        /*debug*/ for (auto s : m_states)
+        /*debug*/     s->json(0, true, 0, true, s.use_count());
+        // clang-format on
 
         // generate_reduce_transitions();
         // generate_indices_for_transitions();

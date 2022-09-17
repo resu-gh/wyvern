@@ -21,36 +21,36 @@ gparser::gparser()
 }
 
 int gparser::parse(std::string::iterator &start, std::string::iterator &finish, const std::shared_ptr<ggrammar> &grammar) {
+    /*debug*/ std::string h = m_log.hook("parse");
+
     assert(&start);
     assert(&finish);
     assert(grammar.get());
-    /*debug*/ m_log.set_fun("constructor");
-    /*debug*/ m_log.trace(0) << m_log.op("get");
-    /*debug*/ m_log.out << "[begin, end) " << m_log.chl;
-    /*debug*/ m_log.out << "[" << (void *)&*start;
-    /*debug*/ m_log.out << ", " << (void *)&*finish << ")\n";
+
     m_position = start;
     m_end = finish;
-    /*debug*/ m_log.trace(0) << m_log.op("get");
-    /*debug*/ m_log.out << "[posit, fin) " << m_log.chl;
-    /*debug*/ m_log.out << "[" << (void *)&*m_position;
+    /*debug*/ m_log.htrace(h, "interval (params)") << "[posit, fin) ";
+    /*debug*/ m_log.out << m_log.chl << "[" << (void *)&*m_position;
     /*debug*/ m_log.out << ", " << (void *)&*m_end << ")\n";
+
     m_grammar = grammar;
-    /*debug*/ m_log.trace(0) << m_log.op("copy");
-    /*debug*/ m_log.out << "ggrammar " << m_log.chl;
-    /*debug*/ m_log.out << (void *)&*m_grammar << " ";
-    /*debug*/ m_log.out << "<" << m_grammar.use_count() << ">";
-    /*debug*/ m_log.out << m_log.cnr << " to .m_grammar\n";
+    /*debug*/ m_log.out << m_log.op("grammar (shared copied)") << "address ";
+    /*debug*/ m_log.out << m_log.chl << &*m_grammar << m_log.cnr << " use_count ";
+    /*debug*/ m_log.out << m_log.chl << m_grammar.use_count() << "\n";
+
     m_line = 1;
     m_errors = 0;
+
+    /*debug*/ m_log.out << m_log.op("initialize") << "m_line " << m_log.chl << m_line << "\n";
+    /*debug*/ m_log.out << m_log.op("initialize") << "m_errors " << m_log.chl << m_errors << "\n";
+
     if (!match_grammar()) {
         ++m_errors;
-        /*error*/ m_log.set_fun("constructor");
-        /*error*/ m_log.etrace(0) << m_log.op("error");
-        /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
-        /*error*/ m_log.err << "(line 1)\n";
-        /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "parsing grammar failed\n";
+        /*error*/ m_log.ehtrace(h, "ERROR !match_grammar()") << "type: " << ecode::E_SYNTAX << ", ";
+        /*error*/ m_log.err << "line: 1 , #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "parsing grammar failed!\n";
     }
+
     return m_errors;
 }
 
@@ -126,6 +126,8 @@ bool gparser::match_error() {
 }
 
 bool gparser::match_literal() {
+    /*debug*/ std::string h = m_log.hook("match_literal");
+
     match_whitespace_and_comments();
     if (match("'")) {
         bool escaped = false;
@@ -136,26 +138,25 @@ bool gparser::match_literal() {
         }
         if (position == m_end || !is_new_line(position)) {
             m_lexeme.assign(m_position, position);
-            /*debug*/ m_log.set_fun("match_literal");
-            /*debug*/ m_log.trace(0) << m_log.op("match");
-            /*debug*/ m_log.out << m_log.cnr << "literal ";
-            /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
+            /*debug*/ m_log.htrace(h, "matched LITERAL") << m_log.chl << m_lexeme << "\n";
+
             m_position = position;
             expect("'");
             return true;
         }
         ++m_errors;
-        /*error*/ m_log.set_fun("match_literal");
-        /*error*/ m_log.etrace(0) << m_log.op("error");
-        /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
-        /*error*/ m_log.err << "(line " << m_line << ")\n       ";
-        /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "unterminated literal\n";
+        /*error*/ m_log.ehtrace(h, "ERROR !match_literal()") << "type: " << ecode::E_SYNTAX << ", ";
+        /*error*/ m_log.err << "line: " << m_line << " , #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "unterminated literal!";
+
         return false;
     }
     return false;
 }
 
 bool gparser::match_regex() {
+    /*debug*/ std::string h = m_log.hook("match_regex");
+
     match_whitespace_and_comments();
     if (match("\"")) {
         bool escaped = false;
@@ -165,10 +166,8 @@ bool gparser::match_regex() {
             ++position;
         }
         m_lexeme.assign(m_position, position);
-        /*debug*/ m_log.set_fun("match_regex");
-        /*debug*/ m_log.trace(0) << m_log.op("match");
-        /*debug*/ m_log.out << m_log.cnr << "regex ";
-        /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
+        /*debug*/ m_log.htrace(h, "matched REGEX") << m_log.chl << m_lexeme << "\n";
+
         m_position = position;
         expect("\"");
         return true;
@@ -236,6 +235,8 @@ bool gparser::match_action() {
 }
 
 bool gparser::match_identifier() {
+    /*debug*/ std::string h = m_log.hook("match_identifier");
+
     match_whitespace_and_comments();
     // TODO maybe extract to is_identifier_char (maybe init char w/ parameter)
     std::string::iterator position = m_position;
@@ -244,10 +245,8 @@ bool gparser::match_identifier() {
         while (position != m_end && (std::isalnum(*position) || std::isdigit(*position) || *position == '_'))
             ++position;
         m_lexeme.assign(m_position, position);
-        /*debug*/ m_log.set_fun("match_ident");
-        /*debug*/ m_log.trace(0) << m_log.op("match");
-        /*debug*/ m_log.out << m_log.cnr << "identifier ";
-        /*debug*/ m_log.out << m_log.chl << m_lexeme << "\n";
+        /*debug*/ m_log.htrace(h, "matched IDENTIFIER") << m_log.chl << m_lexeme << "\n";
+
         m_position = position;
         return true;
     }
@@ -276,16 +275,16 @@ bool gparser::match_whitespace() {
 }
 
 bool gparser::match_line_comment() {
+    /*debug*/ std::string h = m_log.hook("match_line_comment");
+
     if (match_without_skipping_whitespace("//")) {
         std::string::iterator position = m_position;
         while (position != m_end && !is_new_line(position))
             ++position;
-        /*debug*/ m_log.set_fun("match_lcomm");
-        /*debug*/ m_log.trace(0) << m_log.op("match");
-        /*debug*/ m_log.out << m_log.cnr << "line comment ";
         /*debug*/ auto s = std::string(m_position, position);
         /*debug*/ auto l = (s.size() < 20 ? s.size() : 20);
-        /*debug*/ m_log.out << m_log.chl << s.substr(0, l) << " ...\n";
+        /*debug*/ m_log.htrace(h, "ignored LINE COMMENT") << m_log.chl << s.substr(0, l) << " ...\n";
+
         m_position = new_line(position);
         return true;
     }
@@ -293,6 +292,8 @@ bool gparser::match_line_comment() {
 }
 
 bool gparser::match_block_comment() {
+    /*debug*/ std::string h = m_log.hook("match_block_comment");
+
     if (match_without_skipping_whitespace("/*")) {
         bool done = false;
         std::string::iterator position = m_position;
@@ -309,12 +310,10 @@ bool gparser::match_block_comment() {
                 ++position;
             }
         }
-        /*debug*/ m_log.set_fun("match_bcomm");
-        /*debug*/ m_log.trace(0) << m_log.op("match");
-        /*debug*/ m_log.out << m_log.cnr << "block comment ";
         /*debug*/ auto s = std::string(m_position, position);
         /*debug*/ auto l = (s.size() < 20 ? s.size() : 20);
-        /*debug*/ m_log.out << m_log.chl << s.substr(0, l) << " ...\n";
+        /*debug*/ m_log.htrace(h, "ignored BLOCK COMMENT") << m_log.chl << s.substr(0, l) << " ...\n";
+
         m_position = position;
         return true;
     }
@@ -322,6 +321,8 @@ bool gparser::match_block_comment() {
 }
 
 bool gparser::match_without_skipping_whitespace(const std::string &plexeme) {
+    /*debug*/ std::string h = m_log.hook("match_without_skipping_whitespace");
+
     std::string::const_iterator lexeme = plexeme.begin();
     std::string::iterator position = m_position;
     while (position != m_end && *lexeme != 0 && *position == *lexeme) {
@@ -329,11 +330,8 @@ bool gparser::match_without_skipping_whitespace(const std::string &plexeme) {
         ++lexeme;
     }
     if (*lexeme == 0) {
-        /*debug*/ m_log.set_fun("match_noskip");
-        /*debug*/ m_log.trace(0) << m_log.op("!skip");
-        /*debug*/ m_log.out << m_log.cnr << "symbol ";
-        /*debug*/ auto s = std::string(m_position, position);
-        /*debug*/ m_log.out << m_log.chl << s << "\n";
+        /*debug*/ m_log.htrace(h, "matched NO SKIP WHITESPACE") << m_log.chl << std::string(m_position, position) << "\n";
+
         m_position = position;
         return true;
     }
@@ -351,15 +349,17 @@ bool gparser::match(const std::string &keyword) {
 }
 
 bool gparser::expect(const std::string &lexeme) {
+    /*debug*/ std::string h = m_log.hook("expect");
+
     if (match(lexeme))
         return true;
     m_position = m_end;
+
     ++m_errors;
-    /*error*/ m_log.set_fun("match_literal");
-    /*error*/ m_log.etrace(0) << m_log.op("error");
-    /*error*/ m_log.err << m_log.cred << ecode::E_SYNTAX << " ";
-    /*error*/ m_log.err << "(line " << m_line << ")\n       ";
-    /*error*/ m_log.etrace(1) << m_log.op("") << m_log.cred << "expected `" << lexeme << "` not found\n";
+    /*error*/ m_log.ehtrace(h, "ERROR !expect()") << "type: " << ecode::E_SYNTAX << ", ";
+    /*error*/ m_log.err << "line: " << m_line << " , #errors: " << m_errors << ", ";
+    /*error*/ m_log.err << "expected `" << lexeme << "` not found\n";
+
     return false;
 }
 

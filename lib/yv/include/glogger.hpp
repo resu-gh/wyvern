@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <unordered_map>
 
 /// @brief generic logger
 
@@ -43,4 +44,8 @@ class glogger final {
     std::string op(const std::string &) const;
     std::ostream &trace(int, std::ostream & = std::cout) const;
     std::ostream &etrace(int) const;
+
+    std::string hook(const std::string &) const;
+    std::ostream &htrace(const std::string &, const std::string &op = "") const;
+    std::ostream &ehtrace(const std::string &, const std::string &op = "") const;
 };

@@ -12,14 +12,14 @@ gcompiler::gcompiler()
       m_log("yyv", "gcomp", 45) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
-    m_log.set_fun("compile");
 
-    /*debug*/ m_log.trace(0) << m_log.op("get") << "[begin, end) ";
-    /*debug*/ m_log.out << m_log.chl << "[" << (void *)&*begin << ", ";
-    /*debug*/ m_log.out << (void *)&*end << ")\n";
-    /*debug*/ m_log.trace(1) << m_log.op("get") << "m_ggrammar ";
-    /*debug*/ m_log.out << m_log.chl << (void *)&*m_grammar << " ";
-    /*debug*/ m_log.out << "<" << m_grammar.use_count() << ">\n";
+    /*debug*/ std::string h = m_log.hook("compile");
+    /*debug*/ m_log.htrace(h, "interval (params)") << "[begin, end) ";
+    /*debug*/ m_log.out << m_log.chl << "[" << (void *)&*begin;
+    /*debug*/ m_log.out << ", " << (void *)&*end << ")\n";
+    /*debug*/ m_log.out << m_log.op("grammar (shared owned)") << "address ";
+    /*debug*/ m_log.out << m_log.chl << &*m_grammar << m_log.cnr << " use_count ";
+    /*debug*/ m_log.out << m_log.chl << m_grammar.use_count() << "\n";
 
     gparser parser;
     int errors = parser.parse(begin, end, m_grammar);

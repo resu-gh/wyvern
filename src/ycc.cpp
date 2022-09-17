@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
     std::string::iterator end = ms.source.end();
 
     /*debug*/ glogger log("ycc", "main", 110);
-    /*debug*/ log.set_fun("main");
-    /*debug*/ log.trace(0) << log.op("init") << "[begin, end) ";
+    /*debug*/ std::string h = log.hook("main");
+    /*debug*/ log.htrace(h, "interval (builded)") << "[begin, end) ";
     /*debug*/ log.out << log.chl << "[" << (void *)&*begin;
     /*debug*/ log.out << ", " << (void *)&*end << ")\n";
 

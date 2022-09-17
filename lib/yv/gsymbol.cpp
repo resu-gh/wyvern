@@ -362,9 +362,15 @@ void gsymbol::json(int sc, bool nested, int in, bool inlined, int uc) const {
     m_log.out << m_log.chl << m_index;
     m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
-    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "identifier: ";
-    m_log.out << m_log.chl << m_identifier;
-    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    if (m_identifier.empty()) {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "lexeme: ";
+        m_log.out << m_log.chl << m_lexeme;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    } else {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "identifier: ";
+        m_log.out << m_log.chl << m_identifier;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    }
 
     if (!inlined) {
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lexeme" << m_log.cnr << ": ";
