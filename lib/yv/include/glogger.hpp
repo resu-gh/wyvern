@@ -37,6 +37,7 @@ class glogger final {
     void set_fun(const std::string &);
 
   public:
+    std::string sp(int) const;
     std::string fg(int) const;
     std::string bg(int) const;
     std::string op(const std::string &) const;

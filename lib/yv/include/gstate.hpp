@@ -31,6 +31,7 @@ class gstate {
     int index() const;
     bool processed() const;
     const std::set<gitem> &items() const;
+    const std::set<gtransition> &transitions() const;
 
   public:
     void set_index(int index);
@@ -46,6 +47,7 @@ class gstate {
 
   public:
     std::string microdump() const;
+    void json(int sc, bool nested, int in) const;
 
   public:
     static const int INVALID_INDEX = -1; // TODO maybe useless

@@ -61,6 +61,9 @@ class ggenerator {
     void clojure(const std::shared_ptr<gstate> &state);
     std::shared_ptr<gstate> goto_(const std::shared_ptr<gstate> &state, const gsymbol &symbol);
     void generate_indices_for_states();
+    int lookahead_clojure(const std::shared_ptr<gstate> &state) const;
+    int lookahead_goto(const std::shared_ptr<gstate> &state) const;
+    std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead(const gitem &item) const;
 
   public:
     void dump() const;

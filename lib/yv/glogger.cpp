@@ -28,6 +28,10 @@ void glogger::set_fun(const std::string &fun) {
     m_fun = fun + "()";
 }
 
+std::string glogger::sp(int s) const {
+    return std::string(s, ' ');
+}
+
 std::string glogger::fg(int col) const {
     if (col < 0 || col > 255)
         throw std::runtime_error("invalid ansi escape code\n");
@@ -51,7 +55,7 @@ std::string glogger::bg(int col) const {
 std::ostream &glogger::trace(int cont, std::ostream &o) const {
     std::stringstream s;
     if (cont)
-        s << std::string(sep, ' ');
+        s << sp(sep);
     else
         s << m_loc << m_fun;
     if (s.str().size() < sep)

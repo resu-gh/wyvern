@@ -42,9 +42,9 @@ int gitem::add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbo
 bool gitem::next_node(const gsymbol &symbol) const {
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.ccyan;
     /*debug*/ if (m_production->symbol_by_position(m_position) != nullptr)
-    /*debug*/     m_log.out << m_production->symbol_by_position(m_position)->identifier();
+        /*debug*/ m_log.out << m_production->symbol_by_position(m_position)->identifier();
     /*debug*/ else
-    /*debug*/     m_log.out << "(nullptr)";
+        /*debug*/ m_log.out << "(nullptr)";
     /*debug*/ m_log.out << " == " << symbol.identifier() << " ? ";
     auto res = (&*m_production->symbol_by_position(m_position) == &symbol);
     /*debug*/ m_log.out << m_log.cwhite << (res ? "true\n" : "false\n");
@@ -63,4 +63,24 @@ std::string gitem::microdump() const {
     s << m_production->microdump();
     s << "lookah[" << m_lookahead_symbols.size() << "] ";
     return s.str();
+}
+
+void gitem::json(int sc, bool nested, int in) const {
+    m_log.out << m_log.chl << m_log.sp(in)<<"gitem: " << m_log.cnr << "{\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this << ",\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "index: ";
+    m_log.out << m_log.chl << m_position << ",\n";
+
+    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "production: ";
+    // // m_production.json(sc + 4);
+    //
+    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lookahead_symbols: [\n";
+    // for (auto l : m_lookahead_symbols)
+    //     l.json(sc + 4);
+    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "]\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc) << "},\n";
 }

@@ -601,6 +601,32 @@ void ggenerator::generate_states() {
         /*debug*/     m_log.out << "<" << s.use_count() << "> " << s->microdump() << "\n";
         /*debug*/ }
         // clang-format on
+
+        // TODO do-while
+        added = 1;
+        while (added > 0) {
+            added = 0;
+
+            using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::const_iterator;
+            for (state_iter i = m_states.begin(); i != m_states.end(); ++i) {
+                std::shared_ptr<gstate> state = *i; // maybe weak_ptr
+                assert(state.get());
+
+                added += lookahead_clojure(state);
+                added += lookahead_goto(state);
+            }
+        }
+        // clang-format off
+        /*debug*/ m_log.out << m_log.op("get") << ".m_states.indices\n";
+        /*debug*/ for (auto s : m_states) {
+        /*debug*/     m_log.out << m_log.cwhite;
+        /*debug*/     m_log.out << "<" << s.use_count() << "> ";
+        /*debug*/     s->json(0, false, 0);
+        /*debug*/ }
+        // clang-format on
+
+        // generate_reduce_transitions();
+        // generate_indices_for_transitions();
     }
 }
 
@@ -701,6 +727,105 @@ void ggenerator::generate_indices_for_states() {
         state->set_index(index);
         ++index;
     }
+}
+
+int ggenerator::lookahead_clojure(const std::shared_ptr<gstate> &state) const {
+    assert(state.get());
+
+    int added = 0;
+
+    const std::set<gitem> &items = state->items();
+
+    using item_iter = std::set<gitem>::const_iterator;
+    for (item_iter item = items.begin(); item != items.end(); ++item) {
+
+        // maybe weak_ptr or const &
+        std::shared_ptr<gsymbol> symbol = item->production()->symbol_by_position(item->position());
+
+        // != nullptr
+        if (symbol.get()) {
+            std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead_symbols = lookahead(*item);
+
+            const std::vector<std::shared_ptr<gproduction>> &productions = symbol->productions();
+
+            using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
+            for (prod_iter j = productions.begin(); j != productions.end(); ++j) {
+
+                std::shared_ptr<gproduction> production = *j; // maybe weak_ptr or const &
+                assert(production.get());
+
+                added += state->add_lookahead_symbols(production, 0, lookahead_symbols);
+            }
+        }
+    }
+
+    return added;
+}
+
+int ggenerator::lookahead_goto(const std::shared_ptr<gstate> &state) const {
+    assert(state.get());
+
+    int added = 0;
+
+    const std::set<gtransition> &transitions = state->transitions();
+
+    using trans_iter = std::set<gtransition>::const_iterator;
+    for (trans_iter transition = transitions.begin(); transition != transitions.end(); ++transition) {
+
+        std::shared_ptr<gsymbol> symbol = transition->symbol(); // maybe weak_ptr or const &
+        assert(symbol.get());
+
+        const std::set<gitem> &items = state->items();
+
+        using item_iter = std::set<gitem>::const_iterator;
+        for (item_iter item = items.begin(); item != items.end(); ++item) {
+
+            int position = item->position();
+
+            // TODO FIXME check comparison between smart pointers
+            if (item->production()->symbol_by_position(position) == symbol) {
+
+                std::shared_ptr<gstate> goto_state = transition->state(); // maybe weak_ptr or const &
+                added += goto_state->add_lookahead_symbols(item->production(), position + 1, item->lookahead_symbols());
+            }
+        }
+    }
+
+    return added;
+}
+
+std::set<std::shared_ptr<gsymbol>, gsymbolc> ggenerator::lookahead(const gitem &item) const {
+    std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead_symbols;
+
+    std::shared_ptr<gproduction> production = item.production(); // maybe weak_ptr or const &
+    assert(production.get());
+
+    const std::vector<std::shared_ptr<gsymbol>> &symbols = production->symbols();
+
+    std::vector<std::shared_ptr<gsymbol>>::const_iterator i = symbols.begin() + item.position();
+
+    if (i != symbols.end())
+        ++i;
+
+    while (i != symbols.end() && i->get()->nullable()) {
+        std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr or const &
+        assert(symbol.get());
+
+        lookahead_symbols.insert(symbol->first().begin(), symbol->first().end());
+
+        ++i;
+    }
+
+    if (i != symbols.end()) {
+        std::shared_ptr<gsymbol> symbol = *i; // maybe weak_ptr or const &
+        assert(symbol.get());
+
+        lookahead_symbols.insert(symbol->first().begin(), symbol->first().end());
+    } else {
+        lookahead_symbols.insert(item.lookahead_symbols().begin(), item.lookahead_symbols().end());
+    }
+
+    return lookahead_symbols;
 }
 
 void ggenerator::dump() const {

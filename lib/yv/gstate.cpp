@@ -26,6 +26,10 @@ const std::set<gitem> &gstate::items() const {
     return m_items;
 }
 
+const std::set<gtransition> &gstate::transitions() const {
+    return m_transitions;
+}
+
 void gstate::set_index(int index) {
     m_index = index;
 }
@@ -65,4 +69,37 @@ std::string gstate::microdump() const {
     s << "items[" << m_items.size() << "] ";
     s << "trans[" << m_transitions.size() << "] ";
     return s.str();
+}
+
+void gstate::json(int sc, bool nested, int in) const {
+    m_log.out << m_log.chl << m_log.sp(in) << "gstate: " << m_log.cnr << "{\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this << ",\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "index: ";
+    m_log.out << m_log.chl << m_index << ",\n";
+
+    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "processed: ";
+    m_log.out << m_log.chl << (m_processed ? "true,\n" : "false,\n");
+
+    // recursive begin
+    if (!nested) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "items: [";
+        m_log.out << (m_items.size() ? "\n" : "");
+        for (auto i : m_items)
+            i.json(sc + 4, true, sc + 4);
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+    }
+
+    if (!nested) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "transitions: [";
+        m_log.out << (m_transitions.size() ? "\n" : "");
+        for (auto t : m_transitions)
+            t.json(sc + 4, true, sc + 4);
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+    }
+    // recursive end
+
+    m_log.out << m_log.cnr << m_log.sp(sc) << "},\n";
 }
