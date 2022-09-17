@@ -47,7 +47,7 @@ class gstate {
 
   public:
     std::string microdump() const;
-    void json(int sc, bool nested, int in) const;
+    void json(int sc, bool nested, int in, bool inlined, int uc = 0) const;
 
   public:
     static const int INVALID_INDEX = -1; // TODO maybe useless

@@ -47,6 +47,7 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
     gsymbol(const std::string &lexeme);
 
   public:
+    std::shared_ptr<gsymbol> self();
     int index() const;
     int line() const;
     const std::string &lexeme() const;
@@ -73,7 +74,7 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
     void append_production(const std::shared_ptr<gproduction> &production);
     void calculate_identifier();
 
-    std::shared_ptr<gsymbol> implicit_terminal() const;                                // TODO FIXME ?
+    std::shared_ptr<gsymbol> implicit_terminal() const;                                // TODO FIXME?
     void replace_by_non_terminal(const std::shared_ptr<gsymbol> &non_terminal_symbol); // TODO FIXME?
     int calculate_first();
     int add_symbol_to_first(const std::shared_ptr<gsymbol> &symbol);
@@ -84,8 +85,5 @@ class gsymbol : public std::enable_shared_from_this<gsymbol> {
 
   public:
     std::string microdump() const;
-
-    std::shared_ptr<gsymbol> self() {
-        return shared_from_this();
-    }
+    void json(int sc, bool nested, int in, bool inlined, int uc = 0) const;
 };

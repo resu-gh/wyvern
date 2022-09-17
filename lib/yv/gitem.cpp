@@ -40,12 +40,14 @@ int gitem::add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbo
 }
 
 bool gitem::next_node(const gsymbol &symbol) const {
+    // clang-format off
     /*debug*/ m_log.trace(1) << m_log.op("") << m_log.ccyan;
     /*debug*/ if (m_production->symbol_by_position(m_position) != nullptr)
-        /*debug*/ m_log.out << m_production->symbol_by_position(m_position)->identifier();
+    /*debug*/     m_log.out << m_production->symbol_by_position(m_position)->identifier();
     /*debug*/ else
-        /*debug*/ m_log.out << "(nullptr)";
+    /*debug*/     m_log.out << "(nullptr)";
     /*debug*/ m_log.out << " == " << symbol.identifier() << " ? ";
+    // clang-format off
     auto res = (&*m_production->symbol_by_position(m_position) == &symbol);
     /*debug*/ m_log.out << m_log.cwhite << (res ? "true\n" : "false\n");
 
@@ -65,22 +67,36 @@ std::string gitem::microdump() const {
     return s.str();
 }
 
-void gitem::json(int sc, bool nested, int in) const {
-    m_log.out << m_log.chl << m_log.sp(in)<<"gitem: " << m_log.cnr << "{\n";
+void gitem::json(int sc, bool nested, int in, bool inlined, int uc) const {
+    m_log.out << m_log.chl << m_log.sp(in) << "gitem";
+    m_log.out << m_log.cnr << (inlined ? ": { " : ": {\n");
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "this: ";
-    m_log.out << m_log.chl << &*this << ",\n";
+    if (uc) {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "use_count: ";
+        m_log.out << m_log.chl << uc;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    }
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "index: ";
-    m_log.out << m_log.chl << m_position << ",\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
-    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "production: ";
-    // // m_production.json(sc + 4);
-    //
-    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lookahead_symbols: [\n";
-    // for (auto l : m_lookahead_symbols)
-    //     l.json(sc + 4);
-    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "]\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "position: ";
+    m_log.out << m_log.chl << m_position;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
-    m_log.out << m_log.cnr << m_log.sp(sc) << "},\n";
+    // recursive begin
+    if (!nested && !inlined) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "production: ";
+        m_production->json(sc + 2, true, 0, true, m_production.use_count());
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lookahead_symbols: [";
+        m_log.out << (m_lookahead_symbols.size() ? "\n" : "");
+        for (auto l : m_lookahead_symbols)
+            l->json(sc + 4, true, sc + 4, true, l.use_count());
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "]\n";
+    }
+    // recursive end
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc) << "},\n";
 }

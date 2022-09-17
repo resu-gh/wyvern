@@ -25,6 +25,10 @@ gsymbol::gsymbol(const std::string &lexeme)
       m_follow(),
       m_log("yyv", "gsymb", 255) {}
 
+std::shared_ptr<gsymbol> gsymbol::self() {
+    return shared_from_this();
+}
+
 int gsymbol::index() const {
     return m_index;
 }
@@ -338,4 +342,74 @@ std::string gsymbol::microdump() const {
     s << m_identifier << " ";
     s << m_lexeme << " ";
     return s.str();
+}
+
+void gsymbol::json(int sc, bool nested, int in, bool inlined, int uc) const {
+    m_log.out << m_log.chl << m_log.sp(in) << "gsymb";
+    m_log.out << m_log.cnr << (inlined ? ": { " : ": {\n");
+
+    if (uc) {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "use_count: ";
+        m_log.out << m_log.chl << uc;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    }
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "index: ";
+    m_log.out << m_log.chl << m_index;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "identifier: ";
+    m_log.out << m_log.chl << m_identifier;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+    if (!inlined) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lexeme" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_lexeme << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "line" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_line << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbol_type" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_symbol_type << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lexeme_type" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_lexeme_type << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "associativity" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_associativity << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "precedence" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << m_precedence << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "nullable" << m_log.cnr << ": ";
+        m_log.out << m_log.chl << (m_nullable ? "true" : "false") << m_log.cnr << ",\n";
+    }
+
+    // recursive begin
+    if (!nested && !inlined) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "productions: [";
+        m_log.out << (m_productions.size() ? "\n" : "");
+        for (auto p : m_productions)
+            p->json(sc + 4, true, sc + 4, true, p.use_count());
+        m_log.out << m_log.cnr << m_log.sp(m_productions.size() ? sc + 2 : 0) << "],\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "first: [";
+        m_log.out << (m_first.size() ? "\n" : "");
+        for (auto f : m_first)
+            f->json(sc + 4, true, sc + 4, true, f.use_count());
+        m_log.out << m_log.cnr << m_log.sp(m_first.size() ? sc + 2 : 0) << "],\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "follow: [";
+        m_log.out << (m_follow.size() ? "\n" : "");
+        for (auto f : m_follow)
+            f->json(sc + 4, true, sc + 4, true, f.use_count());
+        m_log.out << m_log.cnr << m_log.sp(m_follow.size() ? sc + 2 : 0) << "],\n";
+    }
+    // recursive begin
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc) << "},\n";
 }

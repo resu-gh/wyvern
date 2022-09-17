@@ -33,7 +33,7 @@ class gitem {
 
   public:
     std::string microdump() const;
-    void json(int sc, bool nested, int in) const;
+    void json(int sc, bool nested, int in, bool inlined, int uc = 0) const;
 
   public:
     bool operator<(const gitem &item) const;

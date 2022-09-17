@@ -23,6 +23,7 @@ class gaction {
 
   public:
     std::string microdump() const;
+    void json(int sc, bool nested, int in, bool inlined, int uc = 0);
 
   public:
     static const int INVALID_INDEX = -1;

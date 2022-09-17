@@ -71,35 +71,45 @@ std::string gstate::microdump() const {
     return s.str();
 }
 
-void gstate::json(int sc, bool nested, int in) const {
-    m_log.out << m_log.chl << m_log.sp(in) << "gstate: " << m_log.cnr << "{\n";
+void gstate::json(int sc, bool nested, int in, bool inlined, int uc) const {
+    m_log.out << m_log.chl << m_log.sp(in) << "gstate";
+    m_log.out << m_log.cnr << (inlined ? ": { " : ": {\n");
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "this: ";
-    m_log.out << m_log.chl << &*this << ",\n";
+    if (uc) {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "use_count: ";
+        m_log.out << m_log.chl << uc;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    }
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "index: ";
-    m_log.out << m_log.chl << m_index << ",\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "processed: ";
-    m_log.out << m_log.chl << (m_processed ? "true,\n" : "false,\n");
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "index: ";
+    m_log.out << m_log.chl << m_index;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "processed: ";
+    m_log.out << m_log.chl << (m_processed ? "true" : "false");
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
     // recursive begin
-    if (!nested) {
+    if (!nested && !inlined) {
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "items: [";
         m_log.out << (m_items.size() ? "\n" : "");
         for (auto i : m_items)
-            i.json(sc + 4, true, sc + 4);
+            i.json(sc + 4, true, sc + 4, true);
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
     }
 
-    if (!nested) {
+    if (!nested && !inlined) {
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "transitions: [";
         m_log.out << (m_transitions.size() ? "\n" : "");
         for (auto t : m_transitions)
-            t.json(sc + 4, true, sc + 4);
+            t.json(sc + 4, true, sc + 4, true);
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
     }
     // recursive end
 
-    m_log.out << m_log.cnr << m_log.sp(sc) << "},\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc) << "},\n";
 }

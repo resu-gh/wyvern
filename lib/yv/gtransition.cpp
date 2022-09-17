@@ -38,28 +38,33 @@ std::string gtransition::microdump() const {
     return s.str();
 }
 
-void gtransition::json(int sc, bool nested, int in) const {
-    m_log.out << m_log.chl << m_log.sp(in) << "gtrans: " << m_log.cnr << "{\n";
+void gtransition::json(int sc, bool nested, int in, bool inlined, int uc) const {
+    m_log.out << m_log.chl << m_log.sp(in) << "gtrans";
+    m_log.out << m_log.cnr << (inlined ? ": { " : ": {\n");
 
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "this: ";
-    m_log.out << m_log.chl << &*this << ",\n";
-
-    m_log.out << m_log.cnr << m_log.sp(sc + 2) << "index: ";
-    m_log.out << m_log.chl << m_index << ",\n";
-
-    // recursive begin
-    if (nested) {
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "state: ";
-        m_log.out << m_log.cwhite << "<" << m_state.use_count() << "> ";
-        m_state->json(sc + 2, true, 0);
+    if (uc) {
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "use_count: ";
+        m_log.out << m_log.chl << uc;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
     }
 
-    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "lookahead_symbols: [\n";
-    // for (auto l : m_lookahead_symbols)
-    //     l.json(sc + 4);
-    // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "]\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "this: ";
+    m_log.out << m_log.chl << &*this;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
 
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "index: ";
+    m_log.out << m_log.chl << m_index;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+    // recursive begin
+    if (!nested && !inlined) {
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "state: ";
+        m_state->json(sc + 2, true, 0, true, m_state.use_count());
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbol: ";
+        m_symbol->json(sc + 2, true, 0, true, m_symbol.use_count());
+    }
     // recursive end
 
-    m_log.out << m_log.cnr << m_log.sp(sc) << "},\n";
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc) << "},\n";
 }
