@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gitem.hpp"
+#include "glogger.hpp"
 #include "gproduction.hpp"
 #include "gsymbol.hpp"
 #include "gsymbolc.hpp"
@@ -20,6 +21,8 @@ class gstate {
     std::set<gitem> m_items;
     /// the available transitions from this state
     std::set<gtransition> m_transitions;
+    /// logger
+    glogger m_log;
 
   public:
     gstate();
@@ -37,6 +40,12 @@ class gstate {
     int add_item(const std::shared_ptr<gproduction> &production, int position);
     int add_lookahead_symbols(const std::shared_ptr<gproduction> &production, int position, const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols);
     void add_transition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state);
+
+  public:
+    bool operator<(const gstate &state) const;
+
+  public:
+    std::string microdump() const;
 
   public:
     static const int INVALID_INDEX = -1; // TODO maybe useless

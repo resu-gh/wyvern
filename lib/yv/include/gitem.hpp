@@ -1,10 +1,12 @@
 #pragma once
 
+#include "glogger.hpp"
 #include "gproduction.hpp"
 #include "gsymbol.hpp"
 #include "gsymbolc.hpp"
 #include <memory>
 #include <set>
+#include <string>
 class gitem {
   private:
     /// the position of the `dot` (cursor) in this item
@@ -13,6 +15,8 @@ class gitem {
     std::shared_ptr<gproduction> m_production;
     /// the lookahead symbols for this item
     mutable std::set<std::shared_ptr<gsymbol>, gsymbolc> m_lookahead_symbols;
+    /// logger
+    glogger m_log;
 
   public:
     gitem(); // TODO maybe useless
@@ -26,6 +30,9 @@ class gitem {
   public:
     int add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols) const;
     bool next_node(const gsymbol &symbol) const;
+
+  public:
+    std::string microdump() const;
 
   public:
     bool operator<(const gitem &item) const;

@@ -472,68 +472,48 @@ void ggenerator::generate_states() {
 
         std::shared_ptr<gstate> start_state = std::make_shared<gstate>();
         start_state->add_item(m_start_symbol->productions().front(), 0);
-        clojure(start_state);
-        // clang-format off
+
         /*debug*/ m_log.set_fun("gen_states");
         /*debug*/ m_log.trace(0) << m_log.op("start");
         /*debug*/ m_log.out << m_log.chl << "<" << start_state.use_count() << "> ";
-        /*debug*/ m_log.out << &*start_state << " ";
-        /*debug*/ m_log.out << start_state->index() << "\n";
-        /*debug*/ m_log.trace(1) << m_log.op("") << "(start_state).items\n";
-        /*debug*/ for (auto i : start_state->items()) {
-        /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
-        /*debug*/     m_log.out << i.position() << " "; 
-        /*debug*/     m_log.out << i.production()->microdump() << m_log.cnr << "on " << m_log.chl; 
-        /*debug*/     m_log.out << "<" << i.production()->symbol().use_count() << "> "; 
-        /*debug*/     m_log.out << i.production()->symbol()->microdump() << "\n"; 
-        /*debug*/ }
-        // clang-format on
+        /*debug*/ m_log.out << start_state->microdump() << "\n";
 
-        m_start_state = start_state; // TODO added FIXME check
-        // m_states.insert(start_state);
-        m_states.insert(m_start_state); // changed (start_state) -> (m_start_state)
+        clojure(start_state);
 
-        // clang-format off
+        /*debug*/ m_log.set_fun("gen_states");
+        /*debug*/ m_log.trace(0) << m_log.op("test");
+        /*debug*/ m_log.out << m_log.cwhite << "<" << start_state.use_count() << "> ";
+        /*debug*/ m_log.out << start_state->microdump() << "\n";
+
+        m_start_state = start_state;    // moved 10 lines above
+        m_states.insert(m_start_state); // m_states.insert(start_state);
+
         /*debug*/ m_log.trace(1) << m_log.op("push") << ".m_states <- (start_state)\n";
         /*debug*/ m_log.trace(1) << m_log.op("test");
-        /*debug*/ m_log.out << m_log.chl << "<" << m_states.begin()->use_count() << "> ";
-        /*debug*/ m_log.out << &*m_states.begin()->get() << " ";
-        /*debug*/ m_log.out << m_states.begin()->get()->index() << "\n";
-        /*debug*/ m_log.trace(1) << m_log.op("") << ".m_states[0].items\n";
-        /*debug*/ for (auto i : start_state->items()) {
-        /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
-        /*debug*/     m_log.out << i.position() << " ";
-        /*debug*/     m_log.out << i.production()->microdump() << m_log.cnr << "on " << m_log.chl; 
-        /*debug*/     m_log.out << "<" << i.production()->symbol().use_count() << "> "; 
-        /*debug*/     m_log.out << i.production()->symbol()->microdump() << "\n"; 
-        /*debug*/ }
-        // clang-format on
+        /*debug*/ m_log.out << m_log.cwhite << "<" << m_states.begin()->use_count() << "> ";
+        /*debug*/ m_log.out << m_states.begin()->get()->microdump() << "\n";
 
-        // m_start_state = start_state; // TODO look 20 lines above
-        /*debug*/ m_log.trace(1) << m_log.op("set") << ".m_start_state <- (start_state)\n";
-        /*debug*/ m_log.trace(1) << m_log.op("test");
-        /*debug*/ m_log.out << m_log.chl << "<" << m_start_state.use_count() << "> ";
-        /*debug*/ m_log.out << &*m_start_state << " ";
-        /*debug*/ m_log.out << m_start_state->index() << "\n";
+        // m_start_state = start_state;
 
         std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead_symbols;
         lookahead_symbols.insert(m_end_symbol);
+
         /*debug*/ m_log.trace(1) << m_log.op("set") << "(lookahead_symbols) <- .m_end_symbol\n";
         /*debug*/ m_log.trace(1) << m_log.op("test");
         /*debug*/ m_log.out << m_log.chl << "<" << m_end_symbol.use_count() << "> ";
-        /*debug*/ m_log.out << &*m_end_symbol << " ";
-        /*debug*/ m_log.out << m_end_symbol->index() << "\n";
+        /*debug*/ m_log.out << m_end_symbol->microdump() << "\n";
         /*debug*/ m_log.trace(1) << m_log.op("");
         /*debug*/ m_log.out << m_log.cwhite << "<" << lookahead_symbols.begin()->use_count() << "> ";
-        /*debug*/ m_log.out << &*lookahead_symbols.begin()->get() << " ";
-        /*debug*/ m_log.out << lookahead_symbols.begin()->get()->index() << "\n";
+        /*debug*/ m_log.out << lookahead_symbols.begin()->get()->microdump() << "\n";
 
-        // start_state->add_lookahead_symbols(m_start_symbol->productions().front(), 0, lookahead_symbols);
-        // TODO FIXME use m_start_state instead of start_state
+        // start_state->add_lookahead_symbols(...)
         m_start_state->add_lookahead_symbols(m_start_symbol->productions().front(), 0, lookahead_symbols);
+
         // clang-format off
+        /*debug*/ m_log.trace(1) << m_log.op("iter") << "(start_state).items.lookaheads\n";
         /*debug*/ for (auto i : start_state->items()) {
-        /*debug*/     m_log.trace(1) << m_log.op("iter") << "(start_state).item[curr].lookaheads\n";
+        /*debug*/     m_log.trace(1) << m_log.op("item") << m_log.chl;
+        /*debug*/     m_log.out << i.microdump()<<"\n";
         /*debug*/     for (auto l : i.lookahead_symbols()) {
         /*debug*/         m_log.trace(1) << m_log.op("") << m_log.chl;
         /*debug*/         m_log.out << "<" << l.use_count() << "> ";
@@ -553,13 +533,15 @@ void ggenerator::generate_states() {
 
                 const std::shared_ptr<gstate> &state = *i;
                 assert(state.get());
-                /*debug*/ m_log.trace(1) << m_log.op("state") << "state(microdump!) " << m_log.chl;
-                /*debug*/ m_log.out << &*state << "\n";
+                /*debug*/ m_log.trace(1) << m_log.op("state") << m_log.chl;
+                /*debug*/ m_log.out << "<" << state.use_count() << "> ";
+                /*debug*/ m_log.out << state->microdump() << "\n";
 
                 if (!state->processed()) {
 
                     state->set_processed(true);
-                    /*debug*/ m_log.trace(1) << m_log.op("set") << "(state).processed <- true\n";
+                    /*debug*/ m_log.trace(1) << m_log.op("set") << "(state).processed " << m_log.cwhite;
+                    /*debug*/ m_log.out << (state->processed() ? "true" : "false") << "\n";
 
                     /*debug*/ m_log.trace(1) << m_log.op("iter") << ".m_symbols\n";
                     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
@@ -574,30 +556,32 @@ void ggenerator::generate_states() {
 
                         if (symbol != m_end_symbol) {
                             /*debug*/ m_log.trace(1) << m_log.op("if") << m_log.ccyan;
-                            /*debug*/ m_log.out << symbol << " != " << m_end_symbol << "\n";
+                            /*debug*/ m_log.out << symbol->identifier() << " != ";
+                            /*debug*/ m_log.out << m_end_symbol->identifier() << "\n";
 
                             // TODO FIXME check if *symbol == *symbol.get()
                             std::shared_ptr<gstate> goto_state = goto_(state, *symbol);
                             /*debug*/ m_log.set_fun("gen_states");
                             /*debug*/ m_log.trace(0) << m_log.op("goto") << m_log.chl;
                             /*debug*/ m_log.out << "<" << goto_state.use_count() << "> ";
-                            /*debug*/ m_log.out << goto_state << "\n";
+                            /*debug*/ m_log.out << goto_state->microdump() << "\n";
 
                             if (!goto_state->items().empty()) {
 
                                 std::shared_ptr<gstate> actual_goto_state = *m_states.insert(goto_state).first;
                                 /*debug*/ m_log.trace(1) << m_log.op("actual") << m_log.chl;
                                 /*debug*/ m_log.out << "<" << actual_goto_state.use_count() << "> ";
-                                /*debug*/ m_log.out << actual_goto_state << "\n";
+                                /*debug*/ m_log.out << actual_goto_state->microdump() << "\n";
 
                                 /*debug*/ m_log.trace(1) << m_log.op("if") << m_log.ccyan;
                                 /*debug*/ m_log.out << goto_state << " == " << actual_goto_state;
                                 /*debug*/ m_log.out << " " << (goto_state == actual_goto_state ? 1 : 0) << "\n";
+
                                 added += goto_state == actual_goto_state ? 1 : 0;
                                 state->add_transition(symbol, actual_goto_state);
                             }
                         }
-                        /*debug*/ m_log.trace(1) << m_log.op("test") << "added: " << m_log.chl << added << "\n";
+                        /*debug*/ m_log.trace(1) << m_log.op("test") << "added: " << m_log.cwhite << added << "\n";
                     }
                 }
             }
@@ -606,7 +590,7 @@ void ggenerator::generate_states() {
         /*debug*/ m_log.trace(1) << m_log.op("get") << ".m_states.indices\n";
         /*debug*/ for (auto s : m_states) {
         /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
-        /*debug*/     m_log.out << &*s << " " << s->index() << "\n";
+        /*debug*/     m_log.out << "<" << s.use_count() << "> " << s->microdump() << "\n";
         /*debug*/ }
         // clang-format on
         generate_indices_for_states();
@@ -614,7 +598,7 @@ void ggenerator::generate_states() {
         /*debug*/ m_log.trace(1) << m_log.op("get") << ".m_states.indices\n";
         /*debug*/ for (auto s : m_states) {
         /*debug*/     m_log.trace(1) << m_log.op("") << m_log.chl;
-        /*debug*/     m_log.out << &*s << " " << s->index() << "\n";
+        /*debug*/     m_log.out << "<" << s.use_count() << "> " << s->microdump() << "\n";
         /*debug*/ }
         // clang-format on
     }
@@ -624,19 +608,27 @@ void ggenerator::clojure(const std::shared_ptr<gstate> &state) {
     /*debug*/ m_log.set_fun("clojure");
 
     assert(state.get());
+    /*debug*/ m_log.trace(0) << m_log.op("<state") << m_log.chl;
+    /*debug*/ m_log.out << "<" << state.use_count() << "> ";
+    /*debug*/ m_log.out << state->microdump() << "\n";
 
     // TODO do-while
+    /*debug*/ m_log.trace(1) << m_log.op("iter") << "until no changes in (state).items\n";
     int added = 1;
     while (added > 0) {
         added = 0;
 
         std::set<gitem> items = state->items();
 
-        /*debug*/ m_log.trace(0) << m_log.op("iter") << "(state).items[curr].production.symbols\n";
+        /*debug*/ m_log.trace(1) << m_log.op("iter") << "(state).items[" << items.size() << "]\n";
         using item_iter = std::set<gitem>::const_iterator;
         for (item_iter item = items.begin(); item != items.end(); ++item) {
+            /*debug*/ m_log.trace(1) << m_log.op("item") << m_log.chl;
+            /*debug*/ m_log.out << item->microdump() << "\n";
 
             std::shared_ptr<gsymbol> symbol = item->production()->symbol_by_position(item->position());
+            /*debug*/ if (!symbol.get())
+                /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl << "nullptr\n";
 
             // != nullptr
             if (symbol.get()) {
@@ -646,7 +638,7 @@ void ggenerator::clojure(const std::shared_ptr<gstate> &state) {
 
                 const std::vector<std::shared_ptr<gproduction>> &productions = symbol->productions();
 
-                /*debug*/ m_log.trace(1) << m_log.op("iter") << "symbols[curr].productions\n";
+                /*debug*/ m_log.trace(1) << m_log.op("iter") << "(symbol).productions[" << productions.size() << "]\n";
                 using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
                 for (prod_iter j = productions.begin(); j != productions.end(); ++j) {
 
@@ -657,9 +649,11 @@ void ggenerator::clojure(const std::shared_ptr<gstate> &state) {
                     /*debug*/ m_log.out << production->microdump() << "\n";
 
                     added += state->add_item(production, 0);
+                    /*debug*/ m_log.trace(1) << m_log.op("add") << m_log.cwhite << added << "\n";
                 }
             }
         }
+        /*debug*/ m_log.trace(1) << m_log.op("test") << "added: " << m_log.chl << added << "\n";
     }
 }
 
@@ -667,18 +661,29 @@ std::shared_ptr<gstate> ggenerator::goto_(const std::shared_ptr<gstate> &state, 
     /*debug*/ m_log.set_fun("goto_");
     assert(state.get());
 
+    /*debug*/ m_log.trace(0) << m_log.op("<state");
+    /*debug*/ m_log.out << m_log.chl << "<" << state.use_count() << "> ";
+    /*debug*/ m_log.out << state->microdump() << "\n";
+
     std::shared_ptr<gstate> goto_state(new gstate());
-    /*debug*/ m_log.trace(0) << m_log.op("gen") << goto_state << "\n";
-    /*debug*/ m_log.trace(0) << m_log.op("state") << state << "\n";
+    /*debug*/ m_log.trace(1) << m_log.op("new");
+    /*debug*/ m_log.out << m_log.chl << "<" << goto_state.use_count() << "> ";
+    /*debug*/ m_log.out << goto_state->microdump() << "\n";
 
     const std::set<gitem> &items = state->items();
 
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << "(goto_state).items\n";
+    /*debug*/ m_log.trace(1) << m_log.op("iter") << "(<state).items\n";
     using item_iter = std::set<gitem>::const_iterator;
-    for (item_iter item = items.begin(); item != items.end(); ++item)
+    for (item_iter item = items.begin(); item != items.end(); ++item) {
+        /*debug*/ m_log.trace(1) << m_log.op("item") << m_log.chl;
+        /*debug*/ m_log.out << item->microdump() << "\n";
 
-        if (item->next_node(symbol))
+        if (item->next_node(symbol)) {
+
             goto_state->add_item(item->production(), item->position() + 1);
+            /*debug*/ m_log.trace(1) << m_log.op("add") << "(goto_state).items <- item\n";
+        }
+    }
 
     clojure(goto_state);
 

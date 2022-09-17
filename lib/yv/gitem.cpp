@@ -2,17 +2,21 @@
 
 #include <cassert>
 #include <cstddef>
+#include <sstream>
+#include <string>
 
 // TODO maybe useless
 gitem::gitem()
     : m_position(0),
       m_production(),
-      m_lookahead_symbols() {}
+      m_lookahead_symbols(),
+      m_log("yyv", "gitem", 0) {}
 
 gitem::gitem(const std::shared_ptr<gproduction> &production, int position)
     : m_position(position),
       m_production(production),
-      m_lookahead_symbols() {
+      m_lookahead_symbols(),
+      m_log("yyv", "gitem", 0) {
     assert(m_production.get());
     assert(m_position >= 0 && m_position < m_production->length() + 1);
 }
@@ -36,9 +40,27 @@ int gitem::add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbo
 }
 
 bool gitem::next_node(const gsymbol &symbol) const {
-    return &*m_production->symbol_by_position(m_position).get() == &symbol; // TODO FIXME check
+    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.ccyan;
+    /*debug*/ if (m_production->symbol_by_position(m_position) != nullptr)
+    /*debug*/     m_log.out << m_production->symbol_by_position(m_position)->identifier();
+    /*debug*/ else
+    /*debug*/     m_log.out << "(nullptr)";
+    /*debug*/ m_log.out << " == " << symbol.identifier() << " ? ";
+    auto res = (&*m_production->symbol_by_position(m_position) == &symbol);
+    /*debug*/ m_log.out << m_log.cwhite << (res ? "true\n" : "false\n");
+
+    return &*m_production->symbol_by_position(m_position) == &symbol; // TODO FIXME check
 }
 
 bool gitem::operator<(const gitem &item) const {
     return m_production->index() < item.m_production->index() || (m_production->index() == item.m_production->index() && m_position < item.m_position);
+}
+
+std::string gitem::microdump() const {
+    std::stringstream s;
+    s << &*this << " ";
+    s << m_position << " prod ";
+    s << m_production->microdump();
+    s << "lookah[" << m_lookahead_symbols.size() << "] ";
+    return s.str();
 }

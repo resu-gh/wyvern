@@ -2,14 +2,17 @@
 #include "include/gitem.hpp"
 #include "include/gtransition.hpp"
 
+#include <algorithm>
 #include <cassert>
+#include <sstream>
 
 // TODO INVALID_INDEX -> -1
 gstate::gstate()
     : m_index(INVALID_INDEX),
       m_processed(false),
       m_items(),
-      m_transitions() {}
+      m_transitions(),
+      m_log("yvv", "gstat", 0) {}
 
 int gstate::index() const {
     return m_index;
@@ -48,4 +51,18 @@ void gstate::add_transition(const std::shared_ptr<gsymbol> &symbol, const std::s
     assert(state.get());
     assert(m_transitions.find(gtransition(symbol, state)) == m_transitions.end());
     m_transitions.insert(gtransition(symbol, state));
+}
+
+bool gstate::operator<(const gstate &state) const {
+    return std::lexicographical_compare(m_items.begin(), m_items.end(), state.m_items.begin(), state.m_items.end());
+}
+
+std::string gstate::microdump() const {
+    std::stringstream s;
+    s << &*this << " ";
+    s << m_index << " ";
+    s << (m_processed ? "true" : "false") << " ";
+    s << "items[" << m_items.size() << "] ";
+    s << "trans[" << m_transitions.size() << "] ";
+    return s.str();
 }
