@@ -33,4 +33,7 @@ class xtoken {
     int column() const;
     const std::shared_ptr<void> &symbol() const;
     const std::string &lexeme() const;
+
+  public:
+    void json(int sc, bool nested, int in, bool inlined, int uc = 0) const;
 };

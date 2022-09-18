@@ -15,13 +15,13 @@ enum class xtokentype {
 inline std::ostream &operator<<(std::ostream &o, const xtokentype &t) {
     switch (t) {
     case xtokentype::TOKEN_NULL:
-        o << "TOKEN_NULL";
+        o << "TNULL";
         break;
     case xtokentype::TOKEN_REGULAR_EXPRESSION:
-        o << "TOKEN_REGULAR_EXPRESSION";
+        o << "TREGEX";
         break;
     case xtokentype::TOKEN_LITERAL:
-        o << "TOKEN_LITERAL";
+        o << "TLITERAL";
         break;
     }
     return o;
