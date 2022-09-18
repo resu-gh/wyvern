@@ -63,10 +63,10 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     if (m_errors == 0) {
         calculate_terminal_and_non_terminal_symbols(); // FIXME or fixed? (modified)
         calculate_implicit_terminal_symbols();
-        exit(0);
         calculate_symbol_indices();
         calculate_first();
         calculate_follow();
+        exit(0);
         calculate_precedence_of_productions();
         // generate_states( m_start_symbol, m_end_symbol, m_symbols );
         generate_states();
@@ -255,10 +255,18 @@ void ggenerator::calculate_implicit_terminal_symbols() {
     /*debug*/ auto h = m_log.hook("cmp_impl_t");
 
     /*debug*/ m_log.htrace(h, "iterate m_symbols") << "\n";
-    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator; // FIXME iter or const_iter ?
+    using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator;
     for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
 
         std::shared_ptr<gsymbol> non_terminal_symbol = *i; // maybe weak_ptr
+
+        // TODO added
+        // if (non_terminal_symbol->symbol_type() != gsymboltype::SYMBOL_NON_TERMINAL) {
+        //     m_log.out << m_log.cred << "skip " << m_log.chl;
+        //     non_terminal_symbol->json(0, false, 0, true, non_terminal_symbol.use_count());
+        //     continue;
+        // }
+        // TODO added
 
         if (non_terminal_symbol.get() && non_terminal_symbol != m_error_symbol) {
             /*debug*/ m_log.out << m_log.op("processing non-terminal?");
@@ -267,17 +275,19 @@ void ggenerator::calculate_implicit_terminal_symbols() {
             std::shared_ptr<gsymbol> terminal_symbol = non_terminal_symbol->implicit_terminal();
 
             if (terminal_symbol) {
+                assert(terminal_symbol.get() != non_terminal_symbol.get());
+
                 /*debug*/ m_log.out << m_log.op("implicit terminal found");
                 /*debug*/ terminal_symbol->json(0, false, 0, true, terminal_symbol.use_count());
 
-                // TODO continue from here
-                assert(terminal_symbol.get() != non_terminal_symbol.get());
                 terminal_symbol->replace_by_non_terminal(non_terminal_symbol);
+                /*debug*/ m_log.out << m_log.op("replaced with");
+                /*debug*/ terminal_symbol->json(0, false, 0, true, terminal_symbol.use_count());
+
                 replace_references_to_symbol(non_terminal_symbol, terminal_symbol);
 
-                /*debug*/ m_log.trace(1) << m_log.op("reset") << m_log.cred << "<";
-                /*debug*/ m_log.out << i->use_count() << "> " << &*i << " " << i->get() << "\n";
-                // /*debug*/ m_log.out << i->get()->microdump() << "\n";
+                /*debug*/ m_log.htrace(h, "reset symbol") << m_log.cred << "X ";
+                /*debug*/ i->get()->json(0, false, 0, true, i->use_count());
                 i->reset();
             }
         }
@@ -286,48 +296,53 @@ void ggenerator::calculate_implicit_terminal_symbols() {
     symb_iter i = m_symbols.begin();
     while (i != m_symbols.end())
         if (!i->get()) { // i->get() == nullptr
-            /*debug*/ m_log.trace(1) << m_log.op("erase") << m_log.cred << "<";
-            /*debug*/ m_log.out << i->use_count() << "> " << &*i << " " << i->get() << "\n";
+            /*debug*/ m_log.out << m_log.op("erasing nullptr ref") << m_log.cred << "X\n";
             i = m_symbols.erase(i);
         } else {
-            /*debug*/ m_log.trace(1) << m_log.op("symbol");
-            /*debug*/ m_log.out << i->get()->microdump() << m_log.cwhite;
-            /*debug*/ m_log.out << i->get()->identifier() << "\n";
+            /*debug*/ m_log.out << m_log.op("skipping symbol");
+            /*debug*/ i->get()->json(0, false, 0, true, i->use_count());
             ++i;
         }
 
     // i = (!i->get()) ? m_symbols.erase(i) : i + 1;
-    // TODO FIXME check why all gsymbols have the same index
 }
 
 void ggenerator::replace_references_to_symbol(const std::shared_ptr<gsymbol> &to_symbol, const std::shared_ptr<gsymbol> &with_symbol) {
-    /*debug*/ m_log.set_fun("repl_symb_refs");
+    /*debug*/ auto h = m_log.hook("repl_symb_refs");
 
+    /*debug*/ m_log.htrace(h, "iterate m_productions") << "\n";
     using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
     for (prod_iter i = m_productions.begin(); i != m_productions.end(); ++i) {
 
-        std::shared_ptr<gproduction> production = *i;
+        std::shared_ptr<gproduction> production = *i; // TODO maybe weak_ptr or const &
         assert(production.get());
+        /*debug*/ m_log.out << m_log.op("processing production");
+        /*debug*/ production->json(0, false, 0, true, production.use_count());
+
         production->replace_references_to_symbol(to_symbol, with_symbol);
     }
 }
 
 /// calculate the index for each symbol
 void ggenerator::calculate_symbol_indices() {
-    /*debug*/ m_log.set_fun("cmp_indices");
+    /*debug*/ auto h = m_log.hook("cmp_indices");
 
     int index = 0;
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+
+    /*debug*/ m_log.htrace(h, "iterate m_symbols") << "\n";
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator; // FIXME iter or const_iter ?
     for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
 
-        std::shared_ptr<gsymbol> symbol = *i;
         assert(i->get());
 
+        std::shared_ptr<gsymbol> symbol = *i;
+        /*debug*/ m_log.out << m_log.op("processing symbol");
+        /*debug*/ symbol->json(0, false, 0, true, symbol.use_count());
+
         symbol->set_index(index);
-        /*debug*/ m_log.trace(1) << m_log.op("symbol");
-        /*debug*/ m_log.out << m_log.cwhite << symbol->index() << " ";
-        /*debug*/ m_log.out << m_log.chl << symbol->identifier() << "\n";
+        /*debug*/ m_log.out << m_log.op("new index for symbol");
+        /*debug*/ symbol->json(0, false, 0, true, symbol.use_count());
+
         ++index;
     }
 }
@@ -336,28 +351,31 @@ void ggenerator::calculate_symbol_indices() {
 /// until no more terminals can be added to any first
 /// position sets
 void ggenerator::calculate_first() {
-    /*debug*/ m_log.set_fun("cmp_first");
+    /*debug*/ auto h = m_log.hook("cmp_first");
 
     int added = 1;
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::iterator; // FIXME iter or const_iter ?
-                                                                       /// FIXME this is a do-while
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << "until no changes in the first sets\n";
+
+    /*debug*/ m_log.htrace(h, "iterate until no changes in first sets") << "\n";
+
+    // TODO do-while
     while (added > 0) {
         added = 0;
-        /*debug*/ m_log.trace(1) << m_log.op("iter") << m_log.chl << ".m_symbols\n";
+
+        /*debug*/ m_log.htrace(h, "iterate m_symbols") << "\n";
         for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
-            std::shared_ptr<gsymbol> symbol = *i;
             assert(i->get());
-            /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
-            /*debug*/ m_log.out << symbol->microdump() << "\n";
+
+            std::shared_ptr<gsymbol> symbol = *i;
+            /*debug*/ m_log.out << m_log.op("processing symbol");
+            /*debug*/ symbol->json(0, false, 0, true, symbol.use_count());
 
             added += symbol->calculate_first();
-            /*debug*/ m_log.trace(0) << m_log.op("first") << m_log.chl << symbol->microdump() << "\n";
-            // clang-format off
-            /*debug*/ for (auto s : symbol->first())
-            /*debug*/     m_log.trace(1) << m_log.op("") << m_log.cwhite << s->microdump() << "\n";
-            // clang-format on
+            /*debug*/ m_log.out << m_log.op("computed symbol first set") << "\n";
+            /*debug*/ symbol->json(0, false, 0, false, symbol.use_count());
         }
+
+        /*debug*/ m_log.out << m_log.op("added symbols") << "added: " << m_log.cwhite << added << "\n";
     }
 }
 
@@ -365,7 +383,7 @@ void ggenerator::calculate_first() {
 /// until no more terminals can be added to any follow
 /// position sets
 void ggenerator::calculate_follow() {
-    /*debug*/ m_log.set_fun("cmp_follow");
+    /*debug*/ auto h = m_log.hook("cmp_follow");
 
     m_start_symbol->add_symbol_to_follow(m_end_symbol); // TODO maybe useless (repeated inside the loop)
 
