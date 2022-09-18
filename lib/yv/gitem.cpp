@@ -40,18 +40,7 @@ int gitem::add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbo
 }
 
 bool gitem::next_node(const gsymbol &symbol) const {
-    // clang-format off
-    /*debug*/ m_log.trace(1) << m_log.op("") << m_log.ccyan;
-    /*debug*/ if (m_production->symbol_by_position(m_position) != nullptr)
-    /*debug*/     m_log.out << m_production->symbol_by_position(m_position)->identifier();
-    /*debug*/ else
-    /*debug*/     m_log.out << "(nullptr)";
-    /*debug*/ m_log.out << " == " << symbol.identifier() << " ? ";
-    // clang-format off
-    auto res = (&*m_production->symbol_by_position(m_position) == &symbol);
-    /*debug*/ m_log.out << m_log.cwhite << (res ? "true\n" : "false\n");
-
-    return &*m_production->symbol_by_position(m_position) == &symbol; // TODO FIXME check
+    return &*m_production->symbol_by_position(m_position) == &symbol;
 }
 
 bool gitem::operator<(const gitem &item) const {

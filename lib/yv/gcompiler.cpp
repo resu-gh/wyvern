@@ -29,8 +29,7 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
         errors = generator.generate(m_grammar);
 
         if (errors == 0) {
-            /*debug*/ m_log.trace(0) << m_log.op("check");
-            /*debug*/ m_log.out << m_log.chl << "parse && generation: OK\n";
+            /*debug*/ m_log.htrace(h, "parsing and generation -> OK") << "\n";
         }
     }
 

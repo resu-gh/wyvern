@@ -168,26 +168,31 @@ void gsymbol::calculate_identifier() {
         m_identifier.append("_terminal");
 }
 
-// TODO FIXME?
 std::shared_ptr<gsymbol> gsymbol::implicit_terminal() const {
     std::shared_ptr<gsymbol> implicit_terminal = nullptr;
+
     if (m_productions.size() == 1) {
+
         std::shared_ptr<gproduction> production = m_productions.front(); // maybe weak_ptr
         assert(production.get());
+
         if (production.get()->length() == 1 && !production->action().get()) {
+
             std::shared_ptr<gsymbol> symbol = production->symbols().front();
+
             if (symbol->symbol_type() == gsymboltype::SYMBOL_TERMINAL)
                 implicit_terminal = symbol;
         }
     }
+
     return implicit_terminal;
 }
 
-/// TODO FIXME?
 void gsymbol::replace_by_non_terminal(const std::shared_ptr<gsymbol> &non_terminal_symbol) {
     assert(m_symbol_type == gsymboltype::SYMBOL_TERMINAL);
     assert(non_terminal_symbol.get());
     assert(non_terminal_symbol->m_symbol_type == gsymboltype::SYMBOL_NON_TERMINAL);
+
     m_identifier = non_terminal_symbol->m_lexeme;
     m_precedence = non_terminal_symbol->m_precedence;
     m_associativity = non_terminal_symbol->m_associativity;
@@ -233,14 +238,12 @@ int gsymbol::calculate_first() {
 
                 added += m_nullable ? 0 : 1;
                 m_nullable = true;
-
             }
         }
 
     } else {
 
-        added += add_symbol_to_first(self()); /// TODO FIXME check pointer shared_from_this()
-
+        added += add_symbol_to_first(self());
     }
 
     return added;
@@ -261,37 +264,31 @@ int gsymbol::add_symbols_to_first(const std::set<std::shared_ptr<gsymbol>, gsymb
 
 /// calculate the follow set for this symbol
 int gsymbol::calculate_follow() {
-    /*debug*/ m_log.set_fun("cmp_follow");
     int added = 0;
 
     using prod_iter = std::vector<std::shared_ptr<gproduction>>::const_iterator;
 
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << ".m_productions\n";
     for (prod_iter i = m_productions.begin(); i != m_productions.end(); ++i) {
-        std::shared_ptr<gproduction> production = *i;
+
+        std::shared_ptr<gproduction> production = *i; // TODO maybe weak_ptr or const &
         assert(production.get());
-        /*debug*/ m_log.trace(1) << m_log.op("produc") << m_log.chl;
-        /*debug*/ m_log.out << production->microdump() << "\n";
 
         const std::vector<std::shared_ptr<gsymbol>> &symbols = production->symbols();
 
         if (!symbols.empty()) {
-            /*debug*/ m_log.trace(1) << m_log.op("rviter") << "(production).m_symbols\n";
+
             using symb_riter = std::vector<std::shared_ptr<gsymbol>>::const_reverse_iterator;
             symb_riter j = symbols.rbegin();
 
             std::shared_ptr<gsymbol> symbol = *j;
-            /*debug*/ m_log.trace(1) << m_log.op("symbol") << m_log.chl;
-            /*debug*/ m_log.out << symbol->microdump() << "\n";
 
             added += symbol->add_symbols_to_follow(follow());
             ++j;
 
             while (j != symbols.rend() && symbol->nullable()) {
+
                 std::shared_ptr<gsymbol> previous_symbol = *j;
                 assert(previous_symbol.get());
-                /*debug*/ m_log.trace(1) << m_log.op("prev") << m_log.chl;
-                /*debug*/ m_log.out << previous_symbol->microdump() << "\n";
 
                 added += previous_symbol->add_symbols_to_follow(follow());
                 symbol = previous_symbol;
@@ -300,10 +297,9 @@ int gsymbol::calculate_follow() {
             }
 
             while (j != symbols.rend()) {
+
                 std::shared_ptr<gsymbol> previous_symbol = *j;
                 assert(previous_symbol.get());
-                /*debug*/ m_log.trace(1) << m_log.op("prev") << m_log.chl;
-                /*debug*/ m_log.out << previous_symbol->microdump() << "\n";
 
                 added += previous_symbol->add_symbols_to_follow(symbol->first());
                 ++j;
