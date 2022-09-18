@@ -90,5 +90,5 @@ class ggrammar {
     const std::shared_ptr<gaction> &add_action(const std::string &identifier);
 
   public:
-    void dump() const;
+    void dump(bool compact) const;
 };

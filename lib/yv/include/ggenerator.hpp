@@ -66,5 +66,5 @@ class ggenerator {
     std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead(const gitem &item) const;
 
   public:
-    void dump() const;
+    void dump(bool compact) const;
 };

@@ -47,7 +47,7 @@ int gparser::parse(std::string::iterator &start, std::string::iterator &finish, 
     if (!match_grammar()) {
         ++m_errors;
         /*error*/ m_log.ehtrace(h, "ERROR !match_grammar()") << "type: " << ecode::E_SYNTAX << ", ";
-        /*error*/ m_log.err << "line: 1 , #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "line: 1, #errors: " << m_errors << ", ";
         /*error*/ m_log.err << "parsing grammar failed!\n";
     }
 
@@ -146,7 +146,7 @@ bool gparser::match_literal() {
         }
         ++m_errors;
         /*error*/ m_log.ehtrace(h, "ERROR !match_literal()") << "type: " << ecode::E_SYNTAX << ", ";
-        /*error*/ m_log.err << "line: " << m_line << " , #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "line: " << m_line << ", #errors: " << m_errors << ", ";
         /*error*/ m_log.err << "unterminated literal!";
 
         return false;
@@ -357,8 +357,8 @@ bool gparser::expect(const std::string &lexeme) {
 
     ++m_errors;
     /*error*/ m_log.ehtrace(h, "ERROR !expect()") << "type: " << ecode::E_SYNTAX << ", ";
-    /*error*/ m_log.err << "line: " << m_line << " , #errors: " << m_errors << ", ";
-    /*error*/ m_log.err << "expected `" << lexeme << "` not found\n";
+    /*error*/ m_log.err << "line: " << m_line << ", #errors: " << m_errors << ", ";
+    /*error*/ m_log.err << "expected `" << m_log.cwhite << lexeme << m_log.cred << "` not found\n";
 
     return false;
 }

@@ -58,28 +58,13 @@ void gproduction::append_symbol(const std::shared_ptr<gsymbol> &symbol) {
 }
 
 int gproduction::count_references_to_symbol(const std::shared_ptr<gsymbol> &symbol) {
-    /*debug*/ m_log.set_fun("count_refs");
     int references = 0;
 
-    /*debug*/ m_log.trace(0) << m_log.op("iter") << m_log.chl << "(produc).m_symbols\n";
     using symb_iter = std::vector<std::shared_ptr<gsymbol>>::const_iterator;
-    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i) {
-        /*debug*/ m_log.trace(1) << m_log.op("symbol");
-        /*debug*/ m_log.out << m_log.chl << "<" << i->use_count() << "> ";
-        /*debug*/ m_log.out << i->get()->microdump() << "\n";
-
+    for (symb_iter i = m_symbols.begin(); i != m_symbols.end(); ++i)
         references += (&*symbol.get() == &*i->get() ? 1 : 0);
-        // clang-format off
-        /*debug*/ if (&*symbol.get() == &*i->get())
-        /*debug*/     m_log.trace(1) << m_log.op("incr") << "references: " << m_log.cwhite << references << "\n";
-        // clang-format on
-    }
 
     references += (&*m_precedence_symbol.get() == &*symbol.get() ? 1 : 0);
-    // clang-format off
-    /*debug*/ if (&*m_precedence_symbol.get() == &*symbol.get())
-    /*debug*/     m_log.trace(1) << m_log.op("incr") << "references: " << m_log.cwhite << references << "\n";
-    // clang-format on
 
     return references;
 }

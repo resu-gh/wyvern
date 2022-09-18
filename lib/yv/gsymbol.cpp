@@ -117,11 +117,8 @@ void gsymbol::append_production(const std::shared_ptr<gproduction> &production) 
 }
 
 void gsymbol::calculate_identifier() {
-    /*debug*/ m_log.set_fun("calc_ident");
 
     assert(!m_lexeme.empty());
-    // /*debug*/ m_log.trace(0) << m_log.op("test") << m_log.cwhite << "OK ";
-    // /*debug*/ m_log.out << m_log.chl << m_lexeme << m_log.cnr << " is not empty()\n";
 
     // clang-format off
     std::array<std::string, 128> char_names = {
@@ -169,9 +166,6 @@ void gsymbol::calculate_identifier() {
 
     if (m_symbol_type == gsymboltype::SYMBOL_TERMINAL)
         m_identifier.append("_terminal");
-
-    /*debug*/ m_log.trace(0) << m_log.op("to") << m_log.chl;
-    /*debug*/ m_log.out << m_identifier << "\n";
 }
 
 // TODO FIXME?
