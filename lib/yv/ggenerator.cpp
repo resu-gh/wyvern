@@ -12,8 +12,6 @@
 #include <memory>
 #include <vector>
 
-#define br exit(0);
-
 ggenerator::ggenerator()
     : m_identifier(),
       m_actions(),
@@ -828,18 +826,44 @@ void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state
 
             if (production->precedence() == 0 || symbol->precedence() == 0 || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_NULL)) {
 
+                ++m_errors;
+                /*error*/ m_log.ehtrace(h, "ERROR !gen_reduce_tran()") << "type: " << ecode::E_PARSER_PARSE_TABLE_CONFLICT << ", ";
+                /*error*/ m_log.err << "#errors: " << m_errors << ", ";
+                /*error*/ m_log.err << "shift/reduce conflict for ";
+                /*error*/ m_log.err << m_log.cwhite << production->symbol()->identifier();
+                /*error*/ m_log.err << m_log.cred << " on ";
+                /*error*/ m_log.err << m_log.cwhite << symbol->lexeme() << "\n";
+
             } else if (production->precedence() > symbol->precedence() || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_RIGHT)) {
+                // TODO why not production as parameter
+                transition->override_shift_to_reduce(production->symbol(), production->length(), production->precedence(), production->action_index());
             }
 
             break;
 
         case gtranstype::TRANSITION_REDUCE:
-            break;
+            if (production->precedence() == 0 || transition->precedence() == 0 || production->precedence() == transition->precedence()) {
 
+                ++m_errors;
+                /*error*/ m_log.ehtrace(h, "ERROR !gen_reduce_tran()") << "type: " << ecode::E_PARSER_PARSE_TABLE_CONFLICT << ", ";
+                /*error*/ m_log.err << "#errors: " << m_errors << ", ";
+                /*error*/ m_log.err << "reduce/reduce conflict for ";
+                /*error*/ m_log.err << m_log.cwhite << production->symbol()->identifier();
+                /*error*/ m_log.err << m_log.cred << " and ";
+                /*error*/ m_log.err << m_log.cwhite << transition->reduced_symbol()->identifier();
+                /*error*/ m_log.err << m_log.cred << " on ";
+                /*error*/ m_log.err << m_log.cwhite << symbol->lexeme() << "\n";
+
+            } else if (production->precedence() > transition->precedence()) {
+                // TODO why not production as parameter
+                transition->override_reduce_to_reduce(production->symbol(), production->length(), production->precedence(), production->action_index());
+            }
+
+            break;
         }
     }
 
-    std::cin.get();
+    // std::cin.get();
 }
 
 void ggenerator::dump(bool compact) const {

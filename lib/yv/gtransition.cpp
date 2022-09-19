@@ -9,12 +9,20 @@
 gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state)
     : m_symbol(symbol),
       m_state(state),
+      m_reduced_symbol(nullptr),
       m_index(INVALID_INDEX),
+      m_precedence(0),
+      m_action(gaction::INVALID_INDEX),
+      m_reduced_length(0),
       m_type(gtranstype::TRANSITION_SHIFT),
       m_log("yyv", "gtrans", 0) {}
 
 int gtransition::index() const {
     return m_index;
+}
+
+int gtransition::precedence() const {
+    return m_precedence;
 }
 
 gtranstype gtransition::type() const {
@@ -25,12 +33,45 @@ const std::shared_ptr<gsymbol> &gtransition::symbol() const {
     return m_symbol;
 }
 
+const std::shared_ptr<gsymbol> &gtransition::reduced_symbol() const {
+    return m_reduced_symbol;
+}
+
 const std::shared_ptr<gstate> &gtransition::state() const {
     return m_state;
 }
 
 bool gtransition::taken_on_symbol(const std::shared_ptr<gsymbol> &symbol) const {
     return m_symbol == symbol;
+}
+
+void gtransition::override_shift_to_reduce(const std::shared_ptr<gsymbol> &symbol, int length, int precedence, int action) const {
+    assert(m_type == gtranstype::TRANSITION_SHIFT);
+    assert(m_state.get());
+    assert(!m_reduced_symbol.get());
+    assert(length >= 0);
+    assert(precedence >= 0);
+    assert(symbol.get());
+
+    m_type = gtranstype::TRANSITION_REDUCE;
+    m_state = nullptr;
+    m_reduced_symbol = symbol;
+    m_precedence = precedence;
+    m_action = action;
+}
+
+void gtransition::override_reduce_to_reduce(const std::shared_ptr<gsymbol> &symbol, int length, int precedence, int action) const {
+    assert(m_type == gtranstype::TRANSITION_REDUCE);
+    assert(m_reduced_symbol.get());
+    assert(symbol.get());
+    assert(length >= 0);
+    assert(precedence >= 0);
+    assert(m_reduced_symbol != symbol); // TODO FIXME pointers comparison
+    
+    m_reduced_symbol = symbol;
+    m_reduced_length = length;
+    m_precedence = precedence;
+    m_action = action;
 }
 
 bool gtransition::operator<(const gtransition &transition) const {
@@ -65,6 +106,10 @@ void gtransition::json(int sc, bool nested, int in, bool inlined, int uc) const 
     m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "index: ";
     m_log.out << m_log.chl << m_index;
     m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+    
+    if (!inlined) {
+        // TODO continue comment
+    }
 
     // recursive begin
     if (!nested && !inlined) {

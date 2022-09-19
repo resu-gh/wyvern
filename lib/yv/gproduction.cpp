@@ -104,6 +104,10 @@ std::shared_ptr<gsymbol> gproduction::symbol_by_position(int position) const {
     return (position >= 0 && position < int(m_symbols.size())) ? m_symbols[position] : nullptr;
 }
 
+int gproduction::action_index() const {
+    return m_action ? m_action->index() : gaction::INVALID_INDEX; // -1
+}
+
 std::string gproduction::microdump() const {
     std::stringstream s;
     s << (void *)&*this << " ";
