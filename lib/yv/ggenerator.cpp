@@ -563,7 +563,7 @@ void ggenerator::generate_states() {
             }
         }
 
-        // generate_reduce_transitions();
+        generate_reduce_transitions();
         // generate_indices_for_transitions();
     }
 }
@@ -766,6 +766,80 @@ std::set<std::shared_ptr<gsymbol>, gsymbolc> ggenerator::lookahead(const gitem &
     }
 
     return lookahead_symbols;
+}
+
+void ggenerator::generate_reduce_transitions() {
+    /*debug*/ std::string h = m_log.hook("gen_reduce_trans");
+
+    /*debug*/ m_log.htrace(h, "iterate m_states") << "\n";
+    using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::const_iterator;
+    for (state_iter i = m_states.begin(); i != m_states.end(); ++i) {
+
+        std::shared_ptr<gstate> state = *i;
+        assert(state.get());
+        /*debug*/ m_log.out << m_log.op("processing state");
+        /*debug*/ state->json(0, false, 0, true, state.use_count());
+
+        /*debug*/ m_log.htrace(h, "iterate state (var) items") << "\n";
+        using item_iter = std::set<gitem>::const_iterator;
+        for (item_iter item = state->items().begin(); item != state->items().end(); ++item) {
+            /*debug*/ m_log.out << m_log.op("processing item");
+            /*debug*/ item->json(0, false, 0, true);
+
+            if (item->dot_at_end()) {
+                const std::set<std::shared_ptr<gsymbol>, gsymbolc> &symbols = item->lookahead_symbols();
+
+                /*debug*/ m_log.htrace(h, "iterate item (var) lookaheads") << "\n";
+                using symb_iter = std::set<std::shared_ptr<gsymbol>, gsymbolc>::const_iterator;
+                for (symb_iter j = symbols.begin(); j != symbols.end(); ++j) {
+                    std::shared_ptr<gsymbol> symbol = *j;
+                    assert(symbol.get());
+                    /*debug*/ m_log.out << m_log.op("processing lookahead");
+                    /*debug*/ symbol->json(0, false, 0, true, symbol.use_count());
+
+                    generate_reduce_transition(state, symbol, item->production());
+                }
+            }
+        }
+    }
+}
+
+void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state, const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gproduction> &production) {
+    /*debug*/ std::string h = m_log.hook("gen_reduce_tran");
+
+    assert(state.get());
+    assert(symbol.get());
+    assert(production.get());
+
+    std::set<gtransition>::iterator transition = state->find_transition_by_symbol(symbol);
+
+    if (transition == state->transitions().end()) {
+
+        /*debug*/ m_log.htrace(h, "transition on symbol not found") << "\n";
+        // state->add_transition(symbol, production->symbol(), production->length(), production->precedence(), production->action_index());
+
+    } else {
+
+        /*debug*/ m_log.htrace(h, "transition on symbol found") << "\n";
+        /*debug*/ transition->json(0, false, 0, false);
+
+        switch (transition->type()) {
+        case gtranstype::TRANSITION_SHIFT:
+
+            if (production->precedence() == 0 || symbol->precedence() == 0 || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_NULL)) {
+
+            } else if (production->precedence() > symbol->precedence() || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_RIGHT)) {
+            }
+
+            break;
+
+        case gtranstype::TRANSITION_REDUCE:
+            break;
+
+        }
+    }
+
+    std::cin.get();
 }
 
 void ggenerator::dump(bool compact) const {

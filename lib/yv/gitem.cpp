@@ -43,6 +43,10 @@ bool gitem::next_node(const gsymbol &symbol) const {
     return &*m_production->symbol_by_position(m_position) == &symbol;
 }
 
+bool gitem::dot_at_end() const {
+    return m_position == m_production->length();
+}
+
 bool gitem::operator<(const gitem &item) const {
     return m_production->index() < item.m_production->index() || (m_production->index() == item.m_production->index() && m_position < item.m_position);
 }

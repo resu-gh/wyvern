@@ -41,6 +41,9 @@ class gstate {
     int add_item(const std::shared_ptr<gproduction> &production, int position);
     int add_lookahead_symbols(const std::shared_ptr<gproduction> &production, int position, const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols);
     void add_transition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state);
+    
+    // TODO custom impl
+    std::set<gtransition>::iterator find_transition_by_symbol(const std::shared_ptr<gsymbol> &symbol);
 
   public:
     bool operator<(const gstate &state) const;

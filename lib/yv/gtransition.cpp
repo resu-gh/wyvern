@@ -1,5 +1,6 @@
 #include "include/gtransition.hpp"
 #include "include/gstate.hpp"
+#include "include/gtranstype.hpp"
 
 #include <cassert>
 #include <sstream>
@@ -9,10 +10,15 @@ gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shar
     : m_symbol(symbol),
       m_state(state),
       m_index(INVALID_INDEX),
+      m_type(gtranstype::TRANSITION_SHIFT),
       m_log("yyv", "gtrans", 0) {}
 
 int gtransition::index() const {
     return m_index;
+}
+
+gtranstype gtransition::type() const {
+    return m_type;
 }
 
 const std::shared_ptr<gsymbol> &gtransition::symbol() const {
@@ -21,6 +27,10 @@ const std::shared_ptr<gsymbol> &gtransition::symbol() const {
 
 const std::shared_ptr<gstate> &gtransition::state() const {
     return m_state;
+}
+
+bool gtransition::taken_on_symbol(const std::shared_ptr<gsymbol> &symbol) const {
+    return m_symbol == symbol;
 }
 
 bool gtransition::operator<(const gtransition &transition) const {

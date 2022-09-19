@@ -65,6 +65,9 @@ class ggenerator {
     int lookahead_goto(const std::shared_ptr<gstate> &state) const;
     std::set<std::shared_ptr<gsymbol>, gsymbolc> lookahead(const gitem &item) const;
 
+    void generate_reduce_transitions();
+    void generate_reduce_transition(const std::shared_ptr<gstate> &state, const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gproduction> &production);
+
   public:
     void dump(bool compact) const;
 };

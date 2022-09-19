@@ -30,6 +30,7 @@ class gitem {
   public:
     int add_lookahead_symbols(const std::set<std::shared_ptr<gsymbol>, gsymbolc> &lookahead_symbols) const;
     bool next_node(const gsymbol &symbol) const;
+    bool dot_at_end() const;
 
   public:
     std::string microdump() const;

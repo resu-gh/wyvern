@@ -57,6 +57,22 @@ void gstate::add_transition(const std::shared_ptr<gsymbol> &symbol, const std::s
     m_transitions.insert(gtransition(symbol, state));
 }
 
+// TODO custom impl BEGIN
+std::set<gtransition>::iterator gstate::find_transition_by_symbol(const std::shared_ptr<gsymbol> &symbol) {
+    if (symbol.get()) {
+        std::set<gtransition>::iterator i = m_transitions.begin();
+
+        while (i != m_transitions.end() && !i->taken_on_symbol(symbol))
+            ++i;
+
+        if (i != m_transitions.end())
+            return i;
+    }
+
+    return m_transitions.end();
+}
+// TODO custom impl END
+
 bool gstate::operator<(const gstate &state) const {
     return std::lexicographical_compare(m_items.begin(), m_items.end(), state.m_items.begin(), state.m_items.end());
 }

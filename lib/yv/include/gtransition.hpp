@@ -2,6 +2,7 @@
 
 #include "glogger.hpp"
 #include "gsymbol.hpp"
+#include "gtranstype.hpp"
 
 #include <memory>
 #include <string>
@@ -16,6 +17,8 @@ class gtransition {
     std::shared_ptr<gstate> m_state; // TODO FIXME mutable?
     /// transition index
     mutable int m_index;
+    /// transition type
+    mutable gtranstype m_type;
     /// logger
     glogger m_log;
 
@@ -24,8 +27,13 @@ class gtransition {
 
   public:
     int index() const;
+    gtranstype type() const;
     const std::shared_ptr<gsymbol> &symbol() const;
     const std::shared_ptr<gstate> &state() const;
+
+  public:
+    bool taken_on_symbol(const std::shared_ptr<gsymbol> &symbol) const;
+
 
   public:
     bool operator<(const gtransition &transition) const;
