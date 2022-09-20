@@ -33,6 +33,7 @@ class gtransition {
 
   public:
     gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state);
+    gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gsymbol> &reduced_symbol, int reduced_length, int precedence, int action);
 
   public:
     int index() const;
@@ -41,6 +42,9 @@ class gtransition {
     const std::shared_ptr<gsymbol> &symbol() const;
     const std::shared_ptr<gstate> &state() const;
     const std::shared_ptr<gsymbol> &reduced_symbol() const;
+
+  public:
+    void set_index(int index) const;
 
   public:
     bool taken_on_symbol(const std::shared_ptr<gsymbol> &symbol) const;

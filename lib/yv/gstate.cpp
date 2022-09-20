@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <sstream>
 
 // TODO INVALID_INDEX -> -1
@@ -57,8 +58,29 @@ void gstate::add_transition(const std::shared_ptr<gsymbol> &symbol, const std::s
     m_transitions.insert(gtransition(symbol, state));
 }
 
+void gstate::add_transition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gsymbol> &reduce_symbol, int reduced_length, int precedence, int action) {
+
+    assert(symbol.get());
+    assert(reduce_symbol.get());
+    assert(reduced_length >= 0);
+    assert(precedence >= 0);
+
+    std::set<gtransition>::iterator transition = m_transitions.find(gtransition(symbol, reduce_symbol, reduced_length, precedence, action));
+
+    if (transition != m_transitions.end()) {
+
+        assert(transition->type() == gtranstype::TRANSITION_SHIFT);
+        transition->override_shift_to_reduce(reduce_symbol, reduced_length, precedence, action);
+
+    } else {
+
+        transition = m_transitions.insert(gtransition(symbol, reduce_symbol, reduced_length, precedence, action)).first; // TODO useless .first
+    }
+}
+
 // TODO custom impl BEGIN
 std::set<gtransition>::iterator gstate::find_transition_by_symbol(const std::shared_ptr<gsymbol> &symbol) {
+
     if (symbol.get()) {
         std::set<gtransition>::iterator i = m_transitions.begin();
 
@@ -72,6 +94,17 @@ std::set<gtransition>::iterator gstate::find_transition_by_symbol(const std::sha
     return m_transitions.end();
 }
 // TODO custom impl END
+
+void gstate::generate_indices_for_transitions() {
+    int index = 0;
+
+    using trans_iter = std::set<gtransition>::iterator;
+    for (trans_iter transition = m_transitions.begin(); transition != m_transitions.end(); ++transition) {
+
+        transition->set_index(index);
+        ++index;
+    }
+}
 
 bool gstate::operator<(const gstate &state) const {
     return std::lexicographical_compare(m_items.begin(), m_items.end(), state.m_items.begin(), state.m_items.end());

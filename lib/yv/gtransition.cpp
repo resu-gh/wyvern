@@ -9,13 +9,31 @@
 gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state)
     : m_symbol(symbol),
       m_state(state),
-      m_reduced_symbol(nullptr),
+      m_reduced_symbol(nullptr), // TODO nullptr maybe not required
       m_index(INVALID_INDEX),
       m_precedence(0),
       m_action(gaction::INVALID_INDEX),
       m_reduced_length(0),
       m_type(gtranstype::TRANSITION_SHIFT),
-      m_log("yyv", "gtrans", 0) {}
+      m_log("yyv", "gtrans", 0) {
+    assert(m_symbol.get());
+    assert(m_state.get());
+}
+
+gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gsymbol> &reduced_symbol, int reduced_length, int precedence, int action)
+    : m_symbol(symbol),
+      m_state(nullptr), // TODO nullptr maybe not required
+      m_reduced_symbol(reduced_symbol),
+      m_index(INVALID_INDEX),
+      m_precedence(precedence),
+      m_action(action),
+      m_reduced_length(reduced_length),
+      m_type(gtranstype::TRANSITION_REDUCE),
+      m_log("yyv", "gtrans", 0) {
+    assert(m_reduced_symbol.get());
+    assert(m_reduced_length >= 0);
+    assert(m_precedence >= 0);
+}
 
 int gtransition::index() const {
     return m_index;
@@ -39,6 +57,10 @@ const std::shared_ptr<gsymbol> &gtransition::reduced_symbol() const {
 
 const std::shared_ptr<gstate> &gtransition::state() const {
     return m_state;
+}
+
+void gtransition::set_index(int index) const {
+    m_index = index;
 }
 
 bool gtransition::taken_on_symbol(const std::shared_ptr<gsymbol> &symbol) const {
@@ -67,7 +89,7 @@ void gtransition::override_reduce_to_reduce(const std::shared_ptr<gsymbol> &symb
     assert(length >= 0);
     assert(precedence >= 0);
     assert(m_reduced_symbol != symbol); // TODO FIXME pointers comparison
-    
+
     m_reduced_symbol = symbol;
     m_reduced_length = length;
     m_precedence = precedence;
@@ -106,18 +128,44 @@ void gtransition::json(int sc, bool nested, int in, bool inlined, int uc) const 
     m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "index: ";
     m_log.out << m_log.chl << m_index;
     m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
-    
+
+    m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "type: ";
+    m_log.out << m_log.chl << m_type;
+    m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
     if (!inlined) {
-        // TODO continue comment
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "precedence: ";
+        m_log.out << m_log.chl << m_precedence;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "action_index: ";
+        m_log.out << m_log.chl << m_action;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "reduced_length: ";
+        m_log.out << m_log.chl << m_reduced_length;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
     }
 
     // recursive begin
     if (!nested && !inlined) {
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "state: ";
-        m_state->json(sc + 2, true, 0, true, m_state.use_count());
+        if (m_state)
+            m_state->json(sc + 2, true, 0, true, m_state.use_count());
+        else
+            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
 
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbol: ";
-        m_symbol->json(sc + 2, true, 0, true, m_symbol.use_count());
+        if (m_symbol)
+            m_symbol->json(sc + 2, true, 0, true, m_symbol.use_count());
+        else
+            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
+
+        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "reduced_symbol: ";
+        if (m_reduced_symbol)
+            m_reduced_symbol->json(sc + 2, true, 0, true, m_reduced_symbol.use_count());
+        else
+            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
     }
     // recursive end
 

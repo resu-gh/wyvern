@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
 ggenerator::ggenerator()
@@ -212,8 +213,8 @@ void ggenerator::calculate_terminal_and_non_terminal_symbols() {
 
         /// i need to skip over .start, .end and .error (description)
         /// TODO added
-        if (symbol == m_start_symbol || symbol == m_end_symbol || symbol == m_error_symbol)
-            continue;
+        // if (symbol == m_start_symbol || symbol == m_end_symbol || symbol == m_error_symbol)
+        //     continue;
         /// TODO added
 
         /// FIXME very strange check
@@ -562,7 +563,7 @@ void ggenerator::generate_states() {
         }
 
         generate_reduce_transitions();
-        // generate_indices_for_transitions();
+        generate_indices_for_transitions();
     }
 }
 
@@ -790,6 +791,7 @@ void ggenerator::generate_reduce_transitions() {
                 /*debug*/ m_log.htrace(h, "iterate item (var) lookaheads") << "\n";
                 using symb_iter = std::set<std::shared_ptr<gsymbol>, gsymbolc>::const_iterator;
                 for (symb_iter j = symbols.begin(); j != symbols.end(); ++j) {
+
                     std::shared_ptr<gsymbol> symbol = *j;
                     assert(symbol.get());
                     /*debug*/ m_log.out << m_log.op("processing lookahead");
@@ -814,7 +816,10 @@ void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state
     if (transition == state->transitions().end()) {
 
         /*debug*/ m_log.htrace(h, "transition on symbol not found") << "\n";
-        // state->add_transition(symbol, production->symbol(), production->length(), production->precedence(), production->action_index());
+        state->add_transition(symbol, production->symbol(), production->length(), production->precedence(), production->action_index());
+
+        /*debug*/ m_log.out << m_log.op("added transition") << "\n";
+        /*debug*/ state->find_transition_by_symbol(symbol)->json(0, false, 0, false);
 
     } else {
 
@@ -822,7 +827,14 @@ void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state
         /*debug*/ transition->json(0, false, 0, false);
 
         switch (transition->type()) {
-        case gtranstype::TRANSITION_SHIFT:
+        case gtranstype::TRANSITION_SHIFT: {
+
+            /*debug*/ m_log.htrace(h, "multi check (TRANSITION_SHIFT)") << "\n";
+            /*debug*/ production->json(0, false, 0, false, production.use_count());
+            /*debug*/ m_log.out << m_log.ccyan << "prod.precsymb.prec = " << production->precedence() << "\n";
+            /*debug*/ symbol->json(0, false, 0, false, symbol.use_count());
+            /*debug*/ m_log.out << m_log.ccyan << "symb.prec = " << symbol->precedence() << "\n";
+            /*debug*/ m_log.out << m_log.ccyan << "symb.assoc = " << symbol->associativity() << "\n";
 
             if (production->precedence() == 0 || symbol->precedence() == 0 || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_NULL)) {
 
@@ -835,13 +847,15 @@ void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state
                 /*error*/ m_log.err << m_log.cwhite << symbol->lexeme() << "\n";
 
             } else if (production->precedence() > symbol->precedence() || (symbol->precedence() == production->precedence() && symbol->associativity() == gsymbolassoc::ASSOCIATE_RIGHT)) {
+
                 // TODO why not production as parameter
                 transition->override_shift_to_reduce(production->symbol(), production->length(), production->precedence(), production->action_index());
             }
 
             break;
+        }
 
-        case gtranstype::TRANSITION_REDUCE:
+        case gtranstype::TRANSITION_REDUCE: {
             if (production->precedence() == 0 || transition->precedence() == 0 || production->precedence() == transition->precedence()) {
 
                 ++m_errors;
@@ -855,15 +869,37 @@ void ggenerator::generate_reduce_transition(const std::shared_ptr<gstate> &state
                 /*error*/ m_log.err << m_log.cwhite << symbol->lexeme() << "\n";
 
             } else if (production->precedence() > transition->precedence()) {
+
                 // TODO why not production as parameter
                 transition->override_reduce_to_reduce(production->symbol(), production->length(), production->precedence(), production->action_index());
             }
 
             break;
         }
+        }
     }
+}
 
-    // std::cin.get();
+void ggenerator::generate_indices_for_transitions() {
+    /*debug*/ std::string h = m_log.hook("gen_indices_trans");
+
+    /*debug*/ m_log.htrace(h, "iterate m_states") << "\n";
+    using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::const_iterator;
+    for (state_iter i = m_states.begin(); i != m_states.end(); ++i) {
+
+        std::shared_ptr<gstate> state = *i; // TODO maybe weak_ptr or const &
+        assert(state.get());
+
+        /*debug*/ m_log.out << m_log.op("generating transitions indices for state") << "\n";
+        /*debug*/ state->json(0, false, 0, true, state.use_count());
+
+        state->generate_indices_for_transitions();
+
+        // clang-format off
+        /*debug*/ for (auto t : state->transitions())
+        /*debug*/     t.json(0, false, 0, true);
+        // clang-format off
+    }
 }
 
 void ggenerator::dump(bool compact) const {
