@@ -78,6 +78,18 @@ int ggenerator::generate(const std::shared_ptr<ggrammar> &grammar) {
     return errors;
 }
 
+const std::vector<std::shared_ptr<gaction>> &ggenerator::actions() const {
+    return m_actions;
+}
+
+const std::vector<std::shared_ptr<gsymbol>> &ggenerator::symbols() const {
+    return m_symbols;
+}
+
+const std::set<std::shared_ptr<gstate>, gstatec> &ggenerator::states() const {
+    return m_states;
+}
+
 /// calculate identifiers for all symbols
 void ggenerator::calculate_identifiers() {
     /*debug*/ std::string h = m_log.hook("cmp_idents");

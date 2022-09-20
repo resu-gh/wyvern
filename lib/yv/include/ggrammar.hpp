@@ -89,6 +89,10 @@ class ggrammar {
     const std::shared_ptr<gproduction> &add_production(const std::shared_ptr<gsymbol> &symbol, int line);
     const std::shared_ptr<gaction> &add_action(const std::string &identifier);
 
+    /// debug
   public:
     void dump(bool compact) const;
+    ~ggrammar() {
+        std::cout << "\033[0mggrammar " << &*this << " destroyed\n";
+    }
 };
