@@ -20,13 +20,8 @@ class gcompiler {
     std::shared_ptr<ggrammar> m_grammar;
     /// generator
     std::shared_ptr<ggenerator> m_generator;
-
-    /// test
+    /// processed strings
     std::deque<std::string> m_strings;
-    std::unique_ptr<std::vector<paction>> m_actions;
-    std::unique_ptr<std::vector<psymbol>> m_symbols;
-    std::unique_ptr<std::vector<pstate>> m_states;
-    /// test
 
     /// logger
     glogger m_log;
@@ -40,10 +35,4 @@ class gcompiler {
   private:
     const std::string &add_string(const std::string &string);
     void populate_parser_state_machine();
-
-    /// debug
-  public:
-    ~gcompiler() {
-        std::cout << "\033[0mgcompiler " << &*this << " destroyed\n";
-    }
 };

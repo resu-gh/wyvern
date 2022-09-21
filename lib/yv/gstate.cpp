@@ -149,9 +149,7 @@ void gstate::json(int sc, bool nested, int in, bool inlined, int uc) const {
         for (auto i : m_items)
             i.json(sc + 4, true, sc + 4, true);
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
-    }
 
-    if (!nested && !inlined) {
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "transitions: [";
         m_log.out << (m_transitions.size() ? "\n" : "");
         for (auto t : m_transitions)

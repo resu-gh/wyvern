@@ -92,7 +92,4 @@ class ggrammar {
     /// debug
   public:
     void dump(bool compact) const;
-    ~ggrammar() {
-        std::cout << "\033[0mggrammar " << &*this << " destroyed\n";
-    }
 };

@@ -38,6 +38,8 @@ class gtransition {
   public:
     int index() const;
     int precedence() const;
+    int action() const;
+    int reduced_length() const;
     gtranstype type() const;
     const std::shared_ptr<gsymbol> &symbol() const;
     const std::shared_ptr<gstate> &state() const;

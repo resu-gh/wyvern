@@ -90,6 +90,10 @@ const std::set<std::shared_ptr<gstate>, gstatec> &ggenerator::states() const {
     return m_states;
 }
 
+const std::shared_ptr<gstate> &ggenerator::start_state() const {
+    return m_start_state;
+}
+
 /// calculate identifiers for all symbols
 void ggenerator::calculate_identifiers() {
     /*debug*/ std::string h = m_log.hook("cmp_idents");

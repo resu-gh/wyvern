@@ -43,6 +43,14 @@ int gtransition::precedence() const {
     return m_precedence;
 }
 
+int gtransition::action() const {
+    return m_action;
+}
+
+int gtransition::reduced_length() const {
+    return m_reduced_length;
+}
+
 gtranstype gtransition::type() const {
     return m_type;
 }

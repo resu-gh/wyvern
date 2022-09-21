@@ -54,6 +54,7 @@ class ggenerator {
     const std::vector<std::shared_ptr<gaction>> &actions() const;
     const std::vector<std::shared_ptr<gsymbol>> &symbols() const;
     const std::set<std::shared_ptr<gstate>, gstatec> &states() const;
+    const std::shared_ptr<gstate> &start_state() const;
 
     /// tranformations
   private:
@@ -88,10 +89,7 @@ class ggenerator {
     void generate_reduce_transition(const std::shared_ptr<gstate> &state, const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gproduction> &production);
     void generate_indices_for_transitions();
 
-    // debug
+    /// debug
   public:
     void dump(bool compact) const;
-    ~ggenerator() {
-        std::cout << "\033[0mggenerator " << &*this << "destroyed\n";
-    }
 };

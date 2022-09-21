@@ -61,10 +61,4 @@ class gparser {
     bool expect(const std::string &);
     bool is_new_line(std::string::iterator &);                // is_nl
     std::string::iterator &new_line(std::string::iterator &); // nl
-
-    /// debug
-  public:
-    ~gparser() {
-        std::cout << "\033[0mgparser " << &*this << " destroyed\n";
-    }
 };
