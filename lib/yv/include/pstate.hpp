@@ -11,10 +11,9 @@ class pstate {
   public:
     /// state index
     int index;
-    /// number of transitions in this state
-    int length;
     /// available transitions from this state
-    std::shared_ptr<ptransition> transitions; // TODO set?
+    std::vector<ptransition>::const_iterator transitions_begin;
+    std::vector<ptransition>::const_iterator transitions_end;
 
   private:
     /// logger
