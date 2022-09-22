@@ -7,7 +7,7 @@
 glogger::glogger(const std::string &mod, const std::string &loc, int col)
     : out(std::cout),
       err(std::cerr),
-      creset(fg(0)),
+      creset("\033[0m"),
       cred(fg(1)),
       cgreen(fg(2)),
       cyellow(fg(3)),

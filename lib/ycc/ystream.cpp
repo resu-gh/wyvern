@@ -1,5 +1,7 @@
 #include "include/ystream.hpp"
 
+#include <algorithm>
+
 ystream::ystream(const std::string &ifile, const std::string &ofile)
     : m_log(),
       source() {
@@ -37,4 +39,18 @@ void ystream::try_write(const std::string &ofile) {
         m_log.out << m_log.cmagenta << "stdout";
         m_log.out << m_log.creset << "\n";
     }
+}
+
+std::string ystream::sanitize(const std::string &input) {
+    std::size_t length = input.size();
+    std::size_t backsl = std::count(input.begin(), input.end(), '\\');
+    std::string output;
+    output.reserve(length + backsl);
+    for (std::string::const_iterator i = input.begin(); i != input.end(); ++i) {
+        char character = *i;
+        if (character == '\\' || character == '"')
+            output.push_back('\\');
+        output.push_back(character);
+    }
+    return output;
 }
