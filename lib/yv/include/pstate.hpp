@@ -11,9 +11,10 @@ class pstate {
   public:
     /// state index
     int index;
+    /// number of transitions
+    int length;
     /// available transitions from this state
-    std::vector<ptransition>::const_iterator transitions_begin;
-    std::vector<ptransition>::const_iterator transitions_end;
+    const ptransition* transitions;
 
   private:
     /// logger

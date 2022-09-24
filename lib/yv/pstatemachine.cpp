@@ -38,20 +38,20 @@ void pstatemachine::json(int sc, bool nested, int in, bool inlined, int uc) cons
         //     a->json(sc + 4, true, sc + 4, true);
         // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
 
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbols: [\n";
-        for (auto s = symbols_begin; s != symbols_end; ++s)
-            s->json(sc + 4, true, sc + 4, true);
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbols: [\n";
+        // for (auto s = symbols_begin; s != symbols_end; ++s)
+        //     s->json(sc + 4, true, sc + 4, true);
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
 
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "transitions: [\n";
-        for (auto t = transitions_begin; t != transitions_end; ++t)
-            t->json(sc + 4, true, sc + 4, true);
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "transitions: [\n";
+        // for (auto t = transitions_begin; t != transitions_end; ++t)
+        //     t->json(sc + 4, true, sc + 4, true);
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
 
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "states: [\n";
-        for (auto s = states_begin; s != states_end; ++s)
-            s->json(sc + 4, true, sc + 4, true);
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "states: [\n";
+        // for (auto s = states_begin; s != states_end; ++s)
+        //     s->json(sc + 4, true, sc + 4, true);
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
     }
 
     m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc) << "},\n";

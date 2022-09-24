@@ -13,31 +13,31 @@
 class pstatemachine {
   public:
     /// the identifier of the parser
-    const char * identifier;
+    const char *identifier;
     /// number of actions
     int actions_size;
     /// the parser actions for this parser state machine
-    const paction* actions;
-    // std::vector<paction>::const_iterator actions_begin;
-    // std::vector<paction>::const_iterator actions_end;
-
+    const paction *actions;
+    /// number of symbols
+    int symbols_size;
     /// the symbols in the grammar for this parser state machine
-    std::vector<psymbol>::const_iterator symbols_begin;
-    std::vector<psymbol>::const_iterator symbols_end;
-
-    // std::weak_ptr<psymbol> start_symbol;
-    // std::weak_ptr<psymbol> end_symbol;
-    // std::weak_ptr<psymbol> error_symbol;
-
+    const psymbol *symbols;
+    /// the start symbol
+    const psymbol *start_symbol;
+    /// the end symbol
+    const psymbol *end_symbol;
+    /// the error symbol
+    const psymbol *error_symbol;
+    /// number of transitions
+    int transitions_size;
     /// the transitions in the state machine for this parser state machine
-    std::vector<ptransition>::const_iterator transitions_begin;
-    std::vector<ptransition>::const_iterator transitions_end;
-
+    const ptransition *transitions;
+    /// number of states
+    int states_size;
     /// the states in the state machine for this parser state machine
-    std::vector<pstate>::const_iterator states_begin;
-    std::vector<pstate>::const_iterator states_end;
-
-    // std::weak_ptr<pstate> start_state;
+    const pstate *states;
+    /// the start state
+    const pstate *start_state;
 
   private:
     glogger m_log;

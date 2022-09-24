@@ -10,9 +10,9 @@ class psymbol {
     /// symbol index
     int index;
     /// symbol identifier
-    std::string identifier;
+    const char *identifier;
     /// symbol lexeme
-    std::string lexeme;
+    const char *lexeme;
     /// symbol type
     gsymboltype type;
 

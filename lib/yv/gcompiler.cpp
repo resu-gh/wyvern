@@ -21,9 +21,9 @@ gcompiler::gcompiler()
       m_generator(std::make_shared<ggenerator>()),
       m_parser_state_machine(std::make_unique<pstatemachine>()),
       m_actions(),
-      // m_symbols(std::make_shared<std::vector<psymbol>>()),
-      // m_transitions(std::make_shared<std::vector<ptransition>>()),
-      // m_states(std::make_shared<std::vector<pstate>>()),
+      m_symbols(),
+      m_transitions(),
+      m_states(),
       m_log("yyv", "gcomp", 45) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
@@ -83,7 +83,6 @@ void gcompiler::populate_parser_state_machine() {
 
     int actions_size = int(grammar_actions.size());
     std::unique_ptr<paction[]> actions = std::make_unique<paction[]>(actions_size);
-    // assert(actions_size == int(actions->size()));
 
     for (int i = 0; i < actions_size; ++i) {
         const std::shared_ptr<gaction> &grammar_action = grammar_actions[i];
@@ -95,126 +94,113 @@ void gcompiler::populate_parser_state_machine() {
     }
 
     // clang-format off
-    // /*debug*/ m_log.htrace(h, "ggenerator.actions") << "\n";
-    // /*debug*/ for (auto a : grammar_actions)
-    // /*debug*/     a->json(0, false, 0, true, a.use_count());
-    // /*debug*/ m_log.out << m_log.op("computed actions") << "\n";
-    // /*debug*/ for (paction a : *actions)
-    // /*debug*/     a.json(0, false, 0, true);
+    /*debug*/ m_log.htrace(h, "ggenerator.actions") << "\n";
+    /*debug*/ for (auto a : grammar_actions)
+    /*debug*/     a->json(0, false, 0, true, a.use_count());
     // clang-format on
 
-    // const std::vector<std::shared_ptr<gsymbol>> &grammar_symbols = m_generator->symbols();
-    //
-    // int symbols_size = int(grammar_symbols.size());
-    // std::shared_ptr<std::vector<psymbol>> symbols = std::make_shared<std::vector<psymbol>>(symbols_size);
-    // assert(symbols_size == int(symbols->size()));
-    //
-    // for (int i = 0; i < symbols_size; ++i) {
-    //     const std::shared_ptr<gsymbol> &source_symbol = grammar_symbols[i];
-    //     assert(source_symbol);
-    //
-    //     psymbol &symbol = symbols->at(i);
-    //     symbol.index = source_symbol->index();
-    //     symbol.identifier = add_string(source_symbol->identifier());
-    //     symbol.lexeme = add_string(source_symbol->lexeme());
-    //     symbol.type = source_symbol->symbol_type();
-    // }
+    const std::vector<std::shared_ptr<gsymbol>> &grammar_symbols = m_generator->symbols();
+
+    int symbols_size = int(grammar_symbols.size());
+    std::unique_ptr<psymbol[]> symbols = std::make_unique<psymbol[]>(symbols_size);
+
+    for (int i = 0; i < symbols_size; ++i) {
+        const std::shared_ptr<gsymbol> &source_symbol = grammar_symbols[i];
+        assert(source_symbol);
+
+        psymbol &symbol = symbols[i];
+        symbol.index = source_symbol->index();
+        symbol.identifier = add_string(source_symbol->identifier());
+        symbol.lexeme = add_string(source_symbol->lexeme());
+        symbol.type = source_symbol->symbol_type();
+    }
 
     // clang-format off
-    // /*debug*/ m_log.htrace(h, "ggenerator.symbols") << "\n";
-    // /*debug*/ for (auto s : grammar_symbols)
-    // /*debug*/     s->json(0, false, 0, true, s.use_count());
-    // /*debug*/ m_log.out << m_log.op("computed symbols") << "\n";
-    // /*debug*/ for (psymbol s : *symbols)
-    // /*debug*/     s.json(0, false, 0, true);
+    /*debug*/ m_log.htrace(h, "ggenerator.symbols") << "\n";
+    /*debug*/ for (auto s : grammar_symbols)
+    /*debug*/     s->json(0, false, 0, true, s.use_count());
     // clang-format on
 
-    // const std::set<std::shared_ptr<gstate>, gstatec> &grammar_states = m_generator->states();
-    //
-    // int states_size = int(grammar_states.size());
-    // std::shared_ptr<std::vector<pstate>> states = std::make_shared<std::vector<pstate>>(states_size);
-    // assert(states_size == states->size());
-    //
-    // int transitions_size = 0;
-    // using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::iterator;
-    // for (state_iter i = grammar_states.begin(); i != grammar_states.end(); ++i) {
-    //     const std::shared_ptr<gstate> &grammar_state = *i;
-    //     assert(grammar_state.get());
-    //
-    //     transitions_size += int(grammar_state->transitions().size());
-    // }
-    //
-    // std::shared_ptr<std::vector<ptransition>> transitions = std::make_shared<std::vector<ptransition>>(transitions_size);
-    // assert(transitions_size == transitions->size());
-    //
-    // // TODO start state
-    // int state_index = 0;
-    // int transition_index = 0;
-    // for (state_iter i = grammar_states.begin(); i != grammar_states.end(); ++i) {
-    //     const std::shared_ptr<gstate> &grammar_state = *i;
-    //     assert(grammar_state.get());
-    //
-    //     pstate &state = (*states)[state_index];
-    //     assert(&state); // TODO maybe useless ref can't be null
-    //
-    //     const std::set<gtransition> &source_transitions = grammar_state->transitions();
-    //
-    //     state.index = state_index;
-    //     state.transitions_begin = transitions->begin() + transition_index;
-    //
-    //     for (auto j = source_transitions.begin(); j != source_transitions.end(); ++j) {
-    //         const gtransition &source_transition = *j;
-    //         assert(&source_transition); // TODO maybe useless
-    //
-    //         const std::shared_ptr<gsymbol> &source_symbol = source_transition.symbol();
-    //         assert(source_symbol.get());
-    //
-    //         const std::shared_ptr<gstate> &state_transitioned_to = source_transition.state();
-    //         const std::shared_ptr<gsymbol> &reduced_symbol = source_transition.reduced_symbol();
-    //
-    //         ptransition &transition = (*transitions)[transition_index];
-    //
-    //         // TODO check
-    //         transition.symbol = std::make_shared<psymbol>((*symbols)[source_symbol->index()]);
-    //         transition.state = state_transitioned_to ? std::make_shared<pstate>((*states)[state_transitioned_to->index()]) : nullptr;
-    //         transition.reduced_symbol = reduced_symbol ? std::make_shared<psymbol>((*symbols)[reduced_symbol->index()]) : nullptr;
-    //         // TODO check
-    //
-    //         transition.reduced_length = source_transition.reduced_length();
-    //         transition.precedence = source_transition.precedence();
-    //         transition.action = source_transition.action();
-    //         transition.type = source_transition.type();
-    //         transition.index = transition_index;
-    //
-    //         ++transition_index;
-    //     }
-    //
-    //     state.transitions_end = transitions->begin() + transition_index;
-    //
-    //     ++state_index;
-    // }
+    const std::set<std::shared_ptr<gstate>, gstatec> &grammar_states = m_generator->states();
+
+    int states_size = int(grammar_states.size());
+    std::unique_ptr<pstate[]> states = std::make_unique<pstate[]>(states_size);
+
+    int transitions_size = 0;
+    using state_iter = std::set<std::shared_ptr<gstate>, gstatec>::iterator;
+    for (state_iter i = grammar_states.begin(); i != grammar_states.end(); ++i) {
+        const std::shared_ptr<gstate> &grammar_state = *i;
+        assert(grammar_state.get());
+
+        transitions_size += int(grammar_state->transitions().size());
+    }
+
+    std::unique_ptr<ptransition[]> transitions = std::make_unique<ptransition[]>(transitions_size);
+
+    const pstate* start_state = nullptr;
+    int state_index = 0;
+    int transition_index = 0;
+    for (state_iter i = grammar_states.begin(); i != grammar_states.end(); ++i) {
+        const std::shared_ptr<gstate> &grammar_state = *i;
+        assert(grammar_state.get());
+
+        pstate &state = states[state_index];
+
+        const std::set<gtransition> &source_transitions = grammar_state->transitions();
+
+        state.index = state_index;
+        state.length = int(source_transitions.size());
+        state.transitions = &transitions[transition_index];
+
+        if (grammar_state == m_generator->start_state())
+            start_state = &state;
+
+        for (auto j = source_transitions.begin(); j != source_transitions.end(); ++j) {
+            const gtransition &source_transition = *j;
+            assert(&source_transition); // TODO maybe useless
+
+            const std::shared_ptr<gsymbol> &source_symbol = source_transition.symbol();
+            assert(source_symbol.get());
+
+            const std::shared_ptr<gstate> &state_transitioned_to = source_transition.state();
+            const std::shared_ptr<gsymbol> &reduced_symbol = source_transition.reduced_symbol();
+
+            ptransition &transition = transitions[transition_index];
+
+            transition.symbol = &symbols[source_symbol->index()];
+            transition.state = state_transitioned_to ? &states[state_transitioned_to->index()] : nullptr;
+            transition.reduced_symbol = reduced_symbol ? &symbols[reduced_symbol->index()] : nullptr;
+
+            transition.reduced_length = source_transition.reduced_length();
+            transition.precedence = source_transition.precedence();
+            transition.action = source_transition.action();
+            transition.type = source_transition.type();
+            transition.index = transition_index;
+
+            ++transition_index;
+        }
+
+        ++state_index;
+    }
 
     // clang-format off
-    // /*debug*/ m_log.htrace(h, "ggenerator.states") << "\n";
-    // /*debug*/ for (auto s : grammar_states)
-    // /*debug*/     s->json(0, false, 0, true, s.use_count());
-    // /*debug*/ m_log.out << m_log.op("computed states") << "\n";
-    // /*debug*/ for (pstate s : *states)
-    // /*debug*/     s.json(0, false, 0, true);
+    /*debug*/ m_log.htrace(h, "ggenerator.states") << "\n";
+    /*debug*/ for (auto s : grammar_states)
+    /*debug*/     s->json(0, false, 0, true, s.use_count());
     // clang-format on
 
     m_parser_state_machine->identifier = add_string(m_grammar->identifier());
     set_actions(actions, actions_size);
-    // set_symbols(symbols, symbols_size);
-    // set_transitions(transitions, transitions_size);
-    // set_states(states, states_size);
+    set_symbols(symbols, symbols_size);
+    set_transitions(transitions, transitions_size);
+    set_states(states, states_size, start_state);
 
     /*debug*/ assert(actions == nullptr);
     /*debug*/ m_log.htrace(h, "actions (after swap)") << m_log.chl << "== nullptr\n";
-    // /*debug*/ assert(symbols == nullptr);
-    // /*debug*/ m_log.out << m_log.op("symbols (after swap)") << m_log.chl << "== nullptr\n";
-    // /*debug*/ assert(transitions == nullptr);
-    // /*debug*/ m_log.out << m_log.op("transitions (after swap)") << m_log.chl << "== nullptr\n";
+    /*debug*/ assert(symbols == nullptr);
+    /*debug*/ m_log.out << m_log.op("symbols (after swap)") << m_log.chl << "== nullptr\n";
+    /*debug*/ assert(transitions == nullptr);
+    /*debug*/ m_log.out << m_log.op("transitions (after swap)") << m_log.chl << "== nullptr\n";
 }
 
 void gcompiler::set_actions(std::unique_ptr<paction[]> &actions, int actions_size) {
@@ -226,30 +212,31 @@ void gcompiler::set_actions(std::unique_ptr<paction[]> &actions, int actions_siz
     m_parser_state_machine->actions = m_actions.get();
 }
 
-// void gcompiler::set_symbols(std::shared_ptr<std::vector<psymbol>> &symbols, int symbols_size) {
-//     assert(m_parser_state_machine.get());
-//     assert(symbols.get());
-//     assert(symbols_size >= 3);
-//     m_symbols = std::move(symbols);
-//     m_parser_state_machine->symbols_begin = m_symbols->begin();
-//     m_parser_state_machine->symbols_end = m_symbols->end();
-//     // TODO start, end, error symbols
-// }
+void gcompiler::set_symbols(std::unique_ptr<psymbol[]> &symbols, int symbols_size) {
+    assert(m_parser_state_machine.get());
+    assert(symbols.get());
+    assert(symbols_size >= 3);
+    m_symbols = std::move(symbols);
+    m_parser_state_machine->symbols_size = symbols_size;
+    m_parser_state_machine->symbols = m_symbols.get();
+    m_parser_state_machine->start_symbol = &m_symbols[0];
+    m_parser_state_machine->end_symbol = &m_symbols[1];
+    m_parser_state_machine->error_symbol = &m_symbols[2];
+}
 
-// void gcompiler::set_transitions(std::shared_ptr<std::vector<ptransition>> &transitions, int transitions_size) {
-//     assert(transitions.get());
-//     assert(transitions_size >= 0);
-//     m_transitions = std::move(transitions);
-//     m_parser_state_machine->transitions_begin = m_transitions->begin();
-//     m_parser_state_machine->transitions_end = m_transitions->end();
-// }
+void gcompiler::set_transitions(std::unique_ptr<ptransition[]> &transitions, int transitions_size) {
+    assert(transitions.get());
+    assert(transitions_size >= 0);
+    m_transitions = std::move(transitions);
+    m_parser_state_machine->transitions_size = transitions_size;
+    m_parser_state_machine->transitions = m_transitions.get();
+}
 
-// void gcompiler::set_states(std::shared_ptr<std::vector<pstate>> &states, int states_size) {
-//     // TODO insert param start_state
-//     assert(states.get());
-//     assert(states_size >= 0);
-//     // assert(start_state);
-//     m_states = std::move(states);
-//     m_parser_state_machine->states_begin = m_states->begin();
-//     m_parser_state_machine->states_end = m_states->end();
-// }
+void gcompiler::set_states(std::unique_ptr<pstate[]> &states, int states_size, const pstate* start_state) {
+    assert(states.get());
+    assert(states_size >= 0);
+    assert(start_state);
+    m_states = std::move(states);
+    m_parser_state_machine->states = m_states.get();
+    m_parser_state_machine->start_state = start_state;
+}

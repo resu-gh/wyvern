@@ -30,18 +30,6 @@ int main(int argc, char *argv[]) {
     // temp
     auto tab = std::string(4, ' '); // add flag -t <integer>
 
-    std::array<std::string, 4> gs = {
-        "gsymboltype::NONE",
-        "gsymboltype::TERM",
-        "gsymboltype::NON_TERM",
-        "gsymboltype::END",
-    };
-    std::array<std::string, 2> ts = {
-        "gtranstype::SHIFT",
-        "gtranstype::REDUCE",
-    };
-    // temp
-
     ms.out << "#include <wyvern/saction.hpp>\n";
     ms.out << "#include <wyvern/sstate.hpp>\n";
     ms.out << "#include <wyvern/sautomaton.hpp>\n";
@@ -58,38 +46,38 @@ int main(int argc, char *argv[]) {
     for (auto a = automaton->actions; a != automaton->actions + automaton->actions_size; ++a) {
         ms.out << ms.fmt("%s{ %d, \"%s\" },\n", tab.c_str(), a->index, a->identifier);
     }
-    ms.out << tab << "{ -1, nullptr },\n};\n\n";
+    ms.out << ms.fmt("%s{ -1, nullptr },\n};\n\n", tab.c_str());
 
     ms.out << "extern const psymbol symbols[] = {\n";
-    for (auto s = automaton->symbols_begin; s != automaton->symbols_end; ++s) {
-        ms.out << ms.fmt("%s{ %d, \"%s\", \"%s\", %s },\n", tab.c_str(), s->index, s->identifier.c_str(), ms.sanitize(s->lexeme).c_str(), gs[static_cast<int>(s->type)].c_str());
+    for (auto s = automaton->symbols; s != automaton->symbols + automaton->symbols_size; ++s) {
+        ms.out << ms.fmt("%s{ %d, \"%s\", \"%s\", (gsymboltype) %d },\n", tab.c_str(), s->index, s->identifier, ms.sanitize(s->lexeme).c_str(), s->type);
     }
-    ms.out << tab << "{ -1, nullptr, nullptr, " << gs[0] << " },\n};\n\n";
+    ms.out << ms.fmt("%s{ -1, nullptr, nullptr, (gsymboltype) 0 },\n};\n\n", tab.c_str());
 
     ms.out << "extern const ptransition transitions[] = {\n";
-    for (auto t = automaton->transitions_begin; t != automaton->transitions_end; ++t) {
+    for (auto t = automaton->transitions; t != automaton->transitions + automaton->transitions_size; ++t) {
         if (t->reduced_symbol)
-            ms.out << ms.fmt("%s{ &symbols[%d], nullptr, &symbols[%d], %d, %d, %d, %s, %d },\n",
+            ms.out << ms.fmt("%s{ &symbols[%d], nullptr, &symbols[%d], %d, %d, %d, (gtranstype) %d, %d },\n",
                              tab.c_str(),
                              t->symbol ? t->symbol->index : -1,
                              t->reduced_symbol->index,
                              t->reduced_length,
                              t->precedence,
                              t->action,
-                             ts[static_cast<int>(t->type)].c_str(),
+                             t->type,
                              t->index);
         else
-            ms.out << ms.fmt("%s{ &symbols[%d], nullptr, &symbols[%d], %d, %d, %d, %s, %d },\n",
+            ms.out << ms.fmt("%s{ &symbols[%d], nullptr, &symbols[%d], %d, %d, %d, (gtranstype) %d, %d },\n",
                              tab.c_str(),
                              t->symbol ? t->symbol->index : -1,
                              t->state ? t->state->index : -1,
                              t->reduced_length,
                              t->precedence,
                              t->action,
-                             ts[static_cast<int>(t->type)].c_str(),
+                             t->type,
                              t->index);
     }
-    ms.out << tab << "{ nullptr, nullptr, nullptr, 0, 0, 0, " << ts[0] << ", -1 },\n};\n\n";
+    ms.out << ms.fmt("%s{ nullptr, nullptr, nullptr, 0, 0, 0, (gtranstype) 1, -1 },\n};\n\n", tab.c_str());
 
     return EXIT_SUCCESS;
 }

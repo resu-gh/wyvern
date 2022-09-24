@@ -43,23 +43,23 @@ void ptransition::json(int sc, bool nested, int in, bool inlined, int uc) const 
 
     // recursive begin
     if (!nested && !inlined) {
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "state: ";
-        if (state)
-            state.get()->json(sc + 2, true, 0, true, state.use_count());
-        else
-            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
-
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbol: ";
-        if (symbol)
-            symbol->json(sc + 2, true, 0, true, symbol.use_count());
-        else
-            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
-
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "reduced_symbol: ";
-        if (reduced_symbol)
-            reduced_symbol->json(sc + 2, true, 0, true, reduced_symbol.use_count());
-        else
-            m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "state: ";
+        // if (state)
+        //     state.get()->json(sc + 2, true, 0, true, state.use_count());
+        // else
+        //     m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
+        //
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbol: ";
+        // if (symbol)
+        //     symbol->json(sc + 2, true, 0, true, symbol.use_count());
+        // else
+        //     m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
+        //
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "reduced_symbol: ";
+        // if (reduced_symbol)
+        //     reduced_symbol->json(sc + 2, true, 0, true, reduced_symbol.use_count());
+        // else
+        //     m_log.out << m_log.chl << "nullptr" << m_log.cnr << ",\n";
     }
     // recursive end
 
