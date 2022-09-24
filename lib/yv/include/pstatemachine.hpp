@@ -13,11 +13,13 @@
 class pstatemachine {
   public:
     /// the identifier of the parser
-    std::string identifier;
-
+    const char * identifier;
+    /// number of actions
+    int actions_size;
     /// the parser actions for this parser state machine
-    std::vector<paction>::const_iterator actions_begin;
-    std::vector<paction>::const_iterator actions_end;
+    const paction* actions;
+    // std::vector<paction>::const_iterator actions_begin;
+    // std::vector<paction>::const_iterator actions_end;
 
     /// the symbols in the grammar for this parser state machine
     std::vector<psymbol>::const_iterator symbols_begin;

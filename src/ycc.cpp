@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     if (errors != 0)
         return EXIT_FAILURE;
 
-    const std::shared_ptr<pstatemachine> &parser_state_machine = compiler.parser_state_machine();
+    const std::unique_ptr<pstatemachine> &automaton = compiler.parser_state_machine();
     /*debug*/ log.htrace(h, "parser state machine") << "\n";
-    /*debug*/ parser_state_machine->json(0, false, 0, false);
+    /*debug*/ automaton->json(0, false, 0, false);
 
     /*debug*/ log.htrace(h, "writing to output") << log.creset << "\n";
 
@@ -55,19 +55,19 @@ int main(int argc, char *argv[]) {
     ms.out << "using namespace wyvern;\n\n";
 
     ms.out << "extern const paction actions[] = {\n";
-    for (auto a = parser_state_machine->actions_begin; a != parser_state_machine->actions_end; ++a) {
-        ms.out << ms.fmt("%s{ %d, \"%s\" },\n", tab.c_str(), a->index, a->identifier.c_str());
+    for (auto a = automaton->actions; a != automaton->actions + automaton->actions_size; ++a) {
+        ms.out << ms.fmt("%s{ %d, \"%s\" },\n", tab.c_str(), a->index, a->identifier);
     }
     ms.out << tab << "{ -1, nullptr },\n};\n\n";
 
     ms.out << "extern const psymbol symbols[] = {\n";
-    for (auto s = parser_state_machine->symbols_begin; s != parser_state_machine->symbols_end; ++s) {
+    for (auto s = automaton->symbols_begin; s != automaton->symbols_end; ++s) {
         ms.out << ms.fmt("%s{ %d, \"%s\", \"%s\", %s },\n", tab.c_str(), s->index, s->identifier.c_str(), ms.sanitize(s->lexeme).c_str(), gs[static_cast<int>(s->type)].c_str());
     }
     ms.out << tab << "{ -1, nullptr, nullptr, " << gs[0] << " },\n};\n\n";
 
     ms.out << "extern const ptransition transitions[] = {\n";
-    for (auto t = parser_state_machine->transitions_begin; t != parser_state_machine->transitions_end; ++t) {
+    for (auto t = automaton->transitions_begin; t != automaton->transitions_end; ++t) {
         if (t->reduced_symbol)
             ms.out << ms.fmt("%s{ &symbols[%d], nullptr, &symbols[%d], %d, %d, %d, %s, %d },\n",
                              tab.c_str(),

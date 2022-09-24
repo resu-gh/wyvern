@@ -9,7 +9,7 @@ class paction {
     /// action index
     int index;
     /// action identifier
-    std::string identifier;
+    const char* identifier;
 
   private:
     /// logger

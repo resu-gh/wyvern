@@ -33,10 +33,10 @@ void pstatemachine::json(int sc, bool nested, int in, bool inlined, int uc) cons
     // }
 
     if (!nested && !inlined) {
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "actions: [\n";
-        for (auto a = actions_begin; a != actions_end; ++a)
-            a->json(sc + 4, true, sc + 4, true);
-        m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "actions: [\n";
+        // for (auto a = actions_begin; a != actions_end; ++a)
+        //     a->json(sc + 4, true, sc + 4, true);
+        // m_log.out << m_log.cnr << m_log.sp(sc + 2) << "],\n";
 
         m_log.out << m_log.cnr << m_log.sp(sc + 2) << "symbols: [\n";
         for (auto s = symbols_begin; s != symbols_end; ++s)
