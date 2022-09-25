@@ -9,8 +9,8 @@
 gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gstate> &state)
     : m_symbol(symbol),
       m_state(state),
-      m_reduced_symbol(nullptr), // TODO nullptr maybe not required
-      m_index(INVALID_INDEX),
+      m_reduced_symbol(),
+      m_index(gtransition::INVALID_INDEX),
       m_precedence(0),
       m_action(gaction::INVALID_INDEX),
       m_reduced_length(0),
@@ -22,9 +22,9 @@ gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shar
 
 gtransition::gtransition(const std::shared_ptr<gsymbol> &symbol, const std::shared_ptr<gsymbol> &reduced_symbol, int reduced_length, int precedence, int action)
     : m_symbol(symbol),
-      m_state(nullptr), // TODO nullptr maybe not required
+      m_state(),
       m_reduced_symbol(reduced_symbol),
-      m_index(INVALID_INDEX),
+      m_index(gtransition::INVALID_INDEX),
       m_precedence(precedence),
       m_action(action),
       m_reduced_length(reduced_length),

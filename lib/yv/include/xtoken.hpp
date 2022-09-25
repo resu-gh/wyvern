@@ -16,7 +16,7 @@ class xtoken {
     /// column to use when resolving token conflicts or reporting errors
     int m_column;
     /// symbol to return then this token is matched in input
-    std::shared_ptr<void> m_symbol;
+    const void *m_symbol;
     /// literal/regex pattern to match for this token
     std::string m_lexeme;
     /// the tokens that this token has conflicted with
@@ -25,13 +25,13 @@ class xtoken {
     glogger m_log;
 
   public:
-    xtoken(xtokentype type, int line, int column, const std::shared_ptr<void> symbol, const std::string &lexeme);
+    xtoken(xtokentype type, int line, int column, const void *symbol, const std::string &lexeme);
 
   public:
     xtokentype type() const;
     int line() const;
     int column() const;
-    const std::shared_ptr<void> &symbol() const;
+    const void *symbol() const;
     const std::string &lexeme() const;
 
   public:

@@ -10,7 +10,7 @@ gproduction::gproduction(int index, const std::shared_ptr<gsymbol> &symbol, int 
       m_column(column),
       m_action(action),
       m_symbols(),
-      m_precedence_symbol(nullptr),
+      m_precedence_symbol(),
       m_log("yyv", "gprod", 255) {
     assert(m_symbol);
 }

@@ -6,9 +6,13 @@
 #include "include/pstate.hpp"
 #include "include/pstatemachine.hpp"
 #include "include/ptransition.hpp"
+#include "include/xcompiler.hpp"
+#include "include/xtoken.hpp"
+#include "include/xtokentype.hpp"
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
@@ -19,11 +23,13 @@
 gcompiler::gcompiler()
     : m_grammar(std::make_shared<ggrammar>()),
       m_generator(std::make_shared<ggenerator>()),
-      m_parser_state_machine(std::make_unique<pstatemachine>()),
       m_actions(),
       m_symbols(),
       m_transitions(),
       m_states(),
+      m_parser_state_machine(std::make_unique<pstatemachine>()),
+      m_lexer(std::make_unique<xcompiler>()),
+      m_whitespace_lexer(std::make_unique<xcompiler>()),
       m_log("yyv", "gcomp", 45) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {
@@ -46,23 +52,12 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
         if (errors == 0) {
             /*debug*/ m_log.htrace(h, "populating parser state machine") << "\n";
             populate_parser_state_machine();
+            /*debug*/ m_log.htrace(h, "populating lexer state machine") << "\n";
+            populate_lexer_state_machine();            // TODO skipped errors from xcompiler?
+            // /*debug*/ m_log.htrace(h, "populating whitespacelexer state machine") << "\n";
+            // populate_whitespace_lexer_state_machine(); // TODO skipped errors from xcompiler?
         }
     }
-
-    // clang-format off
-    // /*debug*/ m_log.out << m_log.op("gcompiler.actions") << "\n";
-    // /*debug*/ for (auto a : *m_actions)
-    // /*debug*/     a.json(0, false, 0, true);
-    // /*debug*/ m_log.out << m_log.op("gcompiler.symbols") << "\n";
-    // /*debug*/ for (auto s : *m_symbols)
-    // /*debug*/     s.json(0, false, 0, true);
-    // /*debug*/ m_log.out << m_log.op("gcompiler.transitions") << "\n";
-    // /*debug*/ for (auto t : *m_transitions)
-    // /*debug*/     t.json(0, false, 0, true);
-    // /*debug*/ m_log.out << m_log.op("gcompiler.states") << "\n";
-    // /*debug*/ for (auto s : *m_states)
-    // /*debug*/     s.json(0, false, 0, true);
-    // clang-format on
 
     return errors;
 }
@@ -137,7 +132,7 @@ void gcompiler::populate_parser_state_machine() {
 
     std::unique_ptr<ptransition[]> transitions = std::make_unique<ptransition[]>(transitions_size);
 
-    const pstate* start_state = nullptr;
+    const pstate *start_state = nullptr;
     int state_index = 0;
     int transition_index = 0;
     for (state_iter i = grammar_states.begin(); i != grammar_states.end(); ++i) {
@@ -232,11 +227,58 @@ void gcompiler::set_transitions(std::unique_ptr<ptransition[]> &transitions, int
     m_parser_state_machine->transitions = m_transitions.get();
 }
 
-void gcompiler::set_states(std::unique_ptr<pstate[]> &states, int states_size, const pstate* start_state) {
+void gcompiler::set_states(std::unique_ptr<pstate[]> &states, int states_size, const pstate *start_state) {
     assert(states.get());
     assert(states_size >= 0);
     assert(start_state);
     m_states = std::move(states);
     m_parser_state_machine->states = m_states.get();
     m_parser_state_machine->start_state = start_state;
+}
+
+/// generate tokens for generating the lexical analyzer from each
+/// of the terminal symbols in the grammar
+void gcompiler::populate_lexer_state_machine() {
+    /*debug*/ std::string h = m_log.hook("build_scanner_au");
+
+    const std::vector<std::shared_ptr<gsymbol>> &grammar_symbols = m_generator->symbols();
+
+    std::vector<xtoken> tokens;
+    int column = 1;
+
+    for (std::size_t i = 0; i < grammar_symbols.size(); ++i, ++column) {
+        const std::shared_ptr<gsymbol> &grammar_symbol = grammar_symbols[i];
+        assert(grammar_symbol.get());
+
+        if (grammar_symbol->symbol_type() == gsymboltype::SYMBOL_TERMINAL) {
+            psymbol &symbol = m_symbols[i];
+
+            int line = grammar_symbol->line();
+            xtokentype token_type = grammar_symbol->lexeme_type() == glexemetype::LEXEME_REGULAR_EXPRESSION ? xtokentype::TOKEN_REGULAR_EXPRESSION : xtokentype::TOKEN_LITERAL;
+
+            tokens.push_back(xtoken(token_type, line, column, &symbol, symbol.lexeme));
+        }
+    }
+
+    // clang-format off
+    /*debug*/ m_log.htrace(h, "tokens:") << "\n";
+    /*debug*/ for (auto t: tokens)
+    /*debug*/     t.json(0, false, 0, false);
+    // clang-format on
+
+    m_lexer->compile(tokens);
+    m_parser_state_machine->lexer_state_machine = m_lexer->state_machine().get();
+}
+
+void gcompiler::populate_whitespace_lexer_state_machine() {
+    /*debug*/ std::string h = m_log.hook("build_blanks_scanner_au");
+
+    std::unique_ptr<xcompiler> whitespace_lexer_allocations;
+
+    const std::vector<xtoken> &whitespace_tokens = m_grammar->whitespace_tokens();
+
+    if (!whitespace_tokens.empty()) {
+        m_whitespace_lexer->compile(whitespace_tokens);
+        m_parser_state_machine->whitespace_lexer_state_machine = m_whitespace_lexer->state_machine().get();
+    }
 }

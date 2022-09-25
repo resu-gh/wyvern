@@ -18,11 +18,11 @@ ggenerator::ggenerator()
       m_actions(),
       m_productions(),
       m_symbols(),
-      m_start_symbol(nullptr),
-      m_end_symbol(nullptr),
-      m_error_symbol(nullptr),
+      m_start_symbol(),
+      m_end_symbol(),
+      m_error_symbol(),
       m_states(),
-      m_start_state(nullptr),
+      m_start_state(),
       m_errors(0),
       m_log("yyv", "ggenr", 40) {}
 

@@ -1,6 +1,6 @@
 #include "include/xtoken.hpp"
 
-xtoken::xtoken(xtokentype type, int line, int column, const std::shared_ptr<void> symbol, const std::string &lexeme)
+xtoken::xtoken(xtokentype type, int line, int column, const void * symbol, const std::string &lexeme)
     : m_type(type),
       m_line(line),
       m_column(column),
@@ -21,7 +21,7 @@ int xtoken::column() const {
     return m_column;
 }
 
-const std::shared_ptr<void> &xtoken::symbol() const {
+const void *xtoken::symbol() const {
     return m_symbol;
 }
 
@@ -58,6 +58,10 @@ void xtoken::json(int sc, bool nested, int in, bool inlined, int uc) const {
 
         m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "column: ";
         m_log.out << m_log.chl << m_column;
+        m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
+
+        m_log.out << m_log.cnr << m_log.sp(inlined ? 0 : sc + 2) << "symbol: ";
+        m_log.out << m_log.chl << m_symbol;
         m_log.out << m_log.cnr << (inlined ? ", " : ",\n");
     }
 

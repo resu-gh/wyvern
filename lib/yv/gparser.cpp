@@ -10,9 +10,9 @@
 #include <string_view>
 
 gparser::gparser()
-    : m_grammar(nullptr),
-      m_position(nullptr),
-      m_end(nullptr),
+    : m_grammar(),
+      m_position(),
+      m_end(),
       m_line(1),
       m_errors(0),
       m_lexeme(),

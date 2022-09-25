@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glogger.hpp"
+#include "lstatemachine.hpp"
 #include "paction.hpp"
 #include "pstate.hpp"
 #include "psymbol.hpp"
@@ -38,6 +39,10 @@ class pstatemachine {
     const pstate *states;
     /// the start state
     const pstate *start_state;
+    /// the state machine used by the lexer to match tokens
+    const lstatemachine * lexer_state_machine;
+    /// the state machine used by the lexer to skip whitespace
+    const lstatemachine * whitespace_lexer_state_machine;
 
   private:
     glogger m_log;

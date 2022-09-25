@@ -23,11 +23,11 @@ ggrammar::ggrammar()
       m_active_precedence_directive(false),
       m_associativity(gsymbolassoc::ASSOCIATE_NULL),
       m_precedence(0),
-      m_active_production(nullptr),
-      m_active_symbol(nullptr),
-      m_start_symbol(nullptr),
-      m_end_symbol(nullptr),
-      m_error_symbol(nullptr),
+      m_active_production(),
+      m_active_symbol(),
+      m_start_symbol(),
+      m_end_symbol(),
+      m_error_symbol(),
       m_log("yyv", "ggram", 135) {
     /*debug*/ std::string h = m_log.hook("constructor");
 

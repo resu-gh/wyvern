@@ -6,6 +6,7 @@
 #include "pstate.hpp"
 #include "pstatemachine.hpp"
 #include "psymbol.hpp"
+#include "xcompiler.hpp"
 
 #include <array>
 #include <deque>
@@ -24,8 +25,6 @@ class gcompiler {
     /// processed strings
     std::deque<std::string> m_strings;
 
-    /// allocated parser state machine, TODO unique_ptr
-    std::unique_ptr<pstatemachine> m_parser_state_machine;
     /// the parser actions for this parser state machine
     std::unique_ptr<paction[]> m_actions;
     /// the symbols in the grammar for this parser state machine
@@ -34,6 +33,12 @@ class gcompiler {
     std::unique_ptr<ptransition[]> m_transitions;
     /// the states in the state machine for this parser state machine
     std::unique_ptr<pstate[]> m_states;
+    /// allocated lexer state machine
+    std::unique_ptr<xcompiler> m_lexer;
+    /// allocated whitespace lexer state machine;
+    std::unique_ptr<xcompiler> m_whitespace_lexer;
+    /// allocated parser state machine, TODO unique_ptr
+    std::unique_ptr<pstatemachine> m_parser_state_machine;
 
     /// logger
     glogger m_log;
@@ -56,4 +61,6 @@ class gcompiler {
   private:
     const char *add_string(const std::string &string);
     void populate_parser_state_machine();
+    void populate_lexer_state_machine();
+    void populate_whitespace_lexer_state_machine();
 };
