@@ -13,7 +13,7 @@ const std::unique_ptr<lstatemachine> &xcompiler::state_machine() const {
     return m_state_machine;
 }
 
-void xcompiler::compile(const std::vector<xtoken> &tokens) {
+void xcompiler::compile(const std::vector<std::shared_ptr<xtoken>> &tokens) {
     /*debug*/ std::string h = m_log.hook("compile");
 
     std::shared_ptr<xgenerator> generator = std::make_shared<xgenerator>();

@@ -16,7 +16,7 @@ errcalc {
         expr '*' expr [multiply] |
         expr '/' expr [divide] |
         expr error expr [unknown_operator_error] |
-        '(' expr ')' [compound] |
+        '(' expr ')' 'wow\nyes\\\r' [compound] |
         integer [integer]
     ;
     integer: "[0-9]+";

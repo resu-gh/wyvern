@@ -23,8 +23,8 @@ gparser::gparser()
 int gparser::parse(std::string::iterator &start, std::string::iterator &finish, const std::shared_ptr<ggrammar> &grammar) {
     /*debug*/ std::string h = m_log.hook("parse");
 
-    assert(&start);
-    assert(&finish);
+    assert(&start);  // useless
+    assert(&finish); // useless
     assert(grammar.get());
 
     m_position = start;

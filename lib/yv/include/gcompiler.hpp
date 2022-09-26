@@ -62,5 +62,5 @@ class gcompiler {
     const char *add_string(const std::string &string);
     void populate_parser_state_machine();
     void populate_lexer_state_machine();
-    void populate_whitespace_lexer_state_machine();
+    // void populate_whitespace_lexer_state_machine();
 };

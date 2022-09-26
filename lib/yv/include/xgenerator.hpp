@@ -9,7 +9,7 @@
 
 class xgenerator : public std::enable_shared_from_this<xgenerator> {
   private:
-    /// 
+    ///
     std::shared_ptr<xsyntaxtree> m_sytax_tree;
     /// logger
     glogger m_log;
@@ -21,5 +21,5 @@ class xgenerator : public std::enable_shared_from_this<xgenerator> {
     std::shared_ptr<xgenerator> self();
 
   public:
-    int generate(const std::vector<xtoken> &tokens);
+    int generate(const std::vector<std::shared_ptr<xtoken>> &tokens);
 };

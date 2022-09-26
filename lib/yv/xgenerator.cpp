@@ -11,7 +11,7 @@ xgenerator::xgenerator()
 std::shared_ptr<xgenerator> xgenerator::self() {
     return shared_from_this();
 }
-int xgenerator::generate(const std::vector<xtoken> &tokens) {
+int xgenerator::generate(const std::vector<std::shared_ptr<xtoken>> &tokens) {
     /*debug*/ auto h = m_log.hook("generate");
     /*debug*/ m_log.htrace(h, "generator self: ") << self() << "\n";
 

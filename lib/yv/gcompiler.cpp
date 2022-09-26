@@ -53,7 +53,7 @@ int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end)
             /*debug*/ m_log.htrace(h, "populating parser state machine") << "\n";
             populate_parser_state_machine();
             /*debug*/ m_log.htrace(h, "populating lexer state machine") << "\n";
-            populate_lexer_state_machine();            // TODO skipped errors from xcompiler?
+            populate_lexer_state_machine(); // TODO skipped errors from xcompiler?
             // /*debug*/ m_log.htrace(h, "populating whitespacelexer state machine") << "\n";
             // populate_whitespace_lexer_state_machine(); // TODO skipped errors from xcompiler?
         }
@@ -243,7 +243,7 @@ void gcompiler::populate_lexer_state_machine() {
 
     const std::vector<std::shared_ptr<gsymbol>> &grammar_symbols = m_generator->symbols();
 
-    std::vector<xtoken> tokens;
+    std::vector<std::shared_ptr<xtoken>> tokens;
     int column = 1;
 
     for (std::size_t i = 0; i < grammar_symbols.size(); ++i, ++column) {
@@ -256,29 +256,29 @@ void gcompiler::populate_lexer_state_machine() {
             int line = grammar_symbol->line();
             xtokentype token_type = grammar_symbol->lexeme_type() == glexemetype::LEXEME_REGULAR_EXPRESSION ? xtokentype::TOKEN_REGULAR_EXPRESSION : xtokentype::TOKEN_LITERAL;
 
-            tokens.push_back(xtoken(token_type, line, column, &symbol, symbol.lexeme));
+            tokens.push_back(std::make_shared<xtoken>(token_type, line, column, &symbol, symbol.lexeme));
         }
     }
 
     // clang-format off
     /*debug*/ m_log.htrace(h, "tokens:") << "\n";
     /*debug*/ for (auto t: tokens)
-    /*debug*/     t.json(0, false, 0, false);
+    /*debug*/     t->json(0, false, 0, false);
     // clang-format on
 
     m_lexer->compile(tokens);
     m_parser_state_machine->lexer_state_machine = m_lexer->state_machine().get();
 }
 
-void gcompiler::populate_whitespace_lexer_state_machine() {
-    /*debug*/ std::string h = m_log.hook("build_blanks_scanner_au");
-
-    std::unique_ptr<xcompiler> whitespace_lexer_allocations;
-
-    const std::vector<xtoken> &whitespace_tokens = m_grammar->whitespace_tokens();
-
-    if (!whitespace_tokens.empty()) {
-        m_whitespace_lexer->compile(whitespace_tokens);
-        m_parser_state_machine->whitespace_lexer_state_machine = m_whitespace_lexer->state_machine().get();
-    }
-}
+// void gcompiler::populate_whitespace_lexer_state_machine() {
+//     /*debug*/ std::string h = m_log.hook("build_blanks_scanner_au");
+//
+//     std::unique_ptr<xcompiler> whitespace_lexer_allocations;
+//
+//     const std::vector<xtoken> &whitespace_tokens = m_grammar->whitespace_tokens();
+//
+//     if (!whitespace_tokens.empty()) {
+//         m_whitespace_lexer->compile(whitespace_tokens);
+//         m_parser_state_machine->whitespace_lexer_state_machine = m_whitespace_lexer->state_machine().get();
+//     }
+// }

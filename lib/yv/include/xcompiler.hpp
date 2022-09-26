@@ -22,6 +22,6 @@ class xcompiler {
     const std::unique_ptr<lstatemachine> &state_machine() const;
 
   public:
-    void compile(const std::vector<xtoken> &tokens);
+    void compile(const std::vector<std::shared_ptr<xtoken>> &tokens);
     void populate_lexer_state_machine(const std::shared_ptr<xgenerator> &generator);
 };
