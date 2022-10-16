@@ -5,6 +5,7 @@
 #include "gstate.hpp"
 #include "gstatec.hpp"
 #include "gsymbol.hpp"
+
 #include <iostream>
 #include <memory>
 #include <set>

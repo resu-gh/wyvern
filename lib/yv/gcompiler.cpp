@@ -27,9 +27,9 @@ gcompiler::gcompiler()
       m_symbols(),
       m_transitions(),
       m_states(),
-      m_parser_state_machine(std::make_unique<pstatemachine>()),
       m_lexer(std::make_unique<xcompiler>()),
       m_whitespace_lexer(std::make_unique<xcompiler>()),
+      m_parser_state_machine(std::make_unique<pstatemachine>()),
       m_log("yyv", "gcomp", 45) {}
 
 int gcompiler::compile(std::string::iterator &begin, std::string::iterator &end) {

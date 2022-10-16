@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glogger.hpp"
+#include "xaction.hpp"
 #include "xchars.hpp"
 #include "xnode.hpp"
 #include "xnodetype.hpp"
@@ -46,14 +47,25 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void begin_bracket_expression();
     void begin_negative_bracket_expression();
     void end_bracket_expression();
+    void action_expression(const std::string &identifier);
 
     void negative_item_character(int character);
+    void item_character(int character);
 
     void item_alnum();
+    void item_word();
     void item_alpha();
-    void item_lower();
-    void item_upper();
+    void item_blank();
+    void item_cntrl();
     void item_digit();
+    void item_graph();
+    void item_lower();
+    void item_print();
+    void item_punct();
+    void item_space();
+    void item_upper();
+    void item_xdigit();
+    void item_range(int begin, int end);
 
     void negative_item_alnum();
     void negative_item_word();
@@ -76,6 +88,7 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     std::shared_ptr<xnode> regex_node(int begin, int end);
     std::shared_ptr<xnode> regex_node(xnodetype type);
     std::shared_ptr<xnode> regex_node(int begin, int end, const std::shared_ptr<xtoken> &token);
+    std::shared_ptr<xnode> regex_node(const std::shared_ptr<xaction> &action);
 
     void insert_characters(int begin, int end);
     void insert_characters(const std::string &characters);

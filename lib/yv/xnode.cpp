@@ -1,4 +1,5 @@
 #include "include/xnode.hpp"
+#include "include/xaction.hpp"
 #include "include/xtoken.hpp"
 #include <algorithm>
 #include <cassert>
@@ -40,6 +41,19 @@ xnode::xnode(int index, int begin_char, int end_char, const std::shared_ptr<xtok
       m_log("yyv", "xnode", 255) {
     assert(m_begin_char < m_end_char);
     assert(token.get());
+}
+
+xnode::xnode(int index, const std::shared_ptr<xaction> &action)
+    : m_index(index),
+      m_type(xnodetype::LEXER_NODE_ACTION),
+      m_begin_char(xnode::BEGIN_CHARACTER),
+      m_end_char(xnode::END_CHARACTER),
+      m_token(),
+      m_action(action),
+      m_nodes(),
+      m_nullable(false),
+      m_log("yyv", "xnode", 255) {
+    assert(m_action.get());
 }
 
 void xnode::add_node(const std::shared_ptr<xnode> &node) {

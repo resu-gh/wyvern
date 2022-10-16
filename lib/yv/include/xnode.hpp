@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glogger.hpp"
+#include "xaction.hpp"
 #include "xnodetype.hpp"
 #include "xtoken.hpp"
 
@@ -24,6 +25,8 @@ class xnode {
     bool m_nullable;
     /// the token recognized at the node or null if the node doesn't recognize a token
     std::shared_ptr<xtoken> m_token;
+    /// the action taken at the node or null if no action is taken at the node
+    std::shared_ptr<xaction> m_action;
     /// logger
     glogger m_log;
 
@@ -31,6 +34,7 @@ class xnode {
     xnode(int index, xnodetype type);
     xnode(int index, int begin_char, int end_char);
     xnode(int index, int begin_char, int end_char, const std::shared_ptr<xtoken> &token);
+    xnode(int index, const std::shared_ptr<xaction> &action);
 
   public:
     void add_node(const std::shared_ptr<xnode> &node);

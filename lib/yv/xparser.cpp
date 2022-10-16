@@ -55,7 +55,7 @@ bool xparser::match_postfix_expression() {
 }
 
 bool xparser::match_base_expression() {
-    return match_negative_bracket_expression();
+    return match_negative_bracket_expression() || match_bracket_expression() || match_action_expression();
 }
 
 bool xparser::match_negative_bracket_expression() {
@@ -69,6 +69,45 @@ bool xparser::match_negative_bracket_expression() {
             m_syntax_tree->negative_item_character('-');
         expect("]");
         m_syntax_tree->end_bracket_expression();
+        return true;
+    }
+    return false;
+}
+
+bool xparser::match_bracket_expression() {
+    if (match("[")) {
+        m_syntax_tree->begin_bracket_expression();
+        if (match("-"))
+            m_syntax_tree->item_character('-');
+        while (match_item())
+            ;
+        if (match("-"))
+            m_syntax_tree->item_character('-');
+        m_syntax_tree->end_bracket_expression();
+        return true;
+    }
+    return false;
+}
+
+bool xparser::match_action_expression() {
+    if (match(":")) {
+        match_identifier();
+        m_syntax_tree->action_expression(std::string(m_lexeme_begin, m_lexeme_end));
+        expect(":");
+        return true;
+    }
+    return false;
+}
+
+bool xparser::match_identifier() {
+    std::string::const_iterator position = m_position;
+    if (position != m_end && (std::isalpha(*position) || *position == '_')) {
+        ++position;
+        while (position != m_end && (std::isalpha(*position) || *position == '_'))
+            ++position;
+        m_lexeme_begin = m_position;
+        m_lexeme_end = position;
+        m_position = position;
         return true;
     }
     return false;
@@ -127,10 +166,63 @@ bool xparser::match_negative_item() {
     return false;
 }
 
+bool xparser::match_item() {
+    if (match("[:alnum:]")) {
+        m_syntax_tree->item_alnum();
+        return true;
+    } else if (match("[:word:]")) {
+        m_syntax_tree->item_word();
+        return true;
+    } else if (match("[:alpha:]")) {
+        m_syntax_tree->item_alpha();
+        return true;
+    } else if (match("[:blank:]")) {
+        m_syntax_tree->item_blank();
+        return true;
+    } else if (match("[:cntrl:]")) {
+        m_syntax_tree->item_cntrl();
+        return true;
+    } else if (match("[:digit:]")) {
+        m_syntax_tree->item_digit();
+        return true;
+    } else if (match("[:graph:]")) {
+        m_syntax_tree->item_graph();
+        return true;
+    } else if (match("[:lower:]")) {
+        m_syntax_tree->item_lower();
+        return true;
+    } else if (match("[:print:]")) {
+        m_syntax_tree->item_print();
+        return true;
+    } else if (match("[:punct:]")) {
+        m_syntax_tree->item_punct();
+        return true;
+    } else if (match("[:space:]")) {
+        m_syntax_tree->item_space();
+        return true;
+    } else if (match("[:upper:]")) {
+        m_syntax_tree->item_upper();
+        return true;
+    } else if (match("[:xdigit:]")) {
+        m_syntax_tree->item_xdigit();
+        return true;
+    } else if (match_character()) {
+        int character = escape(m_lexeme_begin, m_lexeme_end);
+        if (match_end_of_range()) {
+            int end_character = escape(m_lexeme_begin, m_lexeme_end) + 1;
+            m_syntax_tree->item_range(character, end_character);
+        } else {
+            m_syntax_tree->item_character(character);
+        }
+        return true;
+    }
+    return false;
+}
+
 // TODO FIXME test
 bool xparser::match_character() {
     std::string::const_iterator position = m_position;
-    if (position == m_end) {
+    if (position != m_end) {
         if (*position == '\\') {
             ++position;
             if (position != m_end && (*position == 'x' || *position == 'X')) {

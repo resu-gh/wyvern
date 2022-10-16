@@ -180,9 +180,21 @@ void xsyntaxtree::end_bracket_expression() {
     }
 }
 
+void xsyntaxtree::action_expression(const std::string &identifier) {
+    assert(!identifier.empty());
+    assert(m_generator.get());
+    std::shared_ptr<xnode> node = regex_node(m_generator->add_lexer_action(identifier));
+    m_nodes.push_back(node);
+}
+
 void xsyntaxtree::negative_item_character(int character) {
     assert(character >= xnode::BEGIN_CHARACTER && character < xnode::END_CHARACTER);
     erase_characters(character, character + 1);
+}
+
+void xsyntaxtree::item_character(int character) {
+    assert(character >= xnode::BEGIN_CHARACTER && character < xnode::END_CHARACTER);
+    insert_characters(character, character + 1);
 }
 
 void xsyntaxtree::item_alnum() {
@@ -190,21 +202,63 @@ void xsyntaxtree::item_alnum() {
     item_digit();
 }
 
+void xsyntaxtree::item_word() {
+    item_alpha();
+    item_digit();
+    insert_characters('_', '_' + 1);
+}
+
 void xsyntaxtree::item_alpha() {
     item_lower();
     item_upper();
+}
+
+void xsyntaxtree::item_blank() {
+    insert_characters(" \t");
+}
+
+void xsyntaxtree::item_cntrl() {
+    insert_characters(0x00, 0x1f + 1);
+    insert_characters(0x7f, 0x7f + 1);
+}
+
+void xsyntaxtree::item_digit() {
+    insert_characters('0', '9' + 1);
+}
+
+void xsyntaxtree::item_graph() {
+    insert_characters(0x21, 0x7e + 1);
 }
 
 void xsyntaxtree::item_lower() {
     insert_characters('a', 'z' + 1);
 }
 
+void xsyntaxtree::item_print() {
+    insert_characters(0x20, 0x7e + 1);
+}
+
+void xsyntaxtree::item_punct() {
+    insert_characters("-!\"#$%&'()*+,./:;<=>?@[\\]_`{|}~");
+}
+
+void xsyntaxtree::item_space() {
+    insert_characters(" \t\r\n");
+}
+
 void xsyntaxtree::item_upper() {
     insert_characters('A', 'Z' + 1);
 }
 
-void xsyntaxtree::item_digit() {
-    insert_characters('0', '9' + 1);
+void xsyntaxtree::item_xdigit() {
+    insert_characters("0123456789abcdefABCDEF");
+}
+
+void xsyntaxtree::item_range(int begin, int end) {
+    assert(begin >= xnode::BEGIN_CHARACTER && begin < xnode::END_CHARACTER);
+    assert(end >= xnode::BEGIN_CHARACTER && end < xnode::END_CHARACTER);
+    assert(begin <= end);
+    insert_characters(begin, end);
 }
 
 void xsyntaxtree::negative_item_alnum() {
@@ -346,6 +400,12 @@ std::shared_ptr<xnode> xsyntaxtree::regex_node(int begin, int end, const std::sh
     return node;
 }
 
+std::shared_ptr<xnode> xsyntaxtree::regex_node(const std::shared_ptr<xaction> &action) {
+    std::shared_ptr<xnode> node = std::make_shared<xnode>(m_index, action);
+    ++m_index;
+    return node;
+}
+
 int xsyntaxtree::escape(std::string::const_iterator start, std::string::const_iterator end, std::string::const_iterator *next) {
     // m_log.out << m_log.op("next") << &next << " " << *next << "\n";
     // m_log.out << m_log.op("next2") << &*next << " " << **next << "\n";
@@ -415,7 +475,7 @@ void xsyntaxtree::insert_characters(int begin, int end) {
     }
 }
 
-// TODO TOFIX test this method
+// TODO FIXME test this method
 void xsyntaxtree::insert_characters(const std::string &characters) {
     assert(!characters.empty());
     using char_iter = std::string::const_iterator;

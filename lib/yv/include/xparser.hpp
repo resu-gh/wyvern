@@ -31,7 +31,11 @@ class xparser {
     bool match_postfix_expression();
     bool match_base_expression();
     bool match_negative_bracket_expression();
+    bool match_bracket_expression();
+    bool match_action_expression();
     bool match_negative_item();
+    bool match_item();
+    bool match_identifier();
     bool match_character();
     bool match_end_of_range();
 
