@@ -14,7 +14,7 @@ class pstate {
     /// number of transitions
     int length;
     /// available transitions from this state
-    const ptransition* transitions;
+    const ptransition *transitions;
 
   private:
     /// logger

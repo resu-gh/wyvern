@@ -56,7 +56,7 @@ class gcompiler {
     void set_actions(std::unique_ptr<paction[]> &actions, int actions_size);
     void set_symbols(std::unique_ptr<psymbol[]> &symbols, int symbols_size);
     void set_transitions(std::unique_ptr<ptransition[]> &transitions, int transitions_size);
-    void set_states(std::unique_ptr<pstate[]> &states, int states_size, const pstate* start_state);
+    void set_states(std::unique_ptr<pstate[]> &states, int states_size, const pstate *start_state);
 
   private:
     const char *add_string(const std::string &string);

@@ -1,6 +1,6 @@
 #include "include/xtoken.hpp"
 
-xtoken::xtoken(xtokentype type, int line, int column, const void * symbol, const std::string &lexeme)
+xtoken::xtoken(xtokentype type, int line, int column, const void *symbol, const std::string &lexeme)
     : m_type(type),
       m_line(line),
       m_column(column),

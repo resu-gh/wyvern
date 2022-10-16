@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     /*debug*/ automaton->json(0, false, 0, false);
 
     /*debug*/ log.htrace(h, "writing to output") << log.creset << "\n";
+    exit(0);
 
     // temp
     auto tab = std::string(4, ' '); // add flag -t <integer>

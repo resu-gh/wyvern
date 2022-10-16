@@ -40,9 +40,9 @@ class pstatemachine {
     /// the start state
     const pstate *start_state;
     /// the state machine used by the lexer to match tokens
-    const lstatemachine * lexer_state_machine;
+    const lstatemachine *lexer_state_machine;
     /// the state machine used by the lexer to skip whitespace
-    const lstatemachine * whitespace_lexer_state_machine;
+    const lstatemachine *whitespace_lexer_state_machine;
 
   private:
     glogger m_log;

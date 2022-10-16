@@ -56,10 +56,19 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void item_digit();
 
     void negative_item_alnum();
+    void negative_item_word();
     void negative_item_alpha();
-    void negative_item_lower();
-    void negative_item_upper();
+    void negative_item_blank();
+    void negative_item_cntrl();
     void negative_item_digit();
+    void negative_item_graph();
+    void negative_item_lower();
+    void negative_item_print();
+    void negative_item_punct();
+    void negative_item_space();
+    void negative_item_upper();
+    void negative_item_xdigit();
+    void negative_item_range(int begin, int end);
 
     void parse_regular_expression(const std::shared_ptr<xtoken> &token);
     void parse_literal(const std::shared_ptr<xtoken> &token);
@@ -69,6 +78,8 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     std::shared_ptr<xnode> regex_node(int begin, int end, const std::shared_ptr<xtoken> &token);
 
     void insert_characters(int begin, int end);
+    void insert_characters(const std::string &characters);
+
     void erase_characters(int begin, int end);
 
     int escape(std::string::const_iterator start, std::string::const_iterator end, std::string::const_iterator *next);

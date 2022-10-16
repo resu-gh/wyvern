@@ -1,7 +1,7 @@
 #pragma once
 
-#include "gtranstype.hpp"
 #include "glogger.hpp"
+#include "gtranstype.hpp"
 
 #include <memory>
 
@@ -11,11 +11,11 @@ class pstate;
 class ptransition {
   public:
     /// the symbol that the transition is taken on
-    const psymbol* symbol;
+    const psymbol *symbol;
     /// the state that is transitioned to
-    const pstate* state;
+    const pstate *state;
     /// the symbol that is reduced to (or null if this isn't a reducing transition)
-    const psymbol* reduced_symbol;
+    const psymbol *reduced_symbol;
     /// the number of symbols on the rhs of the reduced production
     int reduced_length;
     /// the precedence of the reduce production (or 0 for the default precedence or no

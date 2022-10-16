@@ -4,6 +4,7 @@
 #include "include/xnode.hpp"
 #include "include/xnodetype.hpp"
 #include "include/xparser.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <memory>
@@ -31,8 +32,7 @@ void xsyntaxtree::reset(const std::vector<std::shared_ptr<xtoken>> &tokens, cons
     /*debug*/ m_log.htrace(h, "m_generator") << &*m_generator << "\n";
 
     calculate_combined_parse_tree(tokens);
-
-    exit(0);
+    // calculate_nullable_first_last_and_follow();
 }
 
 void xsyntaxtree::calculate_combined_parse_tree(const std::vector<std::shared_ptr<xtoken>> &tokens) {
@@ -212,21 +212,63 @@ void xsyntaxtree::negative_item_alnum() {
     negative_item_digit();
 }
 
+void xsyntaxtree::negative_item_word() {
+    negative_item_alpha();
+    negative_item_digit();
+    insert_characters('_', '_' + 1);
+}
+
 void xsyntaxtree::negative_item_alpha() {
     negative_item_lower();
     negative_item_upper();
+}
+
+void xsyntaxtree::negative_item_blank() {
+    insert_characters("\t");
+}
+
+void xsyntaxtree::negative_item_cntrl() {
+    insert_characters(0x00, 0x1f + 1);
+    insert_characters(0x7f, 0x7f + 1);
+}
+
+void xsyntaxtree::negative_item_digit() {
+    insert_characters('0', '9' + 1);
+}
+
+void xsyntaxtree::negative_item_graph() {
+    insert_characters(0x21, 0x7e + 1);
 }
 
 void xsyntaxtree::negative_item_lower() {
     insert_characters('a', 'z' + 1);
 }
 
+void xsyntaxtree::negative_item_print() {
+    insert_characters(0x20, 0x7e + 1);
+}
+
+void xsyntaxtree::negative_item_punct() {
+    insert_characters("-!\"#$%&'()*+,./:;<=>?@[\\]_`{|}~");
+}
+
+void xsyntaxtree::negative_item_space() {
+    insert_characters(" \t\r\n");
+}
+
 void xsyntaxtree::negative_item_upper() {
     insert_characters('A', 'Z' + 1);
 }
 
-void xsyntaxtree::negative_item_digit() {
-    insert_characters('0', '9' + 1);
+void xsyntaxtree::negative_item_xdigit() {
+    insert_characters("0123456789abcdefABCDEF");
+}
+
+void xsyntaxtree::negative_item_range(int begin, int end) {
+    assert(begin >= xnode::BEGIN_CHARACTER && begin < xnode::END_CHARACTER);
+    assert(end >= xnode::BEGIN_CHARACTER && end < xnode::END_CHARACTER);
+    assert(begin <= end);
+    erase_characters(begin, end);
 }
 
 void xsyntaxtree::parse_regular_expression(const std::shared_ptr<xtoken> &token) {
@@ -238,8 +280,6 @@ void xsyntaxtree::parse_regular_expression(const std::shared_ptr<xtoken> &token)
     assert(!token->lexeme().empty());
 
     const std::string &regular_expression = token->lexeme();
-
-    m_log.out << m_log.cred << self() << "\n";
 
     xparser parser;
     bool successful = parser.parse(regular_expression.begin(), regular_expression.end(), self());
@@ -373,6 +413,17 @@ void xsyntaxtree::insert_characters(int begin, int end) {
 
         result = m_bracket_expression_characters.insert(xchars(begin, end)); // useless assignment
     }
+}
+
+// TODO TOFIX test this method
+void xsyntaxtree::insert_characters(const std::string &characters) {
+    assert(!characters.empty());
+    using char_iter = std::string::const_iterator;
+    for (char_iter character = characters.begin(); character != characters.end(); ++character) {
+        insert_characters(*character, *character + 1);
+    }
+    m_log.out << m_log.cred << "CHECK THIS FUNCTION!\n";
+    assert(false);
 }
 
 void xsyntaxtree::erase_characters(int begin, int end) {

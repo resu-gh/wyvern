@@ -2,7 +2,7 @@ SRCD := src lib
 SRCS := $(shell find $(SRCD) -name "*.cpp" -or -name "*.hpp")
 
 BAZELCC := clang++
-BAZELBIN := bazelisk # bazel
+BAZELBIN := bazel
 
 ARGS := ./unit/grammar/errcalc.g
 
