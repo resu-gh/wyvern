@@ -33,11 +33,13 @@ class xparser {
     bool match_negative_bracket_expression();
     bool match_bracket_expression();
     bool match_action_expression();
-    bool match_negative_item();
+    bool match_compound_expression();
+    bool match_character_expression();
     bool match_item();
-    bool match_identifier();
+    bool match_negative_item();
     bool match_character();
     bool match_end_of_range();
+    bool match_identifier();
 
     bool match(const std::string &lexeme);
     bool expect(const std::string &lexeme);

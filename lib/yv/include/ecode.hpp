@@ -14,6 +14,8 @@ enum class ecode {
     E_PARSER_ERROR_ON_LHS,
     /// a `shift-reduce` or `reduce-reduce` conflict was found in the parse table
     E_PARSER_PARSE_TABLE_CONFLICT,
+    /// syntax error occurred while parsing some input
+    E_LEXER_SYNTAX,
 };
 
 inline std::ostream &operator<<(std::ostream &o, const ecode &t) {
@@ -32,6 +34,9 @@ inline std::ostream &operator<<(std::ostream &o, const ecode &t) {
         break;
     case ecode::E_PARSER_PARSE_TABLE_CONFLICT:
         o << "E_PARSER_PARSE_TABLE_CONFLICT";
+        break;
+    case ecode::E_LEXER_SYNTAX:
+        o << "E_LEXER_SYNTAX";
         break;
     }
     return o;

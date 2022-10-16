@@ -12,8 +12,8 @@ xparser::xparser()
       m_end(),
       m_lexeme_begin(),
       m_lexeme_end(),
-      m_log("yyv", "xpars", 255),
-      m_successful(false) {}
+      m_successful(false),
+      m_log("yyv", "xpars", 255) {}
 
 bool xparser::parse(std::string::const_iterator begin, std::string::const_iterator end, const std::shared_ptr<xsyntaxtree> &syntax_tree) {
     m_syntax_tree = syntax_tree;
@@ -55,7 +55,11 @@ bool xparser::match_postfix_expression() {
 }
 
 bool xparser::match_base_expression() {
-    return match_negative_bracket_expression() || match_bracket_expression() || match_action_expression();
+    return match_negative_bracket_expression() || // [^...]
+           match_bracket_expression() ||          // [...]
+           match_action_expression() ||           //
+           match_compound_expression() ||         //
+           match_character_expression();          //
 }
 
 bool xparser::match_negative_bracket_expression() {
@@ -83,6 +87,7 @@ bool xparser::match_bracket_expression() {
             ;
         if (match("-"))
             m_syntax_tree->item_character('-');
+        expect("]");
         m_syntax_tree->end_bracket_expression();
         return true;
     }
@@ -94,6 +99,26 @@ bool xparser::match_action_expression() {
         match_identifier();
         m_syntax_tree->action_expression(std::string(m_lexeme_begin, m_lexeme_end));
         expect(":");
+        return true;
+    }
+    return false;
+}
+
+bool xparser::match_compound_expression() {
+    if (match("(")) {
+        match_or_expression();
+        expect(")");
+        return true;
+    }
+    return false;
+}
+
+bool xparser::match_character_expression() {
+    if (match(".")) {
+        m_syntax_tree->dot();
+        return true;
+    } else if (match_character()) {
+        m_syntax_tree->character(escape(m_lexeme_begin, m_lexeme_end));
         return true;
     }
     return false;

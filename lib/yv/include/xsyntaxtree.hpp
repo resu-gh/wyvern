@@ -36,6 +36,8 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
 
   public:
     void reset(const std::vector<std::shared_ptr<xtoken>> &tokens, const std::shared_ptr<xgenerator> &generator);
+
+  public:
     void calculate_combined_parse_tree(const std::vector<std::shared_ptr<xtoken>> &tokens);
 
     void cat_expression();
@@ -48,10 +50,11 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void begin_negative_bracket_expression();
     void end_bracket_expression();
     void action_expression(const std::string &identifier);
+    void character(int character);
+    void dot();
 
-    void negative_item_character(int character);
+    void item_range(int begin, int end);
     void item_character(int character);
-
     void item_alnum();
     void item_word();
     void item_alpha();
@@ -65,8 +68,9 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void item_space();
     void item_upper();
     void item_xdigit();
-    void item_range(int begin, int end);
 
+    void negative_item_range(int begin, int end);
+    void negative_item_character(int character);
     void negative_item_alnum();
     void negative_item_word();
     void negative_item_alpha();
@@ -80,7 +84,6 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void negative_item_space();
     void negative_item_upper();
     void negative_item_xdigit();
-    void negative_item_range(int begin, int end);
 
     void parse_regular_expression(const std::shared_ptr<xtoken> &token);
     void parse_literal(const std::shared_ptr<xtoken> &token);

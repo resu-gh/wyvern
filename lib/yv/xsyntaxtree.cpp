@@ -1,4 +1,5 @@
 #include "include/xsyntaxtree.hpp"
+#include "include/ecode.hpp"
 #include "include/xchars.hpp"
 #include "include/xgenerator.hpp"
 #include "include/xnode.hpp"
@@ -7,6 +8,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
+#include <iostream>
 #include <memory>
 #include <set>
 #include <utility>
@@ -197,6 +200,16 @@ void xsyntaxtree::item_character(int character) {
     insert_characters(character, character + 1);
 }
 
+void xsyntaxtree::dot() {
+    std::shared_ptr<xnode> node = regex_node(xnode::BEGIN_CHARACTER, xnode::END_CHARACTER);
+    m_nodes.push_back(node);
+}
+
+void xsyntaxtree::character(int character) {
+    std::shared_ptr<xnode> node = regex_node(character, character + 1);
+    m_nodes.push_back(node);
+}
+
 void xsyntaxtree::item_alnum() {
     item_alpha();
     item_digit();
@@ -337,6 +350,28 @@ void xsyntaxtree::parse_regular_expression(const std::shared_ptr<xtoken> &token)
 
     xparser parser;
     bool successful = parser.parse(regular_expression.begin(), regular_expression.end(), self());
+
+    if (!successful) {
+        ++m_errors;
+        /*error*/ m_log.ehtrace(h, "ERROR !parse_regex()") << "type: " << ecode::E_LEXER_SYNTAX << ", ";
+        /*error*/ m_log.err << "line: 1, #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "syntax error in regex `" << token->lexeme() << "`!\n";
+        m_nodes.clear();
+    } else {
+        // add the end char to the regex that has just been
+        // parsed and the combine that regex with any literals
+        // or regex that have benn previously parsed using
+        // an or expression
+        assert(m_nodes.size() == 1 | m_nodes.size() == 2);
+        assert(m_nodes.back().get());
+
+        std::shared_ptr<xnode> node = regex_node(xnode::INVALID_BEGIN_CHARACTER, xnode::INVALID_END_CHARACTER, token);
+        m_nodes.push_back(node);
+        cat_expression();
+
+        while (m_nodes.size() > 1)
+            or_expression();
+    }
 }
 
 void xsyntaxtree::parse_literal(const std::shared_ptr<xtoken> &token) {
