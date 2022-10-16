@@ -35,6 +35,7 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     std::shared_ptr<xsyntaxtree> self();
 
   public:
+    void reset();
     void reset(const std::vector<std::shared_ptr<xtoken>> &tokens, const std::shared_ptr<xgenerator> &generator);
 
   public:

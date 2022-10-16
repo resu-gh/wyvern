@@ -27,11 +27,20 @@ std::shared_ptr<xsyntaxtree> xsyntaxtree::self() {
     return shared_from_this();
 }
 
+void xsyntaxtree::reset() {
+    m_generator = nullptr;
+    m_bracket_expression_characters.clear();
+    m_index = 0;
+    m_nodes.clear();
+    m_errors = 0;
+}
+
 void xsyntaxtree::reset(const std::vector<std::shared_ptr<xtoken>> &tokens, const std::shared_ptr<xgenerator> &generator) {
     /*debug*/ std::string h = m_log.hook("reset");
     /*debug*/ m_log.htrace(h, "generator (param)") << &*generator << "\n";
 
     assert(generator);
+    reset();
     m_generator = generator;
     /*debug*/ m_log.htrace(h, "m_generator") << &*m_generator << "\n";
 
@@ -77,6 +86,7 @@ void xsyntaxtree::calculate_combined_parse_tree(const std::vector<std::shared_pt
             assert(false);
             break;
         }
+        dump();
 
         /*debug*/ m_log.htrace(h, "created node") << "\n";
         // clang-format off
@@ -571,19 +581,49 @@ void xsyntaxtree::dump() const {
     /*debug*/ m_log.htrace(h, "dumping the tree...") << "\n";
 
     dump_nodes(m_nodes, 0);
-    m_log.out << "\n";
 }
+
+#include <chrono>
+#include <thread>
 
 void xsyntaxtree::dump_nodes(const std::vector<std::shared_ptr<xnode>> &nodes, int level) const {
     using node_iter = std::vector<std::shared_ptr<xnode>>::const_iterator;
-    for (node_iter i = m_nodes.begin(); i != m_nodes.end(); ++i) {
+    for (node_iter i = nodes.begin(); i != nodes.end(); ++i) {
         assert(i->get());
         const std::shared_ptr<xnode> &node = *i;
 
         m_log.out << m_log.cyellow;
         m_log.out << std::string(level, ' ');
         m_log.out << node->index() << ", ";
-        m_log.out << node->type() << ", ";
-        m_log.out << node->lexeme() << ", ";
+        m_log.out << node->type() << ", [";
+        m_log.out << node->begin_char() << ", ";
+        m_log.out << node->end_char() << "), is_nullable=";
+        m_log.out << (node->is_nullable() ? "true" : "false") << ", ";
+        m_log.out << "first={";
+        dump_positions(node->first_positions());
+        m_log.out << "}, last={";
+        dump_positions(node->last_positions());
+        m_log.out << "}, follow={";
+        dump_positions(node->follow_positions());
+        m_log.out << "}\n";
+
+        if (!node->nodes().empty())
+            dump_nodes(node->nodes(), level + 1);
+    }
+}
+
+void xsyntaxtree::dump_positions(const std::set<std::shared_ptr<xnode>, xnodec> &positions) const {
+    std::set<std::shared_ptr<xnode>, xnodec>::const_iterator i = positions.begin();
+    if (i != positions.end()) {
+        assert(i->get());
+        const std::shared_ptr<xnode> &node = *i;
+        m_log.out << node->index() << ", ";
+        ++i;
+    }
+    while (i != positions.end()) {
+        assert(i->get());
+        const std::shared_ptr<xnode> &node = *i;
+        m_log.out << node->index() << ", ";
+        ++i;
     }
 }

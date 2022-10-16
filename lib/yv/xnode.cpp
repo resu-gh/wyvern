@@ -85,8 +85,32 @@ xnodetype xnode::type() const {
     return m_type;
 }
 
+int xnode::begin_char() const {
+    return m_begin_char;
+}
+
+int xnode::end_char() const {
+    return m_end_char;
+}
+
 bool xnode::is_nullable() const {
     return m_nullable;
+}
+
+const std::vector<std::shared_ptr<xnode>> &xnode::nodes() const {
+    return m_nodes;
+}
+
+const std::set<std::shared_ptr<xnode>, xnodec> &xnode::first_positions() const {
+    return m_first_positions;
+}
+
+const std::set<std::shared_ptr<xnode>, xnodec> &xnode::last_positions() const {
+    return m_last_positions;
+}
+
+const std::set<std::shared_ptr<xnode>, xnodec> &xnode::follow_positions() const {
+    return m_follow_positions;
 }
 
 // TODO FIXME custom impl

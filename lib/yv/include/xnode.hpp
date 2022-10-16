@@ -50,7 +50,13 @@ class xnode : public std::enable_shared_from_this<xnode> {
   public:
     int index() const;
     xnodetype type() const;
+    int begin_char() const;
+    int end_char() const;
     bool is_nullable() const;
+    const std::vector<std::shared_ptr<xnode>> &nodes() const;
+    const std::set<std::shared_ptr<xnode>, xnodec> &first_positions() const;
+    const std::set<std::shared_ptr<xnode>, xnodec> &last_positions() const;
+    const std::set<std::shared_ptr<xnode>, xnodec> &follow_positions() const;
 
   public:
     std::string lexeme() const;

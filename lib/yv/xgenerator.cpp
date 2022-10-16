@@ -9,7 +9,8 @@
 xgenerator::xgenerator()
     : m_sytax_tree(std::make_shared<xsyntaxtree>()),
       m_actions(),
-      m_log("yyv", "xgenr", 255) {}
+      m_log("yyv", "xgenr", 255) {
+}
 
 std::shared_ptr<xgenerator> xgenerator::self() {
     return shared_from_this();
