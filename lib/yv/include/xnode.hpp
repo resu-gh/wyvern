@@ -2,14 +2,16 @@
 
 #include "glogger.hpp"
 #include "xaction.hpp"
+#include "xnodec.hpp"
 #include "xnodetype.hpp"
 #include "xtoken.hpp"
 
 #include <climits>
 #include <memory>
+#include <set>
 #include <vector>
 
-class xnode {
+class xnode : public std::enable_shared_from_this<xnode> {
   private:
     /// node index
     int m_index;
@@ -27,6 +29,12 @@ class xnode {
     std::shared_ptr<xtoken> m_token;
     /// the action taken at the node or null if no action is taken at the node
     std::shared_ptr<xaction> m_action;
+    /// the first positions at the node
+    std::set<std::shared_ptr<xnode>, xnodec> m_first_positions;
+    /// the last positions at the node
+    std::set<std::shared_ptr<xnode>, xnodec> m_last_positions;
+    /// the follow positions at the node
+    std::set<std::shared_ptr<xnode>, xnodec> m_follow_positions;
     /// logger
     glogger m_log;
 
@@ -37,7 +45,27 @@ class xnode {
     xnode(int index, const std::shared_ptr<xaction> &action);
 
   public:
+    std::shared_ptr<xnode> self();
+
+  public:
+    int index() const;
+    xnodetype type() const;
+    bool is_nullable() const;
+
+  public:
+    std::string lexeme() const;
+
+  public:
     void add_node(const std::shared_ptr<xnode> &node);
+
+  public:
+    void calculate_nullable();
+    void calculate_first_positions();
+    void calculate_last_positions();
+    void calculate_follow_positions();
+
+  public:
+    bool operator<(const xnode &node) const;
 
   public:
     void json(int sc, bool nested, int in, bool inlined, int uc = 0) const;

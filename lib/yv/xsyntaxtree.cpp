@@ -13,6 +13,7 @@
 #include <memory>
 #include <set>
 #include <utility>
+#include <vector>
 
 xsyntaxtree::xsyntaxtree()
     : m_generator(),
@@ -35,7 +36,25 @@ void xsyntaxtree::reset(const std::vector<std::shared_ptr<xtoken>> &tokens, cons
     /*debug*/ m_log.htrace(h, "m_generator") << &*m_generator << "\n";
 
     calculate_combined_parse_tree(tokens);
-    // calculate_nullable_first_last_and_follow();
+    calculate_nullable_first_last_and_follow();
+}
+
+void xsyntaxtree::calculate_nullable_first_last_and_follow() {
+    /*debug*/ std::string h = m_log.hook("calc_nullable_first_and_follow");
+    /*debug*/ m_log.htrace(h, "iter nodes") << "\n";
+
+    if (!m_nodes.empty()) {
+        assert(m_nodes.size() == 1);
+        assert(m_nodes.back());
+        const std::shared_ptr<xnode> &node = m_nodes.back();
+        node->json(false, false, false, false);
+        node->calculate_nullable();
+        node->calculate_first_positions();
+        node->calculate_last_positions();
+        node->calculate_follow_positions();
+        /*debug*/ m_log.htrace(h, "post-proc") << "\n";
+        node->json(false, false, false, false, node.use_count());
+    }
 }
 
 void xsyntaxtree::calculate_combined_parse_tree(const std::vector<std::shared_ptr<xtoken>> &tokens) {
@@ -354,7 +373,7 @@ void xsyntaxtree::parse_regular_expression(const std::shared_ptr<xtoken> &token)
     if (!successful) {
         ++m_errors;
         /*error*/ m_log.ehtrace(h, "ERROR !parse_regex()") << "type: " << ecode::E_LEXER_SYNTAX << ", ";
-        /*error*/ m_log.err << "line: 1, #errors: " << m_errors << ", ";
+        /*error*/ m_log.err << "line: " << token->line() << ", #errors: " << m_errors << ", ";
         /*error*/ m_log.err << "syntax error in regex `" << token->lexeme() << "`!\n";
         m_nodes.clear();
     } else {
@@ -362,7 +381,7 @@ void xsyntaxtree::parse_regular_expression(const std::shared_ptr<xtoken> &token)
         // parsed and the combine that regex with any literals
         // or regex that have benn previously parsed using
         // an or expression
-        assert(m_nodes.size() == 1 | m_nodes.size() == 2);
+        assert(m_nodes.size() == 1 || m_nodes.size() == 2);
         assert(m_nodes.back().get());
 
         std::shared_ptr<xnode> node = regex_node(xnode::INVALID_BEGIN_CHARACTER, xnode::INVALID_END_CHARACTER, token);
@@ -544,5 +563,27 @@ void xsyntaxtree::erase_characters(int begin, int end) {
             assert(inserted);
             (void)inserted; // TODO why? useless?
         }
+    }
+}
+
+void xsyntaxtree::dump() const {
+    /*debug*/ std::string h = m_log.hook("dump");
+    /*debug*/ m_log.htrace(h, "dumping the tree...") << "\n";
+
+    dump_nodes(m_nodes, 0);
+    m_log.out << "\n";
+}
+
+void xsyntaxtree::dump_nodes(const std::vector<std::shared_ptr<xnode>> &nodes, int level) const {
+    using node_iter = std::vector<std::shared_ptr<xnode>>::const_iterator;
+    for (node_iter i = m_nodes.begin(); i != m_nodes.end(); ++i) {
+        assert(i->get());
+        const std::shared_ptr<xnode> &node = *i;
+
+        m_log.out << m_log.cyellow;
+        m_log.out << std::string(level, ' ');
+        m_log.out << node->index() << ", ";
+        m_log.out << node->type() << ", ";
+        m_log.out << node->lexeme() << ", ";
     }
 }

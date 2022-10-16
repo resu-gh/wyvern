@@ -19,6 +19,8 @@ int xgenerator::generate(const std::vector<std::shared_ptr<xtoken>> &tokens) {
     /*debug*/ m_log.htrace(h, "generator self: ") << self() << "\n";
 
     m_sytax_tree->reset(tokens, self());
+    /*debug*/ m_log.htrace(h, "xsyntaxtree dump") << "\n";
+    m_sytax_tree->dump();
     return 0;
 }
 

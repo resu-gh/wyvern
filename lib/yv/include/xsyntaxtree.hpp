@@ -39,6 +39,7 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
 
   public:
     void calculate_combined_parse_tree(const std::vector<std::shared_ptr<xtoken>> &tokens);
+    void calculate_nullable_first_last_and_follow();
 
     void cat_expression();
     void or_expression();
@@ -99,4 +100,9 @@ class xsyntaxtree : public std::enable_shared_from_this<xsyntaxtree> {
     void erase_characters(int begin, int end);
 
     int escape(std::string::const_iterator start, std::string::const_iterator end, std::string::const_iterator *next);
+
+  public:
+    void dump() const;
+    void dump_nodes(const std::vector<std::shared_ptr<xnode>> &nodes, int level) const;
+    void dump_positions(const std::set<std::shared_ptr<xnode>, xnodec> &positions) const;
 };
